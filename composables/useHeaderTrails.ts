@@ -1,4 +1,4 @@
-export const useHeaderTrails = (currentPageRoute, currentPageTitle = '') => {
+export const useHeaderTrails = (currentPageRoute, currentPageTitle = '', project = false) => {
   const route = useRoute();
   const headerStore = usePageHeaderStore();
   const trailStore = useTrailStore();
@@ -6,6 +6,7 @@ export const useHeaderTrails = (currentPageRoute, currentPageTitle = '') => {
   const { t } = useI18n();
 
   const { trailId, id } = route.params;
+
   onBeforeMount(() => {
     headerStore.showHeader = true;
   });
@@ -15,23 +16,48 @@ export const useHeaderTrails = (currentPageRoute, currentPageTitle = '') => {
     () => {
       if (learningPlanStore.loading || trailStore.loading) return [];
 
-      const items = [
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${id}`,
-        },
-        {
-          title: t('pages.courses.trails'),
-          disabled: false,
-          to: `/courses/${id}/trails`,
-        },
-        {
-          title: trailStore.trail?.title || '',
-          disabled: !currentPageRoute,
-          to: `/courses/${id}/trails/${trailId}`,
-        },
-      ];
+      const items = !project
+        ? [
+            {
+              title: learningPlanStore.learningPlan?.title || '',
+              disabled: false,
+              to: `/courses/${id}`,
+            },
+            {
+              title: t('pages.courses.trails'),
+              disabled: false,
+              to: `/courses/${id}/trails`,
+            },
+            {
+              title: trailStore.trail?.title || '',
+              disabled: !currentPageRoute,
+              to: `/courses/${id}/trails/${trailId}`,
+            },
+          ]
+        : [
+            {
+              title: t('pages.projects.common.my_projects'),
+              to: '/projects/me',
+            },
+            {
+              title: learningPlanStore.learningPlan?.title || '',
+              to: `/projects/${id}/overview`,
+              disabled: /projects\/[0-9]+\/overview/.test(route.path),
+            },
+            {
+              title: t('components.trails.header.chip'),
+              to: `/projects/${id}/individual_learning`,
+              disabled: false,
+            },
+            {
+              title: t('pages.courses.trails'),
+              disabled: true,
+            },
+            {
+              title: trailStore.trail?.title ?? '',
+              disabled: true,
+            },
+          ];
 
       if (currentPageRoute)
         items.push({
