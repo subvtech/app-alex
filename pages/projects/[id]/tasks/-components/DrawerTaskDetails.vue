@@ -85,6 +85,56 @@
       </v-row>
 
       <alex-learningplan-task-description v-model="description" class="my-4" :mention-users="mentionUsers" edit />
+
+      <!-- Entregas-->
+      <p class="text-h3 mt-6">
+        {{ $t('components.learningPlan.drawer.task.submission.label') }}
+      </p>
+      <v-row class="mx-0 mt-3 mb-4">
+        <v-col class="pa-0 d-flex align-center" cols="6">
+          <alex-custom-switch
+            v-model="submissionRequired"
+            :label="$t('components.learningPlan.drawer.task.submission.reqSubmission')"
+            :disabled="hasAtLeastSubmission"
+          />
+        </v-col>
+        <template v-if="submissionRequired"
+          ><v-col class="pa-0 d-flex align-center" cols="6">
+            <alex-custom-switch
+              v-model="canSubmitAfterDeadline"
+              :label="$t('components.learningPlan.drawer.task.submission.aftrDeadline')"
+            />
+          </v-col>
+          <v-col class="mt-4 pa-0" cols="12">
+            <alex-learningplan-task-restrictions v-model="restrictionsValue" edit /> </v-col
+        ></template>
+      </v-row>
+
+      <alex-learningplan-task-description
+        v-if="submissionRequired"
+        v-model="submissionDescription"
+        class="mb-6"
+        name="submissionDescription"
+        edit
+        :mention-users="mentionUsers"
+        :title="$t('components.learningPlan.drawer.task.submission.description.label')"
+      />
+
+      <!-- Recursos de aprendizagem -->
+      <div class="my-6">
+        <alex-learningplan-task-resources
+          v-model="openResources"
+          :task-id="props.task?.id ?? 0"
+          :trail-id="props.task?.trail?.id"
+          :blocks="blocks"
+          teacher
+          project
+          edit
+        />
+
+        <!-- Ver blocks -->
+      </div>
+
       <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
       <v-window v-model="activePage">
         <v-window-item value="1">
@@ -107,11 +157,14 @@
 <script setup lang="ts">
 import Options from '@/pages/projects/[id]/tasks/-components/Options.vue';
 import { isBefore } from 'date-fns';
+import { WritableComputedRef } from 'vue';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { RestrictionValue } from '~/components/alex/learningplan/task/Restrictions.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
 import Members from './members/Index.vue';
+
 interface DrawerProjectProps {
   task?: SprintTask;
   sprints?: SprintSimple[];
@@ -132,6 +185,12 @@ const status = ref<KanbanColumn | null>(null);
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
 
+const submissionRequired = ref<boolean | null>(null);
+const canSubmitAfterDeadline = ref<boolean | null>(null);
+const submissionDescription = ref<string | null>(null);
+const restrictions = ref<string | null>(null);
+const openResources = ref<boolean>(false);
+
 const activePage = ref<number>(1);
 const taskEvents = ref<TaskEvent[]>([]);
 
@@ -145,7 +204,23 @@ const selectedSprint = ref<SprintSimple>();
 const selectedHistory = ref<TaskSimple | null>(null);
 const selectedParent = ref<TaskSimple | null | undefined>(undefined);
 const description = ref<string>('');
-const mentionUsers = computed(() => []);
+const mentionUsers = computed(() => {
+  if (!props.task?.task_members?.[0]) return [];
+  return (
+    props.task.task_members[0].learning_plan_group?.group_members.map((member) => member.student_member.user) || []
+  );
+});
+const hasAtLeastSubmission = computed(
+  () => !!props.task?.task_members?.filter((member) => member.last_submission_at).length,
+);
+const restrictionsValue = computed({
+  get() {
+    return restrictions.value ? restrictions.value.split(',') : [];
+  },
+  set(newValue) {
+    restrictions.value = newValue.join(',');
+  },
+}) as WritableComputedRef<RestrictionValue[]>;
 const trailId = ref<number | null>(null);
 const blocks = ref<BlockSimple[]>([]);
 const route = useRoute();
@@ -254,6 +329,36 @@ const statusOptions = computed(
     })) ?? [],
 );
 
+watch(submissionRequired, async (required) => {
+  if (required === null || !props.task?.id || isFirstTimeOpened.value) {
+    return;
+  }
+  await update('tasks', props.task.id, {
+    submission_required: required,
+  });
+  emit('update-value', 'submission-required', required);
+});
+
+watch(canSubmitAfterDeadline, async (canSubmit) => {
+  if (canSubmit === null || !props.task?.id || isFirstTimeOpened.value) {
+    return;
+  }
+  await update('tasks', props.task.id, {
+    can_submit_after_deadline: canSubmit,
+  });
+  emit('update-value', 'can_submit_after_deadline', canSubmit);
+});
+
+watch(restrictions, async (restrictions) => {
+  if (restrictions === null || !props.task?.id || isFirstTimeOpened.value) {
+    return;
+  }
+  await update('tasks', props.task.id, {
+    allowed_editor_plugins: restrictions,
+  });
+  emit('update-value', 'allowed_editor_plugins', restrictions);
+});
+
 const startDateComp = ref<{
   close: () => void;
 } | null>(null);
@@ -325,6 +430,12 @@ watch(open, () => {
   blocks.value = props.task?.blocks ?? [];
 
   selectedParent.value = props.task?.parent_task ?? null;
+
+  // Entregas
+  canSubmitAfterDeadline.value = props.task?.can_submit_after_deadline ?? null;
+  submissionDescription.value = props.task?.submission_description ?? null;
+  submissionRequired.value = props.task?.submission_required ?? null;
+  restrictions.value = props.task?.allowed_editor_plugins ?? null;
 
   // Sprint, epic and story data
   selectedSprint.value = props.task?.sprint ?? undefined;
@@ -431,6 +542,28 @@ useOnStopTyping(
   false,
   false,
 );
+useOnStopTyping(
+  submissionDescription,
+  async () => {
+    try {
+      if (isFirstTimeOpened.value || !props.task) {
+        return;
+      }
+
+      await update('tasks', props.task.id, {
+        submission_description: submissionDescription.value,
+      });
+      emit('update-value', 'submission-description', submissionDescription.value);
+      // emit('change-submission-description', submissionDescription.value);
+    } catch (error) {
+      notifyFieldError('submissionDescription');
+    }
+  },
+  1000,
+  false,
+  false,
+);
+
 useOnStopTyping(
   title,
   () => {
