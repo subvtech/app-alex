@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { avatar } from '@/components/alex/custom/AvatarGroup.vue';
 import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 // import { TaskStatus } from '~/models/simple/taskSimple.model';
@@ -27,7 +28,7 @@ const header = [
     width: 192,
   },
   {
-    title: t('pages.projects.tasks.header_students'),
+    title: t('pages.projects.tasks.header_members'),
     key: 'students',
     sortable: false,
     width: 192,
@@ -100,6 +101,17 @@ const props = withDefaults(
     draggedTask: null,
   },
 );
+
+const getUsers = (task: SprintTask) => {
+  if (!task?.task_members?.[0]) return [];
+  return (task.task_members[0].learning_plan_group?.group_members.map((member) => ({
+    name: member.student_member.user.fullname,
+    image: {
+      url: member.student_member.user?.avatar?.url,
+      alt: member.student_member.user.fullname,
+    },
+  })) || []) as avatar[];
+};
 
 const typing = ref(false);
 const tableSortBy = ref<{ key: string; order: string }[]>([]);
@@ -445,8 +457,8 @@ const setDragStart = (id: number, e: DragEvent) => {
                       </span>
                     </td>
                     <td class="min-w-48">
-                      <div v-if="item.students?.length" class="ml-2" :class="{ 'gray-filter': isArchived }">
-                        <alex-custom-avatar-group :avatar-items="item.students || []" :max="3" />
+                      <div v-if="getUsers(item).length" class="ml-2" :class="{ 'gray-filter': isArchived }">
+                        <alex-custom-avatar-group :avatar-items="getUsers(item) || []" :max="3" />
                       </div>
                       <span v-else>{{ $t('pages.projects.tasks.no_members') }}</span>
                     </td>
