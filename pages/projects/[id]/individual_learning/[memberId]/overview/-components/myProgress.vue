@@ -145,7 +145,7 @@ watch(
                   <div>
                     <p class="text-body-5 text-gray-400 mb-2 ellipsis lines-1">
                       <alex-custom-chip
-                        :text="task.status"
+                        :text="$t(`components.courses.tasks.task.status.${task.status}`)"
                         :status="chipStatus(task.status)"
                         size="small"
                         class="width-20 mr-2"
