@@ -101,6 +101,7 @@ import { useField } from 'vee-validate';
 
 export interface CreateTrailDialogComponentType {
   learningStructure: number;
+  userId?: number;
 }
 
 const { createTrailsRules } = useFormRules();
@@ -120,7 +121,7 @@ const { t } = useI18n();
 
 const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
-const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), {});
+const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), { userId: undefined });
 const {
   value: descriptionValue,
   errorMessage: descriptionErrorMsg,
@@ -178,10 +179,12 @@ const createTrail = async () => {
     let createdLearningStructure = null;
 
     if (!props.learningStructure) {
-      const member = learningPlanStore.learningPlan?.members.find((member) => member.user.id === user.value.id);
+      const member = learningPlanStore.learningPlan?.members.find(
+        (member) => member.user.id === (props.userId || user.value?.id),
+      );
 
       const newStructure = await create('learning-plan-structures', {
-        title: user.value?.fullname ?? 'Learning Structure',
+        title: member?.user.fullname ?? 'Learning Structure',
         type: 'standard',
         learningplan: learningPlanStore.learningPlan?.id ?? 0,
         author_member: member?.id ?? 0,
