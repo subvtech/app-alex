@@ -413,6 +413,7 @@ const getStudentTasks = async () => {
           $not: 'draft',
         },
         type: 'individual',
+        learningplan: +route.params.id,
       },
     },
   });
