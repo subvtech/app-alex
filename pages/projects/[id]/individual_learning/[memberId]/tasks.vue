@@ -270,10 +270,6 @@ const columns = ref<any>([
   },
 ]);
 
-watch(tasks, (tasks) => {
-  console.log('tasks:', tasks);
-});
-
 // Edit drawer
 const teacherDrawer = ref<boolean>(false);
 const taskDetails = ref<TaskSimple | null>(null);
@@ -417,6 +413,7 @@ const getStudentTasks = async () => {
           $not: 'draft',
         },
         type: 'individual',
+        learningplan: +route.params.id,
       },
     },
   });
