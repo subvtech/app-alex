@@ -19,29 +19,12 @@ const showAddTrailDialog = ref(false);
 const myCollabs = ref<TrailSimple[] | undefined>(undefined);
 const myTrails = ref<TrailSimple[] | undefined>(undefined);
 
-<<<<<<< HEAD
 const learningStructure = computed<number | null>(
   () =>
     learningPlanStore.learningPlan?.learning_structures?.find(
       (structure) => structure.type === 'standard' && structure.author_member?.user?.id === +route.params.memberId,
     )?.id ?? null,
 );
-=======
-// const ITEMS_PER_PAGE = 12;
-
-const trails = computed<TrailSimple[]>(() => {
-  return (
-    learningPlanStore.standardTrails?.map((trail) => {
-      const { blocks = [] } = trail.structures.at(-1) || {};
-      return { ...trail, blocks };
-    }) || []
-  );
-});
-
-const learningStructure = computed<number>(() => {
-  return learningPlanStore.learningPlan?.learning_structures?.[0]?.id ?? 0;
-});
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
 
 const filteredMyTrails = computed<TrailSimple[]>(
   () =>
@@ -61,7 +44,6 @@ const filteredMyCollabs = computed<TrailSimple[]>(
     ) ?? [],
 );
 
-<<<<<<< HEAD
 const formattedCount = (count: number | undefined) => {
   if (count === undefined) {
     count = 0;
@@ -101,54 +83,20 @@ const toggleVisibility = async (id: number, hidden: boolean) => {
     myTrails.value?.map((trail) => updateTrailHidden(trail, id, !hidden));
 
     setMessage(t(`${i18dir}.messages.failHidden`), 'error', true);
-=======
-// const getShowingMessage = (total: number) => {
-//   const itemsPerPage = search.value === '' ? ITEMS_PER_PAGE : total;
-
-//   const to = page.value * itemsPerPage > trails.value.length ? trails.value.length : page.value * itemsPerPage;
-
-//   return to === 0
-//     ? t('pages.trails.noData')
-//     : t('pages.trails.showingData', {
-//         to,
-//         from: (page.value - 1) * itemsPerPage + 1,
-//         total: trails.value.length,
-//       });
-// };
-
-const toggleVisibility = (index: number, id: number) => {
-  const hidden = !trails.value[index].hidden;
-
-  try {
-    learningPlanStore.standardTrails[index].hidden = hidden;
-    update('trails', id, { hidden });
-  } catch (error) {
-    learningPlanStore.standardTrails[index].hidden = !hidden;
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
   }
 };
 
 const navigate = (trailId: number, page?: string) => {
-<<<<<<< HEAD
   const { id } = route.params;
   const slug = page === 'settings' ? '/settings' : '';
   navigateTo(`/projects/${id}/trails/${trailId}${slug}`);
 };
 
 const handleTrailCreate = async (trailId: number, newStructure) => {
-=======
-  const { id, memberId } = route.params;
-  const slug = page === 'settings' ? '/settings' : '';
-  navigateTo(`/projects/${id}/individual_learning/${memberId}/trails/${trailId}${slug}`);
-};
-
-const handleTrailCreate = async (trailId: number) => {
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
   const populate = ['cover_image', 'structures.blocks'];
   const trail = await findOne('trails', trailId, { populate });
   learningPlanStore.standardTrails.unshift(trail.data as TrailSimple);
   showAddTrailDialog.value = false;
-<<<<<<< HEAD
 
   if (myTrails.value) {
     myTrails.value = [...myTrails.value, formatTrail(trail.data as TrailSimple)];
@@ -172,30 +120,16 @@ onBeforeMount(async () => {
   // My trails
   find('trails', {
     populate: ['structures.blocks', 'cover_image'],
-=======
-};
-
-onBeforeMount(() => {
-  const user = +route.params.memberId;
-
-  // My trails
-  find('trails', {
-    populate: ['structures', 'cover_image'],
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
     filters: {
       learning_structure: {
         author_member: {
           user,
         },
-<<<<<<< HEAD
         learningplan: learningPlanStore.learningPlan?.id,
-=======
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
       },
     },
   })
     .then(({ data }) => {
-<<<<<<< HEAD
       myTrails.value = (data as TrailSimple[]).map(formatTrail);
     })
     .catch(() => setMessage(t(`${i18dir}.messages.failMyTrails`), 'error', true));
@@ -203,23 +137,10 @@ onBeforeMount(() => {
   // My collabs
   find('trails', {
     populate: ['structures.blocks', 'cover_image'],
-=======
-      myTrails.value = (data as TrailSimple[]).map((trail) => {
-        const { blocks = [] } = trail.structures.at(-1) || {};
-        return { ...trail, blocks };
-      });
-    })
-    .catch(() => setMessage('Falha ao carregar suas colaborações', 'error', true));
-
-  // My collabs
-  find('trails', {
-    populate: ['structures', 'cover_image'],
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
     filters: {
       partners: {
         user,
       },
-<<<<<<< HEAD
       learning_structure: {
         learningplan: learningPlanStore.learningPlan?.id,
       },
@@ -230,47 +151,15 @@ onBeforeMount(() => {
     })
     .catch(() => setMessage(t(`${i18dir}.messages.failMyCollabs`), 'error', true));
 });
-=======
-    },
-  })
-    .then(({ data }) => {
-      myCollabs.value = (data as TrailSimple[]).map((trail) => {
-        const { blocks = [] } = trail.structures.at(-1) || {};
-        return { ...trail, blocks };
-      });
-      console.log(data);
-    })
-    .catch(() => setMessage('Falha ao carregar suas colaborações', 'error', true));
-});
-
-watch(
-  () => learningPlanStore.loading,
-  (loading) => {
-    if (!loading) {
-      console.log(learningPlanStore.standardTrails);
-    }
-  },
-);
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
 </script>
 
 <template>
   <div class="tw-flex tw-flex-1 tw-flex-col tw-bg-white tw-rounded-lg tw-p-6 tw-min-h-[500px]">
     <!-- Inputs -->
-<<<<<<< HEAD
     <div class="tw-flex tw-flex-wrap tw-w-full tw-gap-6 tw-gap-sm-1 tw-justify-between tw-mb-6">
       <alex-inputs-text-field
         v-model="search"
         :placeholder="$t(`${i18dir}.search`)"
-=======
-    <div
-      class="tw-flex tw-flex-wrap tw-w-full tw-gap-6 tw-gap-sm-1"
-      :class="!trails.length ? 'tw-justify-end' : 'tw-justify-between tw-mb-6'"
-    >
-      <alex-inputs-text-field
-        v-model="search"
-        :placeholder="$t('pages.trails.searchPlaceholder')"
->>>>>>> c39853a75b1e049a89a3f0fa2e4b40a2ff906095
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         name="search"
