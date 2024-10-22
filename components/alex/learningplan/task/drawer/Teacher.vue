@@ -129,7 +129,7 @@
       <v-row class="mx-0 mt-3 mb-4 gap-3">
         <div
           class="pa-0 rounded-lg tw-border tw-min-w-[288px] sm:tw-w-[288px] tw-w-full d-flex cursor-pointer"
-          @click="openGradeCompositionDialog = true"
+          @click="openGradeCompositionModal"
         >
           <div class="px-3 py-3 bg-gray-blue tw-border-r d-flex align-center">
             <v-icon size="32" icon="alex:FactCheck" color="secondary-0"></v-icon>
@@ -137,21 +137,50 @@
           <div class="pa-3">
             <h5 class="text-h5 text-secondary-0 mb-2">Composição da Nota</h5>
             <span v-if="!gradeTaskComposition" class="text-body-4 text-gray-500">Selecione uma avaliação</span>
-            <alex-custom-chip v-else :text="gradeTaskComposition?.gradeComposition?.grade?.title"></alex-custom-chip>
-            {{ gradeTaskCompositions }}
+            <alex-custom-chip v-else :text="gradeTaskComposition?.grade_composition?.grade?.title" status="secondary" />
           </div>
         </div>
 
-        <div class="pa-0 rounded-lg tw-border tw-min-w-[288px] sm:tw-w-[288px] tw-w-full d-flex cursor-pointer">
+        <div
+          class="pa-0 rounded-lg tw-border tw-min-w-[288px] sm:tw-w-[288px] tw-w-full d-flex cursor-pointer"
+          @click="openEvaluationModal"
+        >
           <div class="px-3 py-3 bg-gray-blue tw-border-r d-flex align-center">
             <v-icon size="32" icon="alex:FactCheck" color="secondary-0"></v-icon>
           </div>
           <div class="pa-3">
             <h5 class="text-h5 text-secondary-0 mb-2">Tipo avaliativo</h5>
-            <span class="text-body-4 text-gray-500">Selecione os critérios</span>
+            <span v-if="!taskEvaluationGroup" class="text-body-4 text-gray-500">Selecione os critérios</span>
+            <alex-custom-chip v-else :text="taskEvaluationGroupText" status="secondary" />
           </div>
         </div>
-
+        <alex-custom-dialog
+          v-model="openEvaluationGroupDialog"
+          title="Tipo de avaliação"
+          main-button-text="Associar"
+          :main-button-disabled="!evaluationGroupData.groupId"
+          @on-secondary-action="openEvaluationGroupDialog = false"
+        >
+          <alex-inputs-radio-button
+            v-model="evaluationGroupData.groupType"
+            label="Como deseja avaliar essa tarefa?"
+            name="evaluationGroupType"
+            required
+            :buttons="[
+              { label: 'Grupo de critérios', value: 'standard' },
+              { label: 'Rubrica', value: 'rubric' },
+            ]"
+          />
+          <alex-inputs-select
+            v-model="evaluationGroupData.groupId"
+            name="evaluationGroupId"
+            label="Critérios avaliativos"
+            required
+            :items="evaluationGroups"
+            item-title="name"
+            item-value="id"
+          />
+        </alex-custom-dialog>
         <alex-custom-dialog
           v-model="openGradeCompositionDialog"
           title="Composição avaliativa"
@@ -222,7 +251,10 @@ import type { RestrictionValue } from '../Restrictions.vue';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 const openGradeCompositionDialog = ref(false);
-const { find } = useStrapiUtils();
+const openEvaluationGroupDialog = ref(false);
+const { find, findOne } = useStrapiUtils();
+
+const user = useStrapiUser();
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
@@ -323,25 +355,73 @@ const { data: grades } = useQuery({
   },
 });
 
-const { data: gradeTaskCompositions } = useQuery({
-  queryKey: ['gradeTaskComposition', taskId],
+const { data: taskEvaluationData } = useQuery({
+  queryKey: ['taskEvaluationData', taskId],
   queryFn: async () => {
-    const composition = await find('grade-composition-tasks', {
-      filters: {
-        task: { id: taskId.value },
-      },
-      populate: ['grade_composition.grade'],
+    const composition = await findOne('tasks', taskId.value, {
+      populate: ['grade_composition_task.grade_composition.grade', 'evaluation_group.evaluation_criterias'],
     });
 
-    return composition.data;
+    return composition.data || [];
   },
+  enabled: () => taskId.value > 0,
 });
 
 const gradeTaskComposition = computed(() => {
-  return gradeTaskCompositions.value ? gradeTaskCompositions.value[0] : null;
+  return taskEvaluationData.value?.grade_composition_task;
 });
 
+const taskEvaluationGroup = computed(() => {
+  return taskEvaluationData.value?.evaluation_group;
+});
+
+const taskEvaluationGroupText = computed(() => {
+  const typeText = taskEvaluationGroup.value?.type === 'rubric' ? 'Rubrica' : 'Grupo';
+  return `${typeText}: ${taskEvaluationGroup.value?.name}`;
+});
+
+const openGradeCompositionModal = () => {
+  openGradeCompositionDialog.value = true;
+
+  gradeAssociatonData.value.gradeId = gradeTaskComposition.value?.grade_composition?.grade?.id;
+  gradeAssociatonData.value.weight = gradeTaskComposition.value?.weight || 1;
+};
+
+const openEvaluationModal = () => {
+  openEvaluationGroupDialog.value = true;
+
+  evaluationGroupData.value.groupType = taskEvaluationGroup.value?.type || 'standard';
+  evaluationGroupData.value.groupId = taskEvaluationGroup.value?.id;
+};
+
 const gradeAssociatonData = ref({ gradeId: null, weight: 1 });
+const evaluationGroupData = ref({ groupType: 'standard', groupId: null });
+
+const selectedGroupType = computed(() => evaluationGroupData.value.groupType);
+
+const { data: evaluationGroups } = useQuery({
+  queryKey: ['groups', user, selectedGroupType],
+  queryFn: async () => {
+    const groups = await find('evaluation-groups', {
+      filters: {
+        $or: [
+          {
+            public: true,
+          },
+          {
+            user: {
+              id: user.value?.id,
+            },
+          },
+        ],
+        type: selectedGroupType.value,
+      },
+      populate: ['evaluation_criterias'],
+    });
+
+    return groups.data;
+  },
+});
 
 watch(model, (value) => {
   if (value) {
