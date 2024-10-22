@@ -49,6 +49,14 @@ export const useHeaderTrails = (currentPageRoute, currentPageTitle = '', project
               to: `/projects/${id}/individual_learning`,
               disabled: false,
             },
+            {
+              title: t('pages.courses.trails'),
+              disabled: true,
+            },
+            {
+              title: trailStore.trail?.title ?? '',
+              disabled: true,
+            },
           ];
 
       if (currentPageRoute)
