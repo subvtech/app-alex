@@ -4,6 +4,7 @@ import StatisticCard from '../../../-components/StatisticCard.vue';
 import Events from './-components/events.vue';
 import Progress from './-components/myProgress.vue';
 import Performance from './-components/performance.vue';
+import Goals from './-components/goals.vue';
 
 const learningPlanStore = useLearningPlanStore();
 const { setMessage } = useMessageStore();
@@ -49,8 +50,34 @@ const grades = [
 ];
 
 const events = ref<FormattedEvent[]>([]);
+const yourGoals = ref<LearningGoalSimple[]>([]);
 
 const progress = ref([]);
+
+const memberId = computed<number>(() => {
+  const member = learningPlanStore.learningPlan?.members.find(({ user }) => user.id === +route.params.memberId);
+  return member?.id ?? 0;
+});
+
+const formattedYourGoals = computed(() =>
+  yourGoals.value.map((goal, index) => ({
+    id: goal.id,
+    title: goal.description,
+    keyWord: goal.verb?.text,
+    errorKeyWord: false,
+    errorTitle: false,
+    contentData: {
+      id: goal.id,
+      index,
+      description: goal.description,
+      verb: {
+        id: goal.verb?.id,
+        text: goal.verb?.text,
+        general: goal.verb?.general,
+      },
+    },
+  })),
+);
 
 const getPercentage = (amount: number, total: number): number => {
   const result = Math.floor((amount / total) * 100);
@@ -185,8 +212,10 @@ const getData = () => {
   find('learning-goals', {
     filters: {
       learningplan: learningPlanStore.learningPlan?.id,
+      author: member.id,
     },
     populate: {
+      verb: true,
       tasks: {
         populate: {
           task_members: true,
@@ -199,6 +228,7 @@ const getData = () => {
       },
     },
   }).then(({ data }) => {
+    yourGoals.value = data as LearningPlanGoalSimple[];
     progress.value = (data as LearningPlanGoalSimple[]).map((goal) => {
       const taskMemberStatus = goal?.tasks?.map((task) => task?.task_members?.[0]?.status) ?? [];
       const completedTasks = taskMemberStatus?.filter((status) => status === 'done');
@@ -246,6 +276,24 @@ watch(
         <Performance :data="grades" />
       </v-col>
     </v-row>
-    <Events :items="events" />
+    <v-row class="mb-6">
+      <v-col cols="12" lg="8">
+        <Events :items="events" />
+      </v-col>
+      <v-col class="d-flex tw-items-stretch" cols="12" lg="4">
+        <Goals
+          sizing-class="px-6 pb-6 w-100"
+          class="w-100 h-100 d-flex tw-flex-col"
+          is-nested
+          :course-id="+route.params.id"
+          :user-id="memberId"
+          :data="formattedYourGoals"
+          :tooltip="$t('components.courses.goals.tooltip')"
+          can-edit
+          no-icon
+          @update="() => getData()"
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
