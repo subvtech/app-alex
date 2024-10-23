@@ -1,6 +1,7 @@
 <template>
   <alex-custom-card
     :title="$t('components.courses.goals.title')"
+    class="tw-min-h-[438px]"
     is-nested
     hide-dividers
     show-tooltip
@@ -15,50 +16,52 @@
     @toggle:is-editing="toggleEditing"
   >
     <template #content>
-      <alex-custom-empty-placeholder
-        v-if="localData.length === 0 && !isEditing"
-        class="align-self-center"
-        :empty-text-message="$t('components.courses.goals.empty')"
-        empty-text-image="/svg/EmptyGoals.svg"
-      />
-      <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
-        <alex-custom-accordion
-          v-if="localData.length > 0"
-          v-model="selectedPanel"
-          v-model:data="localData"
-          show-positions
-          :overwrite-item="!isEditing"
-        >
-          <template v-if="isEditing" #content="{ index }">
-            <alex-learningplan-form-goal
-              :index="index"
-              :data="localData"
-              :filtered-items="generalVerbs || []"
-              @error:description="onErrorDescription"
-              @error:keyword="onErrorKeyword"
-              @success:description="onSuccessDescription"
-              @success:keyword="onSuccessKeyword"
-            /> </template
-        ></alex-custom-accordion>
-        <alex-custom-button
-          class="add-button w-100 mt-5"
-          prepend-icon="mdi-plus"
-          variant="text"
-          size="large"
-          @click="addGoal"
-        >
-          {{ $t('components.courses.goals.add') }}</alex-custom-button
-        >
-      </div>
-      <div v-else class="d-flex flex-column gap-2 w-100">
-        <alex-learningplan-goal
-          v-for="(item, index) in localData"
-          :key="index"
-          :index="index"
-          :key-word="item.keyWord"
-          :title="item.title"
+      <v-slide-y-transition group hide-on-leave>
+        <alex-custom-empty-placeholder
+          v-if="localData.length === 0 && !isEditing"
+          class="align-self-center"
+          :empty-text-message="$t('components.courses.goals.empty')"
+          empty-text-image="/svg/EmptyGoals.svg"
         />
-      </div>
+        <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
+          <alex-custom-accordion
+            v-if="localData.length > 0"
+            v-model="selectedPanel"
+            v-model:data="localData"
+            show-positions
+            :overwrite-item="!isEditing"
+          >
+            <template v-if="isEditing" #content="{ index }">
+              <alex-learningplan-form-goal
+                :index="index"
+                :data="localData"
+                :filtered-items="generalVerbs || []"
+                @error:description="onErrorDescription"
+                @error:keyword="onErrorKeyword"
+                @success:description="onSuccessDescription"
+                @success:keyword="onSuccessKeyword"
+              /> </template
+          ></alex-custom-accordion>
+          <alex-custom-button
+            class="add-button w-100 mt-5"
+            prepend-icon="mdi-plus"
+            variant="text"
+            size="large"
+            @click="addGoal"
+          >
+            {{ $t('components.courses.goals.add') }}</alex-custom-button
+          >
+        </div>
+        <div v-else class="d-flex flex-column gap-2 w-100">
+          <alex-learningplan-goal
+            v-for="(item, index) in localData"
+            :key="index"
+            :index="index"
+            :key-word="item.keyWord"
+            :title="item.title"
+          />
+        </div>
+      </v-slide-y-transition>
     </template>
   </alex-custom-card>
 </template>
