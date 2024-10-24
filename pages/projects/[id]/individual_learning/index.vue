@@ -101,14 +101,11 @@ onMounted(fetchMembers);
                           variant="text"
                         />
                       </div>
-                      <div class="tw-flex tw-flex-col tw-overflow-hidden">
-                        <span
-                          class="text-gray-800 text-h5 tw-text-ellipsis tw-overflow-hidden tw-whitespace-nowrap"
-                          :title="member.fullname"
-                        >
+                      <div class="tw-flex tw-flex-col tw-overflow-hidden w-100">
+                        <span class="text-gray-800 text-h5 tw-truncate" :title="member.fullname">
                           {{ member.fullname }}
                         </span>
-                        <span class="text-gray-600 text-body-3" :title="member.email">
+                        <span class="text-gray-600 text-body-3 tw-truncate" :title="member.email">
                           {{ member.email }}
                         </span>
                       </div>

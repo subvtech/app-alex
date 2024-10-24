@@ -229,9 +229,11 @@ const { setMessage } = useMessageStore();
 const strapi = useStrapi();
 const { find } = useStrapiUtils();
 const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
 
 // Ref
+const loading = ref<boolean>(true);
 const kanban = ref<{
   setCanDrag: (val: boolean) => void;
   handleFilter: () => void;
@@ -270,10 +272,6 @@ const columns = ref<any>([
   },
 ]);
 
-watch(tasks, (tasks) => {
-  console.log('tasks:', tasks);
-});
-
 // Edit drawer
 const teacherDrawer = ref<boolean>(false);
 const taskDetails = ref<TaskSimple | null>(null);
@@ -292,7 +290,6 @@ const newTaskTitle = ref<string>('');
 
 // Function
 const handleCreateTask = async (title: string, column) => {
-  // console.log(learningPlanStore.learningPlan?.end_date);
   if (!title || !column) {
     return;
   }
@@ -385,6 +382,8 @@ const checkMobile = () => {
 
 // - Get data
 const getStudentTasks = async () => {
+  loading.value = true;
+
   const memberId = route.params?.memberId || 0;
 
   const res = await find('task-members', {
@@ -396,7 +395,7 @@ const getStudentTasks = async () => {
       'task.task_events.learning_plan_member.user.avatar',
       'task.task_members.learning_plan_member.user.avatar',
       'task.task_members.learning_plan_group.group_members.student_member.user.avatar',
-      'task.learning_goals',
+      'task.learning_goals.verb',
       'learning_plan_member.learning_class',
       'learning_plan_member.user.avatar',
       'learning_plan_group.group_members.student_member.user.avatar',
@@ -417,6 +416,7 @@ const getStudentTasks = async () => {
           $not: 'draft',
         },
         type: 'individual',
+        learningplan: +route.params.id,
       },
     },
   });
@@ -427,6 +427,7 @@ const getStudentTasks = async () => {
 
   // Formatado para kanban
   tasks.value = (res.data as TaskMember[])?.map(formatTaskMember) || [];
+  loading.value = false;
 };
 
 // Util
@@ -795,16 +796,23 @@ const handleChangeAlterFromReview = (val: boolean) => {
 
 //
 onBeforeMount(() => {
-  headerStore.showHeader = false;
-
   getStudentTasks();
 });
 
 onMounted(() => {
+  headerStore.showHeader = true;
   checkMobile();
-
   window.addEventListener('resize', () => checkMobile());
 });
+
+watch(
+  () => headerStore.showHeader,
+  (show) => {
+    if (!show) {
+      headerStore.showHeader = true;
+    }
+  },
+);
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', () => checkMobile());
@@ -819,6 +827,22 @@ watch(teacherDrawer, (open) => {
 watch(isKanban, () => {
   expanded.value = 'tasks';
   filters.value = [];
+});
+
+watch(loading, (loading) => {
+  if (loading || !route.query?.task) {
+    return;
+  }
+
+  setTimeout(() => openDrawer(+route.query?.task), 300);
+});
+
+watch(teacherDrawer, (open) => {
+  if (open || !route.query?.task) {
+    return;
+  }
+
+  setTimeout(() => router.replace({ path: route.path, query: { ...route.query, task: undefined } }), 500);
 });
 </script>
 

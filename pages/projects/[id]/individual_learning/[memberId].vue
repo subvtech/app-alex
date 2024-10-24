@@ -40,6 +40,19 @@ watch(activeTab, (slug) => {
   navigateTo(`${route.path.split('/').slice(0, -1).join('/')}/${slug}`);
 });
 
+watch(
+  () => route.fullPath,
+  (path) => {
+    // Caso o usuario seja direcionado para tasks/[tarefa]
+    // A tab ativa será atualizada
+    const tab = path?.split('/')?.at(-1) ?? '';
+
+    if (tab.includes('tasks')) {
+      activeTab.value = tab;
+    }
+  },
+);
+
 onMounted(fetchUser);
 </script>
 

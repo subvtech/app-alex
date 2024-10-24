@@ -1,4 +1,43 @@
 {
+  "overview": {
+    "statisticCards": {
+      "totalTasks": "Total de tarefas",
+      "totalObjectives": "Total de objetivos",
+      "totalContributions": "Total de contribuições"
+    },
+    "events": {
+      "title": "Eventos",
+      "task_created": "Tarefa criada",
+      "task_start_date": "Data de início mudou",
+      "task_deadline": "Prazo mudou",
+      "task_submission": "Submissão",
+      "task_archived": "Tarefa arquivada",
+      "task_deadline_ended": "Prazo expirado",
+      "student_deadline": "Prazo do estudante",
+      "student_status": "Status do estudante",
+      "student_added": "Estudante adicionado",
+      "student_removed": "Estudante removido",
+      "group_added": "Grupo adicionado",
+      "group_removed": "Grupo removido",
+      "submission_send": "Submissão enviada",
+      "submission_denied": "Submissão rejeitada",
+      "submission_evaluated": "Submissão avaliada",
+      "message": "Mensagem enviada"
+    },
+    "myProgress": {
+      "title": "Meu progresso",
+      "finishedTasks": "das tarefas foram terminadas",
+      "deadline": "Término",
+      "lastUpdate": "Última atualização",
+      "goalAcronym": "OA",
+      "noTaskAttached": "Nenhuma tarefa associada a este projeto",
+      "noGoalRegistered": "Nenhum objetivo cadastrado"
+    },
+    "performance": "Desempenho",
+    "message": {
+      "failTasks": "Falha ao carregar tarefas"
+    }
+  },
   "tasks": {
     "seeKanban": "Ver Kanban",
     "seeList": "Ver Lista",
@@ -18,6 +57,16 @@
       "taskCreated": "Tarefa criada com sucesso",
       "taskDeleted": "Tarefa deletada com sucesso",
       "failDeleteTask": "Falha ao deletar tarefa"
+    }
+  },
+  "trails": {
+    "myTrails": "Minhas Trilhas",
+    "myCollabs": "Minhas Colaborações",
+    "search": "Encontrar trilha",
+    "messages": {
+      "failHidden": "Falha ao alterar visibilidade",
+      "failMyCollabs": "Falha ao carregar suas colaborações",
+      "failMyTrails": "Falha ao carregar suas trilhas"
     }
   }
 }

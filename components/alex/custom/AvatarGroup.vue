@@ -36,7 +36,7 @@ interface AvatarImageType {
   url: string;
   alt?: string;
 }
-interface avatar {
+export interface avatar {
   name: string;
   image?: AvatarImageType;
   className?: string;
