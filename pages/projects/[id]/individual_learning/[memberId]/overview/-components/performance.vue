@@ -3,7 +3,7 @@
     :title="$t('components.projects.individual_learning.overview.performance')"
     no-footer
     sizing-class="py-0 px-6"
-    class="tw-min-h-[470px]"
+    class="tw-min-h-[470px] h-100"
   >
     <template #content>
       <BarChart
@@ -18,7 +18,7 @@
         :colors="['#4aca84', '#dcf5e7']"
         :x-formatter="
           (tick) => {
-            return tick.toString();
+            return processedData.length ? tick.toString() : '';
           }
         "
         :y-formatter="

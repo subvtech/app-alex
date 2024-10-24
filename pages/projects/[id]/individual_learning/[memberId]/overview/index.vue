@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { GalleryHorizontal } from 'lucide-vue-next';
 import StatisticCard from '../../../-components/StatisticCard.vue';
 import Events from './-components/events.vue';
+import Goals from './-components/goals.vue';
 import Progress from './-components/myProgress.vue';
 import Performance from './-components/performance.vue';
-import Goals from './-components/goals.vue';
 
 const learningPlanStore = useLearningPlanStore();
 const { setMessage } = useMessageStore();
@@ -13,41 +12,36 @@ const { t } = useI18n();
 const route = useRoute();
 
 interface FormattedEvent {
-  id: Number;
+  id: number;
   title: string;
   event: string;
   date: string;
 }
 
-// TODO @Eliezir - Add custom icons & i18n
 const totalizers = ref({
   tasks: {
-    title: 'Total de tarefas',
-    icon: 'alex:Sprint',
-    value: '00',
+    title: t('components.projects.individual_learning.overview.statisticCards.totalTasks'),
+    icon: 'alex:FactCheck',
+    value: '0',
     percentage: 0,
   },
   objectives: {
-    title: 'Total de objetivos',
-    icon: 'alex:ManageHistory',
-    value: '00',
+    title: t('components.projects.individual_learning.overview.statisticCards.totalObjectives'),
+    icon: 'mdi-school-outline',
+    value: '0',
     percentage: 0,
   },
   contributions: {
-    title: 'Total de contribuições',
-    icon: 'alex:HistoryEdu',
-    value: '00',
-    percentage: 0, // TODO @Eliezir - Add custom percentage label
+    title: t('components.projects.individual_learning.overview.statisticCards.totalContributions'),
+    icon: 'alex:ArticleFilled',
+    value: '0',
+    percentage: 0,
     color: 'warning-0',
     chipColor: 'warning--2',
   },
 });
 
-const grades = [
-  // { name: 'Média', grade: 10 },
-  // { name: 'AV2', grade: 2 },
-  // { name: 'AV1', grade: 8 },
-];
+const grades = [];
 
 const events = ref<FormattedEvent[]>([]);
 const yourGoals = ref<LearningGoalSimple[]>([]);
@@ -80,8 +74,8 @@ const formattedYourGoals = computed(() =>
 );
 
 const getPercentage = (amount: number, total: number): number => {
-  const result = Math.floor((amount / total) * 100);
-  return !isNaN(result) ? result : 100;
+  const result = amount > 0 ? Math.floor((amount / total) * 100) : 0;
+  return !Number.isNaN(result) ? result : 100;
 };
 
 const getData = () => {
@@ -117,7 +111,7 @@ const getData = () => {
 
       newTotalizers.tasks = {
         ...newTotalizers.tasks,
-        value: total.toString().padStart(2, '0'),
+        value: !total ? '0' : total.toString().padStart(2, '0'),
         percentage,
       };
 
@@ -149,7 +143,7 @@ const getData = () => {
 
       newTotalizers.objectives = {
         ...newTotalizers.objectives,
-        value: totalGoals.toString().padStart(2, '0'),
+        value: !totalGoals ? '0' : totalGoals.toString().padStart(2, '0'),
         percentage: getPercentage(filteredCompletedGoals, totalGoals),
       };
 
@@ -180,7 +174,7 @@ const getData = () => {
 
       newTotalizers.contributions = {
         ...newTotalizers.contributions,
-        value: totalContributions.toString().padStart(2, '0'),
+        value: !totalContributions ? '0' : totalContributions.toString().padStart(2, '0'),
         percentage: getPercentage(filteredCompletedContributions, totalContributions),
       };
 
@@ -241,7 +235,7 @@ const getData = () => {
         })) ?? [];
       return {
         id: goal.id,
-        name: goal.description,
+        name: `${goal.verb?.text} ${goal.description}`,
         percentage: getPercentage(completedTasks.length, taskMemberStatus.length),
         tasks,
       };
