@@ -3,6 +3,7 @@
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
+import TaskDrawer from './-components/drawer.vue';
 
 type assessment = {
   name: string;
@@ -257,6 +258,7 @@ const dropdownItems = (assessments: assessment) => [
         </v-data-table>
       </div>
     </div>
+    <TaskDrawer />
   </div>
 </template>
 
