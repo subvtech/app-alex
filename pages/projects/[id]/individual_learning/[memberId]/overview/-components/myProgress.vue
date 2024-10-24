@@ -112,7 +112,7 @@ watch(
           </div>
         </div>
         <div class="lg:tw-w-1/2 tw-w-full pb-6 pl-6 tw-max-h-[400px]">
-          <v-tabs class="text-gray-800 w-100">
+          <v-tabs v-model="activePage" class="text-gray-800 w-100">
             <v-tooltip
               v-for="(tab, index) in processedData"
               :key="tab.id"

@@ -1,6 +1,6 @@
 <template>
   <div class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
-    <KanbanColumnHeader :title="title" :quantity="items?.length" :color="color" />
+    <KanbanColumnHeader :title="title" :quantity="items?.length ?? 0" :color="color" />
     <SlickList
       class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
