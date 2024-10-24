@@ -47,6 +47,7 @@ const events = ref<FormattedEvent[]>([]);
 const yourGoals = ref<LearningGoalSimple[]>([]);
 
 const progress = ref([]);
+const progressPercentage = ref<number>(0);
 
 const memberId = computed<number>(() => {
   const member = learningPlanStore.learningPlan?.members.find(({ user }) => user.id === +route.params.memberId);
@@ -190,16 +191,17 @@ const getData = () => {
     filters: {
       learning_plan_member: member.id,
     },
-    populate: {
-      task: true,
-    },
+    populate: ['task', 'learning_plan_member.user'],
+    sort: 'id:desc',
   }).then(({ data }) => {
-    events.value = (data as TaskEvent[]).map(({ id, event, createdAt, task }) => ({
-      id,
-      event,
-      title: task?.title ?? '',
-      date: createdAt,
-    }));
+    events.value = (data as TaskEvent[])
+      .map(({ id, event, createdAt, task, learning_plan_member }) => ({
+        id,
+        event,
+        title: task?.title ?? learning_plan_member?.user?.fullname ?? '',
+        date: createdAt,
+      }))
+      .sort((a, b) => b.id - a.id);
   });
 
   // Get progress
@@ -222,10 +224,17 @@ const getData = () => {
       },
     },
   }).then(({ data }) => {
+    let total = 0;
+    let completed = 0;
+
     yourGoals.value = data as LearningPlanGoalSimple[];
     progress.value = (data as LearningPlanGoalSimple[]).map((goal) => {
       const taskMemberStatus = goal?.tasks?.map((task) => task?.task_members?.[0]?.status) ?? [];
       const completedTasks = taskMemberStatus?.filter((status) => status === 'done');
+
+      total += taskMemberStatus.length;
+      completed += completedTasks.length;
+
       const tasks =
         goal?.tasks?.map((task) => ({
           id: task.id,
@@ -240,6 +249,7 @@ const getData = () => {
         tasks,
       };
     });
+    progressPercentage.value = getPercentage(completed, total);
   });
 };
 
@@ -264,7 +274,7 @@ watch(
     </div>
     <v-row class="mb-6">
       <v-col cols="12" lg="8">
-        <Progress :data="progress" />
+        <Progress :data="progress" :percentage="progressPercentage" />
       </v-col>
       <v-col cols="12" lg="4">
         <Performance :data="grades" />
