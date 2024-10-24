@@ -161,7 +161,7 @@
           :main-button-disabled="!evaluationGroupData.groupId"
           :loading="updatingEvaluationGroup"
           @on-secondary-action="openEvaluationGroupDialog = false"
-          @on-main-action="updateTaskEvaluationGroup"
+          @on-main-action="onUpdateTaskEvaluationGroup"
         >
           <alex-inputs-radio-button
             v-model="evaluationGroupData.groupType"
@@ -184,14 +184,14 @@
             @update:model-value="onChangeEvaluationGroup"
           />
           <template v-if="evaluationGroupData.groupId">
-            <div class="pa-1 tw-full text-body-2 bg-gray-blue d-flex justify-space-between">
+            <div class="pa-2 tw-full text-body-2 bg-gray-blue d-flex justify-space-between tw-rounded-t-lg">
               <div>Critério</div>
               <div class="tw-min-w-[100px] sm:tw-w-[100px]">Peso</div>
             </div>
             <div
               v-for="criteria in evaluationGroupData.evaluationCriterias"
               :key="`criteria-${criteria?.id}`"
-              class="pa-1 tw-full text-body-1 d-flex justify-space-between align-center tw-border"
+              class="pa-2 tw-full text-body-1 d-flex justify-space-between align-center tw-border-b"
             >
               <div>{{ criteria.name }}</div>
               <div class="tw-min-w-[100px] sm:tw-w-[100px] tw-max-h-[36px]">
@@ -214,7 +214,7 @@
           :main-button-disabled="!gradeAssociatonData.gradeId || gradeAssociatonData.weight < 1"
           :loading="updatingGradeComposition"
           @on-secondary-action="openGradeCompositionDialog = false"
-          @on-main-action="updateTaskGradeComposition"
+          @on-main-action="onUpdateTaskGradeComposition"
         >
           <alex-inputs-select
             v-model="gradeAssociatonData.gradeId"
@@ -376,37 +376,6 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
   return true;
 };
 
-const { data: grades } = useQuery({
-  queryKey: ['grades', learningPlanId],
-  queryFn: async () => {
-    const { data } = await find('grades', {
-      filters: { learningplan: { id: learningPlanId.value } },
-      populate: ['grade_compositions'],
-    });
-    return data;
-  },
-});
-
-const { data: taskEvaluationData } = useQuery({
-  queryKey: ['taskEvaluationData', taskId],
-  queryFn: async () => {
-    const composition = await findOne('tasks', taskId.value, {
-      populate: {
-        grade_composition_task: { populate: ['grade_composition.grade'] },
-        evaluation_group: { populate: ['evaluation_criterias'] },
-        task_evaluation_criterias: {
-          populate: {
-            criteria: true,
-          },
-        },
-      },
-    });
-
-    return composition.data || [];
-  },
-  enabled: () => taskId.value > 0,
-});
-
 const gradeTaskComposition = computed(() => {
   return taskEvaluationData.value?.grade_composition_task;
 });
@@ -442,6 +411,21 @@ const evaluationGroupData = ref({ groupType: 'standard', groupId: null, evaluati
 const selectedGroupType = computed(() => evaluationGroupData.value.groupType);
 
 const selectedGrade = computed(() => grades.value?.find((grade) => grade.id === gradeAssociatonData.value.gradeId));
+
+const {
+  getLearningPlanGrades,
+  getTaskEvaluatonData,
+  getUserEvaluationGroupsByType,
+  taskGradeCompositionMutation,
+  taskEvaluationGroupMutation,
+} = useTaskEvaluation(learningPlanId, taskId, user);
+
+const { data: grades } = getLearningPlanGrades();
+
+const { data: taskEvaluationData } = getTaskEvaluatonData();
+
+const { data: evaluationGroups } = getUserEvaluationGroupsByType(selectedGroupType);
+
 const selectedEvaluationGroup = computed(
   () => evaluationGroups.value?.find((groups) => groups.id === evaluationGroupData.value.groupId),
 );
@@ -460,52 +444,27 @@ const onChangeEvaluationGroup = () => {
     }) || [];
 };
 
-const { data: evaluationGroups } = useQuery({
-  queryKey: ['groups', user, selectedGroupType],
-  queryFn: async () => {
-    const groups = await find('evaluation-groups', {
-      filters: {
-        $or: [
-          {
-            public: true,
-          },
-          {
-            user: {
-              id: user.value?.id,
-            },
-          },
-        ],
-        type: selectedGroupType.value,
-      },
-      populate: ['evaluation_criterias'],
-    });
+const { mutate: updateTaskGradeComposition, isPending: updatingGradeComposition } =
+  taskGradeCompositionMutation(openGradeCompositionDialog);
 
-    return groups.data;
-  },
-});
+const onUpdateTaskGradeComposition = () => {
+  updateTaskGradeComposition({
+    taskCompositionId: gradeTaskComposition.value?.id,
+    weight: gradeAssociatonData.value.weight,
+    gradeCompositionId: selectedGrade.value?.grade_compositions[0]?.id,
+  });
+};
 
-const { mutate: updateTaskGradeComposition, isPending: updatingGradeComposition } = useMutation({
-  mutationFn: () => {
-    if (gradeTaskComposition.value) {
-      return update('grade-composition-tasks', gradeTaskComposition.value.id, {
-        grade_composition: selectedGrade.value?.grade_compositions[0]?.id,
-        weight: gradeAssociatonData.value.weight,
-      });
-    } else {
-      return create('grade-composition-tasks', {
-        grade_composition: selectedGrade.value?.grade_compositions[0]?.id,
-        weight: gradeAssociatonData.value.weight,
-        task: taskId.value,
-      });
-    }
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['taskEvaluationData', taskId] });
-    openGradeCompositionDialog.value = false;
-  },
-});
+const { mutate: updateTaskEvaluationGroup, isPending: updatingEvaluationGroup } =
+  taskEvaluationGroupMutation(openEvaluationGroupDialog);
 
-const { mutate: updateTaskEvaluationGroup, isPending: updatingEvaluationGroup } = useMutation({
+const onUpdateTaskEvaluationGroup = () => {
+  updateTaskEvaluationGroup({
+    groupId: evaluationGroupData.value.groupId,
+    evaluationCriterias: evaluationGroupData.value.evaluationCriterias,
+  });
+};
+useMutation({
   mutationFn: () => {
     return update('tasks', taskId.value, {
       evaluation_group: evaluationGroupData.value.groupId,
