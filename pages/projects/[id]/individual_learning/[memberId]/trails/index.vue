@@ -89,7 +89,7 @@ const toggleVisibility = async (id: number, hidden: boolean) => {
 const navigate = (trailId: number, page?: string) => {
   const { id } = route.params;
   const slug = page === 'settings' ? '/settings' : '';
-  navigateTo(`/projects/${id}/trails/${trailId}${slug}`);
+  navigateTo(`/projects/${id}/trails/${trailId}${slug}?from=${route.params.memberId}`);
 };
 
 const handleTrailCreate = async (trailId: number, newStructure) => {

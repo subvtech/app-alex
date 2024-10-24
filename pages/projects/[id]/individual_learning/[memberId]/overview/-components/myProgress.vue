@@ -3,11 +3,13 @@
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
-import Tooltip from './tooltip.vue';
+import { useRoute } from 'vue-router';
+import ChartTooltip from './tooltip.vue';
 
 const i18Dir = 'components.projects.individual_learning.overview.myProgress';
 const lastUpdate = new Date();
-
+const route = useRoute();
+const currentPath = route.fullPath;
 const activePage = ref(0);
 const i18n = useI18n();
 
@@ -72,7 +74,7 @@ watch(
 </script>
 
 <template>
-  <alex-custom-card :title="$t(`${i18Dir}.title`)" no-footer sizing-class="py-0 px-6" class="tw-min-h-[400px]">
+  <alex-custom-card :title="$t(`${i18Dir}.title`)" no-footer sizing-class="py-0 px-6" class="tw-min-h-[400px] h-100">
     <template #content>
       <div class="d-flex flex-wrap w-100">
         <div
@@ -87,10 +89,11 @@ watch(
             :show-legend="false"
             :colors="['#00b7cc', '#e1f9fc']"
             :bar-width="65"
-            :custom-tooltip="Tooltip"
+            :custom-tooltip="ChartTooltip"
+            :tooltip-props="{ text: 'Custom Tooltip Text', color: 'blue' }"
             :x-formatter="
               (tick) => {
-                return processedData.length ? `${$t(`${i18Dir}.goalAcronym`)}${processedData[tick]?.id}` : '';
+                return processedData.length && tick % 1 === 0 ? `${$t(`${i18Dir}.goalAcronym`)}${tick + 1}` : '';
               }
             "
           />
@@ -109,10 +112,9 @@ watch(
           </div>
         </div>
         <div class="lg:tw-w-1/2 tw-w-full pb-6 pl-6 tw-max-h-[400px]">
-          <!-- <alex-custom-tabs v-model="activePage" :tabs="tabs" /> -->
-          <v-tabs class="text-gray-800 w-100">
+          <v-tabs v-model="activePage" class="text-gray-800 w-100">
             <v-tooltip
-              v-for="tab in processedData"
+              v-for="(tab, index) in processedData"
               :key="tab.id"
               :text="tab.name"
               location="top"
@@ -122,7 +124,7 @@ watch(
             >
               <template #activator="{ props: tooltip }">
                 <v-tab :value="tab.id" v-bind="tooltip" color="accent" @click="activePage = tab.id">
-                  <span>{{ $t(`${i18Dir}.goalAcronym`) }}{{ tab.id }}</span>
+                  <span>{{ $t(`${i18Dir}.goalAcronym`) }}{{ index + 1 }}</span>
                 </v-tab>
               </template>
             </v-tooltip>
@@ -154,7 +156,12 @@ watch(
                     </p>
                     <p class="text-body-2 text-gray-800 ellipsis lines-1">{{ task.name }}</p>
                   </div>
-                  <nuxt-link to="/projects/1/individual_learning/1/overview/1" class="text-body-5 text-primary-0"
+                  <nuxt-link
+                    :to="{
+                      path: currentPath.replace('/overview', '/tasks'),
+                      query: { task: task.id },
+                    }"
+                    class="text-body-5 text-primary-0"
                     ><v-icon icon="mdi-chevron-right" size="28"
                   /></nuxt-link>
                 </div>
