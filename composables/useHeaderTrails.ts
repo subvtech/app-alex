@@ -46,12 +46,13 @@ export const useHeaderTrails = (currentPageRoute, currentPageTitle = '', project
             },
             {
               title: t('components.trails.header.chip'),
-              to: `/projects/${id}/individual_learning`,
+              to: `/projects/${id}/individual_learning${route.query?.from ? `/${route.query.from}` : ''}`,
               disabled: false,
             },
             {
               title: t('pages.courses.trails'),
-              disabled: true,
+              to: `/projects/${id}/individual_learning${route.query?.from ? `/${route.query.from}/trails` : ''}`,
+              disabled: !route.query?.from,
             },
             {
               title: trailStore.trail?.title ?? '',

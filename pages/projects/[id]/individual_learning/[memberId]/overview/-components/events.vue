@@ -1,5 +1,5 @@
 <template>
-  <alex-custom-card id="overview-events" :title="$t(`${i18Dir}.title`)" no-footer>
+  <alex-custom-card id="overview-events" :title="$t(`${i18Dir}.title`)" no-footer class="h-100">
     <template #content>
       <v-timeline
         side="end"
