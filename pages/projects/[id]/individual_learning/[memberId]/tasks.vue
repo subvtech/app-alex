@@ -395,7 +395,7 @@ const getStudentTasks = async () => {
       'task.task_events.learning_plan_member.user.avatar',
       'task.task_members.learning_plan_member.user.avatar',
       'task.task_members.learning_plan_group.group_members.student_member.user.avatar',
-      'task.learning_goals',
+      'task.learning_goals.verb',
       'learning_plan_member.learning_class',
       'learning_plan_member.user.avatar',
       'learning_plan_group.group_members.student_member.user.avatar',
