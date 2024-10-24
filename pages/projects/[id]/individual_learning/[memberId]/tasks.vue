@@ -229,6 +229,7 @@ const { setMessage } = useMessageStore();
 const strapi = useStrapi();
 const { find } = useStrapiUtils();
 const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
 
 // Ref
@@ -799,8 +800,12 @@ onBeforeMount(() => {
 
 onMounted(() => {
   checkMobile();
-
   window.addEventListener('resize', () => checkMobile());
+  if (route.query?.task) {
+    // TODO Open drawer with selected task
+    openDrawer(route.query.task);
+    router.replace({ path: route.path, query: { ...route.query, task: undefined } });
+  }
 });
 
 onBeforeUnmount(() => {

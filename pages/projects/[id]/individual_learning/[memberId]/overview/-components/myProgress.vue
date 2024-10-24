@@ -3,11 +3,13 @@
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
+import { useRoute } from 'vue-router';
 import ChartTooltip from './tooltip.vue';
 
 const i18Dir = 'components.projects.individual_learning.overview.myProgress';
 const lastUpdate = new Date();
-
+const route = useRoute();
+const currentPath = route.fullPath;
 const activePage = ref(0);
 const i18n = useI18n();
 
@@ -154,7 +156,12 @@ watch(
                     </p>
                     <p class="text-body-2 text-gray-800 ellipsis lines-1">{{ task.name }}</p>
                   </div>
-                  <nuxt-link to="/projects/1/individual_learning/1/overview/1" class="text-body-5 text-primary-0"
+                  <nuxt-link
+                    :to="{
+                      path: currentPath.replace('/overview', '/tasks'),
+                      query: { task: task.id },
+                    }"
+                    class="text-body-5 text-primary-0"
                     ><v-icon icon="mdi-chevron-right" size="28"
                   /></nuxt-link>
                 </div>
