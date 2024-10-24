@@ -1,5 +1,10 @@
 {
   "overview": {
+    "statisticCards": {
+      "totalTasks": "Total de tarefas",
+      "totalObjectives": "Total de objetivos",
+      "totalContributions": "Total de contribuições"
+    },
     "events": {
       "title": "Eventos",
       "task_created": "Tarefa criada",
