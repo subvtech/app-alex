@@ -77,7 +77,7 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
                 id: submissionId?.value,
               },
             },
-            populate: ['criteria_evaluations.criteria'],
+            populate: ['criteria_evaluations.criteria.criteria', 'evaluation_group'],
           });
 
           return composition.data[0] || null;

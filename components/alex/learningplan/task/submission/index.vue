@@ -31,10 +31,13 @@
     :deadline="taskDeadline"
     :restrictions="restrictions"
     :task-member-id="taskMemberId"
+    :learning-plan-id="learningPlanId"
+    :task-id="taskId"
     :last-submission="content"
     :task-status="taskStatus"
     :read-only="readOnly"
     :doc-name="shouldBeCollaborative"
+    :member-type="type"
     @update-task-status="(status) => $emit('update-task-status', status)"
     @update-submission="() => $emit('update-submission')"
   />
@@ -96,7 +99,7 @@ const { getTaskEvaluatonData, getTaskSubmissionEvaluation, createSubmissionEvalu
 
 const { data: taskEvaluationData } = getTaskEvaluatonData();
 const { data: taskSubmissionData } = getTaskSubmissionEvaluation();
-const { mutateAsync: createTaskSubmissionValidation } = createSubmissionEvaluationMutation();
+const { mutateAsync: createTaskSubmissionEvaluation } = createSubmissionEvaluationMutation();
 
 const { t } = useI18n();
 const slots = useSlots();
@@ -214,7 +217,7 @@ const text = computed(() => {
 
 const openDialog = async () => {
   if (!taskSubmissionData.value) {
-    await createTaskSubmissionValidation({ groupId: taskEvaluationData.value?.evaluation_group?.id });
+    await createTaskSubmissionEvaluation({ groupId: taskEvaluationData.value?.evaluation_group?.id });
   }
   dialog.value.openDialog();
 };
