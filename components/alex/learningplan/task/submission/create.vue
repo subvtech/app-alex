@@ -11,10 +11,7 @@
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
         <template #default>
           <div class="ml-auto">
-            <alex-learningplan-task-date-chip
-              :date="deadline"
-              :is-published="true"
-            />
+            <alex-learningplan-task-date-chip :date="deadline" :is-published="true" />
           </div>
         </template>
       </alex-custom-dialog-header>
@@ -103,13 +100,7 @@ const checkDataChanges = async () => {
   const submissionStatus = taskSubmission.data[0]?.attributes?.submitted_at;
 
   if (submissionStatus) {
-    setMessage(
-      t('components.courses.tasks.submission_modal.in_review'),
-      'blue',
-      true,
-      false,
-      true,
-    );
+    setMessage(t('components.courses.tasks.submission_modal.in_review'), 'blue', true, false, true);
     isReadOnly.value = true;
     clearInterval(saveInterval);
     emit('update-task-status', 'in_review');
@@ -117,8 +108,7 @@ const checkDataChanges = async () => {
     return false;
   }
 
-  const lastSubmission =
-    taskSubmission.data && taskSubmission.data[0]?.attributes?.submission;
+  const lastSubmission = taskSubmission.data && taskSubmission.data[0]?.attributes?.submission;
 
   if (!lastSubmission) {
     return editorContent.value !== undefined;
@@ -134,12 +124,7 @@ const checkDataChanges = async () => {
   }
 
   for (let i = 0; i < lastSubmission.content.length; i++) {
-    if (
-      !lodash.isEqual(
-        lastSubmission.content[i].content,
-        toRaw(editorContent.value?.content[i].content),
-      )
-    ) {
+    if (!lodash.isEqual(lastSubmission.content[i].content, toRaw(editorContent.value?.content[i].content))) {
       return true;
     }
   }
@@ -194,18 +179,10 @@ const saveSubmission = async () => {
   isLoading.value = true;
   try {
     await saveContent();
-    setMessage(
-      t('components.courses.tasks.submission_modal.save_success'),
-      'success',
-      true,
-    );
+    setMessage(t('components.courses.tasks.submission_modal.save_success'), 'success', true);
     executeSubmissions();
   } catch (error) {
-    setMessage(
-      t('components.courses.tasks.submission_modal.save_error'),
-      'error',
-      true,
-    );
+    setMessage(t('components.courses.tasks.submission_modal.save_error'), 'error', true);
   } finally {
     isLoading.value = false;
   }

@@ -15,9 +15,7 @@
       <h5 class="text-body-4" :class="colorsAndSizes.title">
         {{ text.title }}
       </h5>
-      <p :class="[colorsAndSizes.subtitle, colorsAndSizes.subtitleSize]">
-        {{ text.subtitle }}
-      </p>
+      <p :class="[colorsAndSizes.subtitle, colorsAndSizes.subtitleSize]">{{ text.subtitle }}</p>
     </div>
     <slot name="appendIcon" />
     <v-icon
@@ -47,6 +45,8 @@ interface Submission {
   mark?: number | null;
   maxMark?: number | null;
   taskTitle?: string;
+  taskId?: number;
+  learningPlanId?: number;
   taskDeadline?: string;
   restrictions?: string[];
   content?: TaskSubmissionSimple;
@@ -62,14 +62,15 @@ interface ProfessorSubimission {
   status: 'in_review' | 'reviewed' | 'denied';
   type: 'professor';
 }
-type SubimissionProps = Submission &
-  (StudentSubimission | ProfessorSubimission);
+type SubimissionProps = Submission & (StudentSubimission | ProfessorSubimission);
 
 const props = withDefaults(defineProps<SubimissionProps>(), {
   clickable: false,
   mark: 0,
   maxMark: 0,
   taskTitle: undefined,
+  taskId: 0,
+  learningPlanId: 0,
   taskDeadline: undefined,
   restrictions: undefined,
   content: undefined,
@@ -80,6 +81,23 @@ type Emits = {
   'update-submission': [];
 };
 defineEmits<Emits>();
+const user = useStrapiUser();
+const taskId = toRef(props, 'taskId');
+const learningPlanId = toRef(props, 'learningPlanId');
+const submission = toRef(props, 'content');
+const submissionId = computed(() => submission.value?.id);
+
+const { getTaskEvaluatonData, getTaskSubmissionEvaluation, createSubmissionEvaluationMutation } = useTaskEvaluation(
+  learningPlanId,
+  taskId,
+  user,
+  submissionId,
+);
+
+const { data: taskEvaluationData } = getTaskEvaluatonData();
+const { data: taskSubmissionData } = getTaskSubmissionEvaluation();
+const { mutateAsync: createTaskSubmissionValidation } = createSubmissionEvaluationMutation();
+
 const { t } = useI18n();
 const slots = useSlots();
 const hasPrepend = computed(() => !!slots.prependIcon);
@@ -96,10 +114,7 @@ const formattedMark = computed(() => {
 });
 
 const shouldBeCollaborative = computed(() => {
-  if (
-    ['to_do', 'in_progress'].includes(props.taskStatus) &&
-    props.type === 'student'
-  ) {
+  if (['to_do', 'in_progress'].includes(props.taskStatus) && props.type === 'student') {
     return props.docName;
   }
   return '';
@@ -107,18 +122,12 @@ const shouldBeCollaborative = computed(() => {
 
 const defaultChip = computed(
   () =>
-    ['not_started', 'started'].includes(props.status) ||
-    (props.status === 'in_review' && props.type === 'professor'),
+    ['not_started', 'started'].includes(props.status) || (props.status === 'in_review' && props.type === 'professor'),
 );
 
-const readOnly = computed(
-  () =>
-    ['in_review', 'done'].includes(props.status) || props.type === 'professor',
-);
+const readOnly = computed(() => ['in_review', 'done'].includes(props.status) || props.type === 'professor');
 
-const remake = computed(
-  () => props.status === 'denied' && props.type === 'student',
-);
+const remake = computed(() => props.status === 'denied' && props.type === 'student');
 const colorsAndSizes = computed(() => {
   let subtitle = 'text-gray-500';
   let subtitleSize = 'text-body-5';
@@ -196,13 +205,17 @@ const text = computed(() => {
       subtitle: formattedMark.value,
     };
   }
+
   return {
     title: t('components.courses.tasks.submission.done'),
     subtitle: t('components.courses.tasks.submission.click_to_review'),
   };
 });
 
-const openDialog = () => {
+const openDialog = async () => {
+  if (!taskSubmissionData.value) {
+    await createTaskSubmissionValidation({ groupId: taskEvaluationData.value?.evaluation_group?.id });
+  }
   dialog.value.openDialog();
 };
 </script>
