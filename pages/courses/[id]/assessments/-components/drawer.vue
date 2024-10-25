@@ -24,13 +24,11 @@
     ></alex-inputs-editable-text>
 
     <h3 class="text-gray-800 text-h3 my-4">Tarefas associadas</h3>
-    <div class="mt-4 mb-6 d-flex gap-4">
-      <div class="rounded-lg tw-border tw-w-[260px] tw-h-[120px] pa-4">
+    <div class="mt-4 mb-6 d-flex gap-4 flex-wrap">
+      <div v-for="task in selectedTasks" :key="task.id" class="rounded-lg tw-border tw-w-[260px] tw-h-[120px] pa-4">
         <p class="d-flex">
-          <span class="text-body-4 text-gray-800 tw-max-w-[198px] ellipsis lines-2"
-            >Criar uma protótipagem para a página de dashboard</span
-          >
-          <span class="text-body-2 text-secondary-0">#30</span>
+          <span class="text-body-4 text-gray-800 tw-max-w-[198px] ellipsis lines-2">{{ task.title }}</span>
+          <span class="text-body-2 text-secondary-0">#{{ task.id }}</span>
         </p>
         <div class="mt-4 d-flex align-center">
           <v-icon
@@ -40,8 +38,8 @@
             >mdi-format-list-bulleted</v-icon
           >
           <span>
-            <p class="text-gray-800 text-body-4">Rubrica</p>
-            <p class="text-gray-600 text-body-3">Gestão de projetos</p>
+            <p class="text-gray-800 text-body-4">{{ task.type }}</p>
+            <p class="text-gray-600 text-body-3">{{ task.methodName }}</p>
           </span>
         </div>
       </div>
@@ -62,20 +60,37 @@
         <p class="text-gray-400 text-body-3">Parece que não foi adicionada nenhuma tarefa</p>
       </div>
       <div v-else>
-        <div class="d-flex">
-          <div v-for="i in 3" :key="i" class="d-flex align-center">
-            <div class="pa-4 bg-white rounded-lg tw-w-[150px] d-flex justify-center align-center gap-4">
-              <span class="text-secondary-0 text-body-2"> #30 </span>
+        <div class="d-flex flex-wrap pa-6">
+          <div v-for="(task, index) in selectedTasks" :key="task.id" class="d-flex align-center mb-6">
+            <div class="pa-4 bg-white rounded-lg tw-w-[148px] d-flex justify-center align-center gap-4">
+              <span class="text-secondary-0 text-body-2"> #{{ task.id }}</span>
               <span class="text-body-3 text-gray-500">X</span>
               <span
-                class="text-body-3 text-gray-600 d-flex tw-border px-2 rounded-lg tw-h-[26px] d-flex align-center gap-1 tw-min-w-[43px]"
+                class="text-body-3 text-gray-600 d-flex tw-border rounded-lg tw-h-[26px] d-flex align-center justify-center gap-1 tw-w-[70px]"
                 style="border-color: #a0a8b1"
               >
-                <alex-inputs-editable-text v-model="inputModel" tag="span" :cant-edit="true" class="d-inline" />
-                <v-icon icon="mdi-pencil-outline" size="16" />
+                <alex-custom-button
+                  @click="updateTaskWeight(task, 'down')"
+                  icon="mdi-chevron-down"
+                  size="20"
+                  color="gray-600"
+                  variant="text"
+                />
+                <span>{{ task.value }}</span>
+                <alex-custom-button
+                  @click="updateTaskWeight(task, 'up')"
+                  icon="mdi-chevron-up"
+                  size="20"
+                  color="gray-600"
+                  variant="text"
+                />
               </span>
             </div>
-            <v-icon v-if="i < 3" size="20" color="gray-800" icon="mdi-plus" class="ma-2" />
+            <v-icon v-if="index < selectedTasks.length - 1" size="20" color="gray-800" icon="mdi-plus" class="ma-1" />
+          </div>
+          <div class="bg-gray-200 w-100 tw-h-[2px]" :thickness="2" />
+          <div class="tw-h-14 tw-w-14 bg-white rounded-lg mx-auto d-flex justify-center align-center my-6">
+            {{ selectedTasks.length }}
           </div>
         </div>
       </div>
@@ -86,6 +101,64 @@
 <script setup lang="ts">
 const model = defineModel({ default: true });
 const title = ref('');
-const selectedTasks = ref([]);
+const selectedTasks = ref<task[]>([]);
 const inputModel = ref('1');
+type task = {
+  id: number;
+  title: string;
+  type: 'rubric' | 'criteria' | 'group';
+  methodName: string;
+  value: number;
+};
+
+const tasks: task[] = [
+  {
+    id: 1,
+    title: 'Criar uma protótipagem para a página de dashboard',
+    type: 'rubric',
+    methodName: 'Gestão de projetos',
+    value: 3,
+  },
+  {
+    id: 2,
+    title: 'Criar uma protótipagem para a página de dashboard',
+    type: 'criteria',
+    methodName: 'Gestão de projetos',
+    value: 1,
+  },
+  {
+    id: 3,
+    title: 'Criar uma protótipagem para a página de dashboard',
+    type: 'group',
+    methodName: 'Gestão de projetos',
+    value: 3,
+  },
+  {
+    id: 4,
+    title: 'Criar uma protótipagem para a página de dashboard',
+    type: 'rubric',
+    methodName: 'Gestão de projetos',
+    value: 2,
+  },
+  {
+    id: 5,
+    title: 'Criar uma protótipagem para a página de dashboard',
+    type: 'rubric',
+    methodName: 'Gestão de projetos',
+    value: 1,
+  },
+];
+
+selectedTasks.value = tasks;
+
+const updateTaskWeight = (task: task, update: 'up' | 'down') => {
+  const index = selectedTasks.value.findIndex((t) => t.id === task.id);
+  if (update === 'up' && task.value < 9) {
+    selectedTasks.value[index].value += 1;
+  } else if (update === 'down' && task.value > 1) {
+    {
+      selectedTasks.value[index].value -= 1;
+    }
+  }
+};
 </script>
