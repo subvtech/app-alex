@@ -1,0 +1,13 @@
+{
+  "create": "Criar",
+  "criteria": "Critérios",
+  "criteria_description": "Descrição do critério",
+  "criteria_name": "Nome do critério",
+  "groups": "Grupos",
+  "headings": "Rubricas",
+  "home": "Home",
+  "my_evaluations": "Minhas avaliações",
+  "search_criteria": "Encontrar critério",
+  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
+  "update": "Atualizar"
+}
