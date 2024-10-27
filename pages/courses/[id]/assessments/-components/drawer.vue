@@ -96,13 +96,15 @@
       </div>
     </div>
   </v-navigation-drawer>
+  <Dialog v-model="drawer" />
 </template>
 
 <script setup lang="ts">
+import Dialog from './taskPicker.vue';
 const model = defineModel({ default: true });
 const title = ref('');
 const selectedTasks = ref<task[]>([]);
-const inputModel = ref('1');
+const drawer = ref(true);
 type task = {
   id: number;
   title: string;
