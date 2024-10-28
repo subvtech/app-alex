@@ -110,8 +110,10 @@
                     }}</span>
                     <alex-inputs-text-field
                       v-else
+                      :model-value="evaluation_criteria.grade"
+                      :name="`criteria-evaluation-grade-${evaluation_criteria.id}`"
                       type="number"
-                      @update:modelValue="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
+                      @update:model-value="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
                     />
                   </div>
                 </template>
@@ -212,7 +214,14 @@ const onCriteriaGrading = (grade, criteriaId) => {
   const evaluationData = structuredClone(toRaw(taskSubmissionEvaluationData.value));
 
   const criteriaIdx = evaluationData.criteria_evaluations.findIndex((c) => c.id === criteriaId);
-  evaluationData.criteria_evaluations[criteriaIdx].grade = grade;
+
+  if (grade > 100) {
+    grade = 100;
+  } else if (grade < 0) {
+    grade = 0;
+  }
+
+  console.log(grade);
 
   queryClient.setQueryData(['taskSumbmissionEvaluationData', submissionId], evaluationData);
 };
