@@ -114,9 +114,9 @@
 </template>
 
 <script setup lang="ts">
-import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
+import type { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
-import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
+import type { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 
 export interface TaskItem {
   id: number;
@@ -487,8 +487,15 @@ const openDrawer = (id: number) => {
 
 onMounted(() => {
   if (route.query?.taskId) {
-    openDrawer(parseInt(route.query.taskId.toString()));
+    openDrawer(Number.parseInt(route.query.taskId.toString()));
   }
+});
+
+watch(teacherDrawer, (open) => {
+  if (open || !route.query?.taskId) {
+    return;
+  }
+  setTimeout(() => router.replace({ path: route.path, query: { ...route.query, taskId: undefined } }), 500);
 });
 
 const handleChangeValues = (values: Partial<TaskSimple>) => {
