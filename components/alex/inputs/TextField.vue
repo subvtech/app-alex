@@ -7,11 +7,7 @@
       </p>
       <alex-custom-tooltip v-if="info" :text="info">
         <template #content>
-          <v-icon
-            v-if="info"
-            class="ml-1 align-self-center"
-            size="20"
-            :color="textColor"
+          <v-icon v-if="info" class="ml-1 align-self-center" size="20" :color="textColor"
             >mdi-information-outline</v-icon
           >
         </template>
@@ -132,8 +128,7 @@ onMounted(() => {
     color: rgb(var(--v-theme-gray-300)) !important;
   }
 
-  .v-field:hover:not(.v-field--active):not(.v-field--error)
-    > .v-field__outline {
+  .v-field:hover:not(.v-field--active):not(.v-field--error) > .v-field__outline {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
@@ -150,10 +145,7 @@ onMounted(() => {
     color: rgb(var(--v-theme-gray-300));
   }
 
-  .light
-    .v-field--dirty:not(.v-field--disabled)
-    > .v-field__field
-    > .v-field__input {
+  .light .v-field--dirty:not(.v-field--disabled) > .v-field__field > .v-field__input {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 

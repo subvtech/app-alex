@@ -1,5 +1,6 @@
 <template>
   <alex-custom-dialog
+    v-if="!taskSubmissionEvaluationData || (!taskSubmissionEvaluationData.evaluated_at && memberType === 'student')"
     v-model="dialog"
     :persistent="true"
     :max-width="1080"
@@ -11,10 +12,7 @@
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
         <template #default>
           <div class="ml-auto">
-            <alex-learningplan-task-date-chip
-              :date="deadline"
-              :is-published="true"
-            />
+            <alex-learningplan-task-date-chip :date="deadline" :is-published="true" />
           </div>
         </template>
       </alex-custom-dialog-header>
@@ -30,8 +28,116 @@
       />
     </div>
   </alex-custom-dialog>
+  <alex-custom-dialog
+    v-else
+    v-model="dialog"
+    :persistent="true"
+    :max-width="1760"
+    :retain-focus="false"
+    no-click-animation
+    no-footer
+  >
+    <template #header>
+      <alex-custom-dialog-header :title="title" @on-close="dialog = false">
+        <template #default>
+          <div class="ml-auto">
+            <alex-learningplan-task-date-chip :date="deadline" :is-published="true" />
+          </div>
+        </template>
+      </alex-custom-dialog-header>
+    </template>
+    <v-tabs v-model="tab">
+      <v-tab value="content"> Conteudo </v-tab>
+      <v-tab value="evaluation"> Avaliação </v-tab>
+    </v-tabs>
+    <v-tabs-window v-model="tab">
+      <v-tabs-window-item value="content">
+        <div class="mx-auto editor my-6 px-sm-6 px-md-0 w-100">
+          <div class="d-flex justify-space-between">
+            <div>
+              <tip-tap
+                v-model="editorContent"
+                :doc-name="docName"
+                :edit="!isReadOnly"
+                :collaboration="!!docName"
+                :allowed-blocks="props.restrictions ? props.restrictions : []"
+                :show-loader="true"
+              />
+            </div>
+            <div class="d-flex flex-wrap tw-max-w-[400px] sm:tw-w-[400px] tw-border pa-3">
+              <div class="tw-w-full">Avalição de Entrega</div>
+              <div class="tw-w-full">
+                Tipo: {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }}
+              </div>
+              <div class="tw-w-full">
+                {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }} :
+                {{ taskSubmissionEvaluationData?.evaluation_group?.name }}
+              </div>
+              <div class="tw-w-full">Analise da tarefa</div>
+              <div
+                v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
+                :key="`criteria-${i}`"
+                class="tw-w-full"
+              >
+                {{ evaluation_criteria.criteria.criteria.name }}: {{ evaluation_criteria.grade || 'Nao avaliado' }} x
+                {{ evaluation_criteria.criteria.weight }}
+              </div>
+              <div class="tw-w-full">Nota final: {{ finalGrade }}</div>
+            </div>
+          </div>
+        </div>
+      </v-tabs-window-item>
+      <v-tabs-window-item value="evaluation">
+        <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 d-flex flex-wrap">
+          <div class="d-flex flex-wrap justify-space-between">
+            <div class="d-flex flex-wrap">
+              <div class="tw-w-full">
+                {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }}
+              </div>
+              <div class="tw-w-full">
+                {{ taskSubmissionEvaluationData?.evaluation_group?.name }}
+              </div>
+              <div class="tw-w-full d-flex flex-wrap">
+                <template v-if="taskSubmissionEvaluationData?.evaluation_group?.type === 'standard'">
+                  <div
+                    v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
+                    :key="`criteria-evaluation-grade-${i}`"
+                    class="tw-w-full"
+                  >
+                    {{ evaluation_criteria.criteria.criteria.name }}:
+                    <span v-if="taskSubmissionEvaluationData.evaluated_at">{{
+                      evaluation_criteria.grade || 'Nao avaliado'
+                    }}</span>
+                    <alex-inputs-text-field
+                      v-else
+                      type="number"
+                      @update:modelValue="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
+                    />
+                  </div>
+                </template>
+                <div v-else>Componente de rubrica</div>
+              </div>
+            </div>
+            <div class="d-flex flex-wrap tw-max-w-[400px] sm:tw-w-[400px] tw-border pa-3">
+              <div class="tw-w-full">Criterios</div>
+              <div
+                v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
+                :key="`criteria-evaluation-${i}`"
+                class="tw-w-full"
+              >
+                {{ evaluation_criteria.criteria.criteria.name }}: {{ evaluation_criteria.grade || 'Nao avaliado' }} x
+                {{ evaluation_criteria.criteria.weight }}
+              </div>
+              <div class="tw-w-full">Nota final: {{ finalGrade }}</div>
+            </div>
+          </div>
+        </div>
+      </v-tabs-window-item>
+    </v-tabs-window>
+  </alex-custom-dialog>
 </template>
 <script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query';
 import lodash from 'lodash';
 import { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
 interface submissionProps {
@@ -43,6 +149,9 @@ interface submissionProps {
   lastSubmission?: TaskSubmissionSimple;
   docName?: string;
   readOnly?: boolean;
+  learningPlanId?: number;
+  taskId?: number;
+  memberType?: 'student' | 'professor';
 }
 
 const props = withDefaults(defineProps<submissionProps>(), {
@@ -52,6 +161,9 @@ const props = withDefaults(defineProps<submissionProps>(), {
   lastSubmission: undefined,
   readOnly: false,
   docName: undefined,
+  learningPlanId: 0,
+  taskId: 0,
+  memberType: 'student',
 });
 
 const isReadOnly = ref(props.readOnly);
@@ -78,6 +190,47 @@ const hasEditorChanges = ref(false);
 const lastSaveDate = ref<Date | null>(null);
 const saveCountDown = ref<number>(saveTime);
 const submissionId = ref<number>(props.lastSubmission?.id || 0);
+const tab = ref(null);
+
+const user = useStrapiUser();
+const taskId = toRef(props, 'taskId');
+const learningPlanId = toRef(props, 'learningPlanId');
+
+const { getTaskEvaluatonData, getTaskSubmissionEvaluation } = useTaskEvaluation(
+  learningPlanId,
+  taskId,
+  user,
+  submissionId,
+);
+
+const { data: taskEvaluationData } = getTaskEvaluatonData();
+const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
+
+const queryClient = useQueryClient();
+
+const onCriteriaGrading = (grade, criteriaId) => {
+  const evaluationData = structuredClone(toRaw(taskSubmissionEvaluationData.value));
+
+  const criteriaIdx = evaluationData.criteria_evaluations.findIndex((c) => c.id === criteriaId);
+  evaluationData.criteria_evaluations[criteriaIdx].grade = grade;
+
+  queryClient.setQueryData(['taskSumbmissionEvaluationData', submissionId], evaluationData);
+};
+
+const finalGrade = computed(() => {
+  const totalWeight = taskSubmissionEvaluationData.value.criteria_evaluations.reduce(
+    (total, c) => (c.criteria?.weight || 1) + total,
+    0,
+  );
+
+  const grades = taskSubmissionEvaluationData.value.criteria_evaluations.map(
+    (c) => (c.grade || 0) * (c.criteria?.weight || 0),
+  );
+
+  const totalGrade = grades.reduce((total, grade) => total + grade);
+
+  return totalGrade / totalWeight;
+});
 
 watch(editorContent, (_, previous) => {
   prevEditorContent.value = previous;
@@ -103,13 +256,7 @@ const checkDataChanges = async () => {
   const submissionStatus = taskSubmission.data[0]?.attributes?.submitted_at;
 
   if (submissionStatus) {
-    setMessage(
-      t('components.courses.tasks.submission_modal.in_review'),
-      'blue',
-      true,
-      false,
-      true,
-    );
+    setMessage(t('components.courses.tasks.submission_modal.in_review'), 'blue', true, false, true);
     isReadOnly.value = true;
     clearInterval(saveInterval);
     emit('update-task-status', 'in_review');
@@ -117,8 +264,7 @@ const checkDataChanges = async () => {
     return false;
   }
 
-  const lastSubmission =
-    taskSubmission.data && taskSubmission.data[0]?.attributes?.submission;
+  const lastSubmission = taskSubmission.data && taskSubmission.data[0]?.attributes?.submission;
 
   if (!lastSubmission) {
     return editorContent.value !== undefined;
@@ -134,12 +280,7 @@ const checkDataChanges = async () => {
   }
 
   for (let i = 0; i < lastSubmission.content.length; i++) {
-    if (
-      !lodash.isEqual(
-        lastSubmission.content[i].content,
-        toRaw(editorContent.value?.content[i].content),
-      )
-    ) {
+    if (!lodash.isEqual(lastSubmission.content[i].content, toRaw(editorContent.value?.content[i].content))) {
       return true;
     }
   }
@@ -194,18 +335,10 @@ const saveSubmission = async () => {
   isLoading.value = true;
   try {
     await saveContent();
-    setMessage(
-      t('components.courses.tasks.submission_modal.save_success'),
-      'success',
-      true,
-    );
+    setMessage(t('components.courses.tasks.submission_modal.save_success'), 'success', true);
     executeSubmissions();
   } catch (error) {
-    setMessage(
-      t('components.courses.tasks.submission_modal.save_error'),
-      'error',
-      true,
-    );
+    setMessage(t('components.courses.tasks.submission_modal.save_error'), 'error', true);
   } finally {
     isLoading.value = false;
   }

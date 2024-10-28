@@ -27,6 +27,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     },
     learning_structures: {
       populate: {
+        author_member: {
+          populate: ['user'],
+        },
         trails: {
           sort: 'id:desc',
           populate: ['cover_image', 'structures.blocks'],

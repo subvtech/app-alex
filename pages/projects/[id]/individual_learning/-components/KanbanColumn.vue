@@ -1,6 +1,6 @@
 <template>
   <div class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
-    <KanbanColumnHeader :title="title" :quantity="items.length" :color="color" />
+    <KanbanColumnHeader :title="title" :quantity="items?.length ?? 0" :color="color" />
     <SlickList
       class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends { id: number; status: string; task?: TaskSimple }">
-import { SlickList, SlickItem } from 'vue-slicksort';
+import { SlickItem, SlickList } from 'vue-slicksort';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
 import KanbanColumnHeader from './KanbanColumnHeader.vue';
 

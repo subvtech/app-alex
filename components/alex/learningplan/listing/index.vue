@@ -9,22 +9,14 @@
       class="tw-flex-1 d-flex align-center justify-center flex-column pa-6"
     >
       <v-progress-circular
-        v-if="
-          customDataLoading !== undefined
-            ? customDataLoading
-            : query.isFetching.value
-        "
+        v-if="customDataLoading !== undefined ? customDataLoading : query.isFetching.value"
         color="accent"
         indeterminate
         :size="100"
         :width="6"
       ></v-progress-circular>
       <div v-else>
-        <img
-          class="emptyProjects-img"
-          src="public/images/emptyCourses.svg"
-          alt="Empty Projects"
-        />
+        <img class="emptyProjects-img" src="public/images/emptyCourses.svg" alt="Empty Projects" />
         <p class="text-h3 text-gray-600 text-center">
           {{
             $t('pages.courses.emptyStateText', {
@@ -51,30 +43,18 @@
           density="comfortable"
         />
         <div>
-          <v-tooltip
-            :text="$t('pages.classes.viewModeTooltip')"
-            location="bottom"
-            content-class="bg-gray-800"
-          >
+          <v-tooltip :text="$t('pages.classes.viewModeTooltip')" location="bottom" content-class="bg-gray-800">
             <template #activator="{ props: propsCourseView }">
               <alex-custom-button
                 v-bind="propsCourseView"
-                :icon="
-                  learningPlanView == 'grid'
-                    ? 'mdi-format-list-bulleted'
-                    : 'mdi-view-grid-outline'
-                "
+                :icon="learningPlanView == 'grid' ? 'mdi-format-list-bulleted' : 'mdi-view-grid-outline'"
                 size="large"
                 variant="secondary"
                 @click="changeViewMode"
               />
             </template>
           </v-tooltip>
-          <v-tooltip
-            :text="$t('pages.classes.filterTooltip')"
-            location="bottom"
-            content-class="bg-gray-800"
-          >
+          <v-tooltip :text="$t('pages.classes.filterTooltip')" location="bottom" content-class="bg-gray-800">
             <template #activator="{ props: propsFilter }">
               <alex-custom-button
                 v-bind="propsFilter"
@@ -89,10 +69,7 @@
         </div>
       </div>
       <v-slide-y-transition>
-        <div
-          v-if="hasFilters"
-          class="tw-flex tw-flex-wrap gap-2 tw-pb-4 pa-6 pb-0"
-        >
+        <div v-if="hasFilters" class="tw-flex tw-flex-wrap gap-2 tw-pb-4 pa-6 pb-0">
           <template v-for="(filter, key) in filters" :key="filter?.title">
             <alex-custom-chip
               v-if="checkValidFilters(key, filter)"
@@ -137,11 +114,7 @@
               :image="{
                 url: item.learningPlan.cover_image?.url || '',
               }"
-              :institution="
-                item.learningPlan.type === 'course'
-                  ? undefined
-                  : item.learningPlan.institutions?.[0]
-              "
+              :institution="item.learningPlan.type === 'course' ? undefined : item.learningPlan.institutions?.[0]"
               :facilitator="{
                 name: item.facilitator?.user?.fullname || '',
                 imageURL: item.facilitator?.user?.avatar?.url,
@@ -155,16 +128,8 @@
               :members="getUrlNameMembers(item.learningPlan.members)"
               :hide="item.learningPlan.hidden"
               :unavailable="!isAvailable(item.learningPlan.id)"
-              :trails-count="
-                item.learningPlan.type === 'course'
-                  ? item.trails.count
-                  : undefined
-              "
-              :product="
-                item.learningPlan.type !== 'course'
-                  ? item.learningPlan.product?.text
-                  : undefined
-              "
+              :trails-count="item.learningPlan.type === 'course' ? item.trails.count : undefined"
+              :product="item.learningPlan.type !== 'course' ? item.learningPlan.product?.text : undefined"
               hide-favorited-button
               @toggle-visibility="
                 changeItemVisibility({
@@ -174,11 +139,7 @@
                 })
               "
               @configurations="navigate(item.learningPlan.id, 'settings')"
-              @open="
-                isAvailable(item.learningPlan.id)
-                  ? navigate(item.learningPlan.id, 'page')
-                  : displayUnavailable()
-              "
+              @open="isAvailable(item.learningPlan.id) ? navigate(item.learningPlan.id, 'page') : displayUnavailable()"
             />
           </div>
           <v-data-table
@@ -195,23 +156,16 @@
                 class="table-row text-body-3 text-gray learning-row"
                 :class="{
                   hidden: item.learningPlan.hidden,
-                  'tw-grayscale tw-opacity-40': !isAvailable(
-                    item.learningPlan.id,
-                  ),
+                  'tw-grayscale tw-opacity-40': !isAvailable(item.learningPlan.id),
                 }"
                 @click="
-                  isAvailable(item.learningPlan.id)
-                    ? navigate(item.learningPlan.id, 'page')
-                    : displayUnavailable()
+                  isAvailable(item.learningPlan.id) ? navigate(item.learningPlan.id, 'page') : displayUnavailable()
                 "
               >
                 <td class="max-width-[596px]">
                   <div class="d-flex align-center">
                     <v-img
-                      :src="
-                        item.learningPlan.cover_image?.url ||
-                        '/images/cover_image_course.svg'
-                      "
+                      :src="item.learningPlan.cover_image?.url || '/images/cover_image_course.svg'"
                       width="48"
                       height="36"
                       class="rounded mr-4 !tw-max-w-[48px] !tw-max-h-[36px]"
@@ -227,27 +181,14 @@
                 </td>
                 <td class="text-overflow max-width-[150px]">
                   {{
-                    item.learningPlan.type === 'course'
-                      ? item.facilitator?.user?.fullname
-                      : item.leader?.user?.fullname
+                    item.learningPlan.type === 'course' ? item.facilitator?.user?.fullname : item.leader?.user?.fullname
                   }}
                 </td>
                 <td class="text-overflow max-width-[596px]">
-                  {{
-                    item.learningPlan.type === 'course'
-                      ? item.trails.count
-                      : item.learningPlan.product?.text
-                  }}
+                  {{ item.learningPlan.type === 'course' ? item.trails.count : item.learningPlan.product?.text }}
                 </td>
                 <td v-if="item.facilitator?.user.id === user.id">
-                  <alex-custom-dropdown
-                    :items="
-                      dropdownItems(
-                        item.learningPlan.hidden,
-                        item.learningPlan.id,
-                      )
-                    "
-                  >
+                  <alex-custom-dropdown :items="dropdownItems(item.learningPlan.hidden, item.learningPlan.id)">
                     <template #activator="{ props: propsMenu }">
                       <v-tooltip
                         :text="$t('components.learningPlan.card.options')"
@@ -289,14 +230,8 @@
           </div>
         </template>
         <template #no-data>
-          <div
-            class="tw-flex tw-flex-grow tw-justify-center tw-items-center tw-flex-col"
-          >
-            <img
-              class="emptyProjects-img"
-              src="public/images/emptyCourses.svg"
-              alt="Empty Projects"
-            />
+          <div class="tw-flex tw-flex-grow tw-justify-center tw-items-center tw-flex-col">
+            <img class="emptyProjects-img" src="public/images/emptyCourses.svg" alt="Empty Projects" />
             <p class="text-h3 text-gray-600 text-center">
               {{
                 $t('pages.classes.noData', {
@@ -307,23 +242,14 @@
           </div></template
         >
       </v-data-iterator>
-      <alex-learningplan-filter
-        ref="filterRef"
-        v-model="filterDrawer"
-        :type="type"
-        @submit="mapFiltersValue"
-      />
+      <alex-learningplan-filter ref="filterRef" v-model="filterDrawer" :type="type" @submit="mapFiltersValue" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { LearningPlanFilter } from '../Filter.vue';
-import {
-  LearningPlanData,
-  useGetMyLearningPlan,
-  useUpdateVisibility,
-} from './mutations';
+import { LearningPlanData, useGetMyLearningPlan, useUpdateVisibility } from './mutations';
 
 interface DataTableHeader<T> {
   title: string;
@@ -386,9 +312,7 @@ const isSingleColumn = computed(() => direction.value !== 'VERTICAL');
 const isProfessor = computed(() => {
   return user.value?.role?.type === UserRoles.PROFESSOR;
 });
-const simplifiedType = computed(() =>
-  props.type === 'course' ? 'course' : 'project',
-);
+const simplifiedType = computed(() => (props.type === 'course' ? 'course' : 'project'));
 const hasFilters = computed(() => {
   let hasFilter = false;
   Object.values(filters.value).forEach((filter) => {
@@ -406,15 +330,11 @@ const hasFilters = computed(() => {
 });
 //      Filters
 const filteredByFacilitator = computed(() => {
-  const data = customDataRef.value
-    ? customDataRef.value?.courseProjects
-    : query.data?.value.data || [];
+  const data = customDataRef.value ? customDataRef.value?.courseProjects : query.data?.value.data || [];
 
   return (
     data?.filter((data) =>
-      filters.value.facilitator.value?.id
-        ? data?.facilitator?.user.id === filters.value.facilitator.value?.id
-        : true,
+      filters.value.facilitator.value?.id ? data?.facilitator?.user.id === filters.value.facilitator.value?.id : true,
     ) || []
   );
 });
@@ -435,10 +355,7 @@ const filteredByDate = computed(() =>
 );
 const filteredByCompetences = computed(() =>
   filteredByDate.value.filter((data) => {
-    const competences = [
-      ...filters.value.generalCompetences.value!,
-      ...filters.value.technicalCompetences.value!,
-    ];
+    const competences = [...filters.value.generalCompetences.value!, ...filters.value.technicalCompetences.value!];
     if (!competences.length) {
       return true;
     }
@@ -481,20 +398,13 @@ const headers = computed<DataTableHeader<LearningPlanData>[]>(() => [
   },
   {
     title:
-      props.type === 'course'
-        ? t('pages.classes.tableHeaders.facilitator')
-        : t('pages.classes.tableHeaders.leader'),
-    key:
-      props.type === 'course'
-        ? 'facilitator?.user?.fullname'
-        : 'leader?.user?.fullname',
+      props.type === 'course' ? t('pages.classes.tableHeaders.facilitator') : t('pages.classes.tableHeaders.leader'),
+    key: props.type === 'course' ? 'facilitator?.user?.fullname' : 'leader?.user?.fullname',
     sortRaw(a, b) {
       const hasBothFacilitators = b.facilitator?.user && a.facilitator?.user;
       const hasBothLeaders = b.leader?.user && a.leader?.user;
       if (props.type === 'course' && hasBothFacilitators) {
-        return a.facilitator!.user?.fullname.localeCompare(
-          b.facilitator!.user?.fullname,
-        );
+        return a.facilitator!.user?.fullname.localeCompare(b.facilitator!.user?.fullname);
       }
       if (props.type === 'project' && hasBothLeaders) {
         return a.leader!.user?.fullname.localeCompare(b.leader!.user?.fullname);
@@ -503,10 +413,7 @@ const headers = computed<DataTableHeader<LearningPlanData>[]>(() => [
     },
   },
   {
-    title:
-      props.type === 'course'
-        ? t('pages.classes.tableHeaders.trails')
-        : t('pages.classes.tableHeaders.product'),
+    title: props.type === 'course' ? t('pages.classes.tableHeaders.trails') : t('pages.classes.tableHeaders.product'),
     key: props.type === 'course' ? 'trails.count' : 'learningPlan.product.text',
     sortRaw(a, b) {
       const hasBothProducts = b.learningPlan.product && a.learningPlan.product;
@@ -514,9 +421,7 @@ const headers = computed<DataTableHeader<LearningPlanData>[]>(() => [
         return b.trails.count - a.trails.count;
       }
       if (hasBothProducts) {
-        return a.learningPlan.product!.text.localeCompare(
-          b.learningPlan.product!.text,
-        );
+        return a.learningPlan.product!.text.localeCompare(b.learningPlan.product!.text);
       }
       return 1;
     },
@@ -528,17 +433,11 @@ const itemsPerPageValue = 12;
 
 // Functions
 const isAvailable = (id: number) => {
-  return customDataRef.value?.yourProjects
-    ? customDataRef.value.yourProjects.includes(id)
-    : true;
+  return customDataRef.value?.yourProjects ? customDataRef.value.yourProjects.includes(id) : true;
 };
 
 const displayUnavailable = () => {
-  setMessage(
-    t('components.learningPlan.card.notProjectMember'),
-    'warning',
-    true,
-  );
+  setMessage(t('components.learningPlan.card.notProjectMember'), 'warning', true);
 };
 
 const changeViewMode = () => {
@@ -586,22 +485,15 @@ const navigate = (id: number, page: string) => {
   }
 };
 const showingData = (groupedItems: any, items: Array<any>) => {
-  const itemsPerPage =
-    search.value === '' ? itemsPerPageValue : groupedItems.length;
+  const itemsPerPage = search.value === '' ? itemsPerPageValue : groupedItems.length;
   const from = (page.value - 1) * itemsPerPage + 1;
-  const to =
-    page.value * itemsPerPage > items.length
-      ? items.length
-      : page.value * itemsPerPage;
+  const to = page.value * itemsPerPage > items.length ? items.length : page.value * itemsPerPage;
   const total = items.length;
   const message = t('pages.courses.showingData', {
     from,
     to,
     total,
-    entity:
-      props.type === 'course'
-        ? t('pages.courses.courses')
-        : t('pages.courses.projects'),
+    entity: props.type === 'course' ? t('pages.courses.courses') : t('pages.courses.projects'),
   });
   if (to === 0) {
     return t('pages.classes.noData');
@@ -634,19 +526,12 @@ const handleRemoveFilter = (key: string) => {
 const mapFiltersValue = (values: Partial<LearningPlanFilter>) => {
   for (const key in values) {
     filters.value[key].value = values[key];
-    if (
-      (key === 'startDate' || key === 'finalDate') &&
-      !values[key]?.start &&
-      !values[key]?.end
-    ) {
+    if ((key === 'startDate' || key === 'finalDate') && !values[key]?.start && !values[key]?.end) {
       filters.value[key].value = undefined;
     }
   }
 };
-const checkValidFilters = (
-  key: keyof typeof filters.value,
-  filter: { title: string; value?: any },
-) => {
+const checkValidFilters = (key: keyof typeof filters.value, filter: { title: string; value?: any }) => {
   if (key === 'startDate' || key === 'finalDate') {
     if (!filter.value?.start && !filter?.value?.end) {
       return false;

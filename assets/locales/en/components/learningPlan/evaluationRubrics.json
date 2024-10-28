@@ -1,0 +1,12 @@
+{
+  "headers": {
+    "criterion": "Criterion",
+    "excellent": "Excellent",
+    "good": "Good",
+    "reasonable": "Reasonable",
+    "poor": "Poor"
+  },
+  "findCriteria": "Find Criteria",
+  "selectCriterion": "Select a criterion",
+  "descriptionPlaceholder": "Enter description"
+}

@@ -1,0 +1,74 @@
+<template>
+  <alex-custom-dialog v-model="openDialog" :loading="isLoading" @on-main-action="() => associateTasks()">
+    <alex-inputs-select
+      v-model="selectedTasks"
+      name="tasks"
+      class="ellipsis lines-1"
+      label="Quais tarefas deseja associar?"
+      placeholder="Selecione as tarefas"
+      no-data-text="Nenhuma tarefa com modo de avaliação associado foi encontrada"
+      :items="availableTasks"
+      item-title="title"
+      item-value="id"
+      multiple
+      hide-details
+      return-object
+    >
+      <template #item="{ props: task }">
+        <v-list-item class="pa-1" v-bind="task" title="">
+          <template #default>
+            <div class="px-6 py-4 w-100">
+              <p class="text-body-2 ellipsis lines-1 text-primary-0 mb-2">{{ task?.title }}</p>
+              <div class="text-body-5 text-gray-600">
+                <alex-custom-chip
+                  prepend-icon="mdi-calendar"
+                  :text="formattedDate(task.date)"
+                  class="px-2 mr-2"
+                  status="secondary"
+                />
+                <span v-if="task?.isGroup">
+                  <v-icon size="16" icon="mdi-account-multiple" />
+                  Grupo
+                </span>
+                <span v-else>
+                  <v-icon size="16" icon="mdi-account-multiple" />
+                  Individual
+                </span>
+              </div>
+            </div>
+          </template>
+        </v-list-item>
+      </template>
+    </alex-inputs-select>
+  </alex-custom-dialog>
+</template>
+
+<script setup lang="ts">
+// eslint-disable-next-line import/no-duplicates
+import { format } from 'date-fns';
+// eslint-disable-next-line import/no-duplicates
+import { enIN, ptBR } from 'date-fns/locale';
+const i18n = useI18n();
+const openDialog = defineModel({ default: false });
+const isLoading = ref(false);
+const props = defineProps<{
+  available: any[];
+  selected: any[];
+}>();
+
+const availableTasks = ref([...(props.available || [])]);
+const selectedTasks = ref([...(props.selected || [])]);
+
+const formattedDate = (date: string): string => {
+  return format(new Date(date), 'dd MMM yyyy', { locale: i18n.locale.value === 'en' ? enIN : ptBR });
+};
+
+const associateTasks = () => {
+  isLoading.value = true;
+  // TODO - Implementar a lógica de associação de tarefas
+  setTimeout(() => {
+    isLoading.value = false;
+    openDialog.value = false;
+  }, 2000);
+};
+</script>

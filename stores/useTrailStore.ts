@@ -10,12 +10,14 @@ export const useTrailStore = defineStore('trail', () => {
   const populate = {
     tasks: true,
     cover_image: true,
-    partners: true,
+    partners: {
+      populate: ['user'],
+    },
     structures: {
       populate: ['blocks'],
     },
     learning_structure: {
-      populate: ['learningplan.classes'],
+      populate: ['learningplan.classes', 'author_member.user'],
     },
     contributions: {
       populate: {

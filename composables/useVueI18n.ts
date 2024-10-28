@@ -1,6 +1,6 @@
-import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
+import type { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
-import { ElementType, literalArray } from '../utils';
+import { type ElementType, literalArray } from '../utils';
 import { useImportLanguages } from './useImportedLanguages';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
@@ -69,6 +69,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'admin',
     'users',
     'evaluations',
+    'assessments',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
@@ -104,6 +105,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'learningPlan/join',
     'learningPlan/submissions',
     'learningPlan/drawer',
+    'learningPlan/evaluationRubrics',
     'forgot/sendResetPassword',
     'project/document',
     'profile/about',

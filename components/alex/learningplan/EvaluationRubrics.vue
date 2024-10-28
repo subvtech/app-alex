@@ -46,11 +46,11 @@ const removeRow = (index: number) => {
   <v-table fixed-header :height="500" class="rubrics-table overflow-auto tw-an">
     <thead class="rounded-t-lg bg-gray-800">
       <tr class="text-gray-100 text-h5">
-        <th class="text-left">Critério</th>
-        <th class="text-left">Excelente (10)</th>
-        <th class="text-left">Bom (7.5)</th>
-        <th class="text-left">Razoável (5)</th>
-        <th class="text-left">Ruim (2.5)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.criterion') }}</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.excellent') }} (10)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.good') }} (7.5)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.reasonable') }} (5)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.poor') }} (2.5)</th>
       </tr>
     </thead>
     <tbody>
@@ -63,7 +63,7 @@ const removeRow = (index: number) => {
                 :on-item-select="(item) => onCriteriaSelect(item, index)"
                 :disabled="!editable || !!content[index].criterion.text"
                 :show-search="true"
-                search-placeholder="Encontrar critérios"
+                :search-placeholder="$t('components.learningPlan.evaluationRubrics.findCriteria')"
                 max-height="308"
               >
                 <template #activator="{ props }">
@@ -75,10 +75,14 @@ const removeRow = (index: number) => {
                     @click="rows.criterion.text && editable ? removeRow(index) : null"
                   >
                     <span class="text-wrap ellipsis lines-1">
-                      {{ content[index].criterion.text || 'Selecione um critério' }}
+                      {{
+                        content[index].criterion.text || $t('components.learningPlan.evaluationRubrics.selectCriterion')
+                      }}
                     </span>
-                    <v-icon v-if="editable && !content[index].criterion.text">mdi-chevron-down</v-icon>
-                    <v-icon v-else-if="editable" class="ml-1 delete-icon" size="15">mdi-trash-can-outline</v-icon>
+                    <v-icon v-if="editable && !content[index].criterion.text" class="ml-2 mr-1"
+                      >mdi-chevron-down</v-icon
+                    >
+                    <v-icon v-else-if="editable" class="delete-icon" size="15">mdi-trash-can-outline</v-icon>
                   </v-chip>
                 </template>
               </alex-custom-dropdown>
@@ -86,7 +90,7 @@ const removeRow = (index: number) => {
           </td>
           <td v-for="(rating, key) in ['excellent', 'good', 'reasonable', 'bad']" :key="key">
             <div
-              class="tw-border tw-border-transparent rounded-lg tw-transition-all"
+              class="tw-border tw-border-transparent rounded-lg tw-transition-all h-100"
               :class="[
                 content[index].selected === rating && !editable && 'selected-border',
                 !editable && 'cursor-pointer tw-select-none rubric-card',
@@ -105,7 +109,7 @@ const removeRow = (index: number) => {
                 class="text-body-1 h-100 pa-2"
                 :class="[content[index][rating] ? 'text-gray-800' : 'text-gray-300', !editable && 'cursor-pointer']"
                 :cant-edit="editable"
-                placeholder="Digite uma descrição"
+                :placeholder="$t('components.learningPlan.evaluationRubrics.descriptionPlaceholder')"
               />
             </div>
           </td>
@@ -125,8 +129,7 @@ const removeRow = (index: number) => {
     background-color: transparent !important;
   }
   & td {
-    max-width: 240px !important;
-    min-width: 220px !important;
+    min-width: 240px;
     text-wrap: wrap;
     word-wrap: break-word;
     padding: 16px 8px !important;
@@ -143,19 +146,23 @@ const removeRow = (index: number) => {
   }
 
   & .edit-chip .criteria-chip {
-    padding: 0 4px 0 15px;
+    padding: 0 4px 0 16px;
+    transition: all 0.3s;
     &:hover .delete-icon {
-      visibility: visible !important;
+      opacity: 1;
+      margin: 0 8px 0 4px;
     }
   }
   & .delete-icon {
-    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s;
   }
 }
 
-@media (min-width: 768px) {
-  .edit-chip .criteria-chip {
-    visibility: visible !important;
+@media (max-width: 768px) {
+  .criteria-chip .delete-icon {
+    opacity: 1 !important;
+    margin: 0 4px;
   }
 }
 </style>
