@@ -80,7 +80,10 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
                 id: submissionId?.value,
               },
             },
-            populate: ['criteria_evaluations.criteria.criteria', 'evaluation_group'],
+            populate: [
+              'criteria_evaluations.criteria.criteria',
+              'evaluation_group.rubric_grade_levels.grade_level_criterias.criteria',
+            ],
           });
 
           return composition.data[0] || null;

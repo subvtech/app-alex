@@ -205,6 +205,17 @@ const { data: taskEvaluationData } = getTaskEvaluatonData();
 const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
 const { mutate: updateEvaluationGrades } = gradeSubmissionEvaluationCriteriasMutation();
 
+// const rubricGradeLevels = computed(() => {
+//   return taskEvaluationData.value.evaluation_group.rubric_grade_levels.map((l) => {
+//     return {
+//       ...l,
+//       grade_level_criterias: l.grade_level_criterias.map((c) => {
+//         return { id: c.criteria.id, justification: c.justification };
+//       }),
+//     };
+//   });
+// });
+
 const queryClient = useQueryClient();
 
 const onCriteriaGrading = (grade, criteriaId) => {
