@@ -5,9 +5,18 @@ import { format } from 'date-fns';
 import { enIN, ptBR } from 'date-fns/locale';
 import TaskDrawer from './-components/drawer.vue';
 
+type tasksType = {
+  id: number;
+  title: string;
+  type: 'rubric' | 'criteria' | 'group';
+  methodName: string;
+  value: number;
+  isGroup?: boolean;
+};
+
 type assessment = {
   name: string;
-  tasks: string[];
+  tasks: tasksType[];
   lastUpdate: string;
   id: number;
 };
@@ -19,83 +28,71 @@ const assessments = ref<assessment[]>();
 const page = ref(1);
 const search = ref('');
 const isLoading = ref(false);
+const drawer = ref();
 
 const testAssessments = [
   {
     name: 'Titulo do assessment, que fala sobre o que é o assessment e o que ele faz',
     tasks: [
-      'Ler artigo 1',
-      'Ler artigo 2',
-      'Fazer relatório',
-      'Fazer apresentação',
-      'Revisar relatório',
-      'Revisar apresentação',
-      'Revisar artigo',
-      'Revisar artigo',
-      'Revisar artigo',
-      'Revisar artigo',
-      'Revisar artigo',
+      { id: 1, title: 'Ler artigo 1', type: 'rubric', methodName: 'rubric', value: 3 },
+      { id: 2, title: 'Ler artigo 2', type: 'rubric', methodName: 'rubric', value: 4 },
+      { id: 3, title: 'Fazer relatório', type: 'criteria', methodName: 'criteria', value: 5 },
+      { id: 4, title: 'Fazer apresentação', type: 'criteria', methodName: 'criteria', value: 6 },
+      { id: 5, title: 'Revisar relatório', type: 'group', methodName: 'group', value: 2, isGroup: true },
+      { id: 6, title: 'Revisar apresentação', type: 'group', methodName: 'group', value: 3, isGroup: true },
+      { id: 7, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
+      { id: 8, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
+      { id: 9, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
+      { id: 10, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
+      { id: 11, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
     ],
     lastUpdate: '25/09/2024 às 13:32',
     id: 1,
   },
   {
     name: 'Assessment 2',
-    tasks: ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5'],
+    tasks: [
+      { id: 1, title: 'Task 1', type: 'rubric', methodName: 'rubric', value: 2 },
+      { id: 2, title: 'Task 2', type: 'criteria', methodName: 'criteria', value: 3 },
+      { id: 3, title: 'Task 3', type: 'group', methodName: 'group', value: 4, isGroup: true },
+      { id: 4, title: 'Task 4', type: 'rubric', methodName: 'rubric', value: 5 },
+      { id: 5, title: 'Task 5', type: 'criteria', methodName: 'criteria', value: 6 },
+    ],
     lastUpdate: '25/09/2024 às 13:32',
     id: 2,
   },
   {
     name: 'Assessment 3',
-    tasks: ['Task 1', 'Task 2', 'Task 3'],
+    tasks: [
+      { id: 1, title: 'Task 1', type: 'group', methodName: 'group', value: 2, isGroup: true },
+      { id: 2, title: 'Task 2', type: 'rubric', methodName: 'rubric', value: 3 },
+      { id: 3, title: 'Task 3', type: 'criteria', methodName: 'criteria', value: 4 },
+    ],
     lastUpdate: '26/09/2024 às 14:00',
     id: 3,
   },
   {
     name: 'Assessment 4',
-    tasks: ['Task 1', 'Task 2', 'Task 3', 'Task 4'],
+    tasks: [
+      { id: 1, title: 'Task 1', type: 'rubric', methodName: 'rubric', value: 2 },
+      { id: 2, title: 'Task 2', type: 'criteria', methodName: 'criteria', value: 3 },
+      { id: 3, title: 'Task 3', type: 'group', methodName: 'group', value: 4, isGroup: true },
+      { id: 4, title: 'Task 4', type: 'rubric', methodName: 'rubric', value: 5 },
+    ],
     lastUpdate: '27/09/2024 às 15:45',
     id: 4,
   },
   {
     name: 'Assessment 5',
-    tasks: ['Task 1', 'Task 2'],
+    tasks: [
+      { id: 1, title: 'Task 1', type: 'rubric', methodName: 'rubric', value: 3 },
+      { id: 2, title: 'Task 2', type: 'criteria', methodName: 'criteria', value: 4 },
+    ],
     lastUpdate: '28/09/2024 às 16:30',
     id: 5,
   },
-  {
-    name: 'Assessment 6',
-    tasks: ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5', 'Task 6'],
-    lastUpdate: '29/09/2024 às 17:15',
-    id: 6,
-  },
-  {
-    name: 'Assessment 7',
-    tasks: ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5', 'Task 6', 'Task 7'],
-    lastUpdate: '30/09/2024 às 18:00',
-    id: 7,
-  },
-  {
-    name: 'Assessment 8',
-    tasks: ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5', 'Task 6', 'Task 7', 'Task 8'],
-    lastUpdate: '01/10/2024 às 09:00',
-    id: 8,
-  },
-  {
-    name: 'Assessment 9',
-    tasks: ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5', 'Task 6', 'Task 7', 'Task 8', 'Task 9'],
-    lastUpdate: '02/10/2024 às 10:30',
-    id: 9,
-  },
-  {
-    name: 'Assessment 10',
-    tasks: ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5', 'Task 6', 'Task 7', 'Task 8', 'Task 9', 'Task 10'],
-    lastUpdate: '03/10/2024 às 11:45',
-    id: 10,
-  },
 ];
 
-// TODO - Filtro de tarefas por quantidade, filtro de last update data
 const header = [
   {
     title: 'Name',
@@ -127,18 +124,19 @@ const formattedDate = (strDate: string | Date) => {
   return format(date, dateFormat, { locale });
 };
 
-const getRemainingTasks = (tasks: string[]) => {
-  const remainingTasks = tasks.slice(4);
-  return remainingTasks.join(', ');
+const getRemainingTasks = (tasks: tasksType[]) => {
+  const taskTitles = tasks.map((task) => task.title);
+  return taskTitles.join(', ');
 };
 
 assessments.value = testAssessments;
 
+// Todo: Delete functionality
 const dropdownItems = (assessments: assessment) => [
   {
     // text: t('pages.assessments.edit'),
     text: 'Edit',
-    onClick: () => console.log('Edit assessment - ', assessments.name),
+    onClick: () => drawer.value.openDrawer(assessments),
   },
   {
     // text: t('pages.assessments.delete'),
@@ -173,7 +171,7 @@ const dropdownItems = (assessments: assessment) => [
         v-if="learningPlanStore.userIsFacilitator"
         prepend-icon="mdi-plus"
         size="large"
-        @click="console.log"
+        @click="drawer.openDrawer()"
       >
         {{ $t('pages.assessments.newAssessment') }}</alex-custom-button
       >
@@ -207,11 +205,11 @@ const dropdownItems = (assessments: assessment) => [
                     {{ item.name }}
                   </span>
                 </td>
-                <td class="tw-w-[540px]">
+                <td class="tw-w-[540px] tw-overflow-x-scroll">
                   <template v-for="(task, index) in item.tasks" :key="task">
                     <v-tooltip
                       v-if="index <= 4"
-                      :text="index < 4 ? task : getRemainingTasks(item.tasks)"
+                      :text="index < 4 ? task.title : getRemainingTasks(item.tasks)"
                       location="top"
                       content-class="tw-text-pretty bg-gray-800 text-white text-body-3"
                       max-width="400"
@@ -221,7 +219,7 @@ const dropdownItems = (assessments: assessment) => [
                         <!-- TODO: Navigate to task on click -->
                         <alex-custom-chip
                           v-bind="tooltip"
-                          :text="index < 4 ? task : '+ ' + (item.tasks.length - 4)"
+                          :text="index < 4 ? task.title : '+ ' + (item.tasks.length - 4)"
                           variant="outlined"
                           status="secondary"
                           class="mr-2 rounded-lg !tw-max-w-[100px] text-body-5 tw-text-wrap tw-break-all tw-select-none"
@@ -244,10 +242,10 @@ const dropdownItems = (assessments: assessment) => [
           </template>
           <template #bottom>
             <div
+              v-if="assessments.length > 12"
               class="d-flex w-100 tw-h-[92px] justify-end align-center px-6 tw-border-t-[1px] tw-border-[#e0e0e0] tw-mt-auto"
             >
               <alex-custom-pagination
-                v-if="assessments.length > 12"
                 v-model="page"
                 :length="Math.floor(assessments.length / 12)"
                 :total-visible="5"
@@ -258,7 +256,8 @@ const dropdownItems = (assessments: assessment) => [
         </v-data-table>
       </div>
     </div>
-    <TaskDrawer />
+    <!-- TODO: Pass available tasks (todas as tasks do curso que tenham forma de avaliação associadas ) -->
+    <TaskDrawer ref="drawer" :available-tasks="[]" />
   </div>
 </template>
 

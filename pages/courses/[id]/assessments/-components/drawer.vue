@@ -16,7 +16,7 @@
     </template>
 
     <alex-inputs-editable-text
-      v-model="title"
+      v-model="name"
       tag="h1"
       class="mt-4 text-h2 ellipsis lines-2"
       :cant-edit="true"
@@ -26,8 +26,8 @@
     <h3 class="text-gray-800 text-h3 my-4">Tarefas associadas</h3>
     <div class="mt-4 mb-6 d-flex gap-4 flex-wrap">
       <div v-for="task in selectedTasks" :key="task.id" class="rounded-lg tw-border tw-w-[260px] tw-h-[120px] pa-4">
-        <p class="d-flex">
-          <span class="text-body-4 text-gray-800 tw-max-w-[198px] ellipsis lines-2">{{ task.title }}</span>
+        <p class="d-flex justify-center">
+          <span class="text-body-4 text-gray-800 tw-w-[198px] ellipsis lines-2">{{ task.title }}</span>
           <span class="text-body-2 text-secondary-0">#{{ task.id }}</span>
         </p>
         <div class="mt-4 d-flex align-center">
@@ -43,7 +43,10 @@
           </span>
         </div>
       </div>
-      <div class="rounded-lg tw-border-2 tw-border-dashed tw-w-[260px] tw-h-[120px] d-flex justify-center align-center">
+      <div
+        class="rounded-lg tw-border-2 tw-border-dashed tw-w-[260px] tw-h-[120px] d-flex justify-center align-center cursor-pointer"
+        @click="() => (dialog = true)"
+      >
         <span class="text-body-3 text-black">
           <v-icon class="mr-2">mdi-plus</v-icon>
           Adicionar Tarefa
@@ -55,12 +58,12 @@
       A composição dessa avaliação é formada pela média ponderada das avaliações.
     </p>
     <div class="w-100 tw-min-h-[250px] bg-gray-blue rounded-lg d-flex justify-center align-center tw-flex-col gap-4">
-      <div v-if="!selectedTasks">
-        <img src="/svg/emptyComposition.svg" />
+      <div v-if="!selectedTasks.length">
+        <img src="/svg/emptyComposition.svg" class="mx-auto mb-4" />
         <p class="text-gray-400 text-body-3">Parece que não foi adicionada nenhuma tarefa</p>
       </div>
       <div v-else>
-        <div class="d-flex flex-wrap pa-6">
+        <div class="d-flex flex-wrap pa-6 tw-justify-center">
           <div v-for="(task, index) in selectedTasks" :key="task.id" class="d-flex align-center mb-6">
             <div class="pa-4 bg-white rounded-lg tw-w-[148px] d-flex justify-center align-center gap-4">
               <span class="text-secondary-0 text-body-2"> #{{ task.id }}</span>
@@ -70,19 +73,19 @@
                 style="border-color: #a0a8b1"
               >
                 <alex-custom-button
-                  @click="updateTaskWeight(task, 'down')"
                   icon="mdi-chevron-down"
                   size="20"
                   color="gray-600"
                   variant="text"
+                  @click="updateTaskWeight(task, 'down')"
                 />
                 <span>{{ task.value }}</span>
                 <alex-custom-button
-                  @click="updateTaskWeight(task, 'up')"
                   icon="mdi-chevron-up"
                   size="20"
                   color="gray-600"
                   variant="text"
+                  @click="updateTaskWeight(task, 'up')"
                 />
               </span>
             </div>
@@ -95,72 +98,52 @@
         </div>
       </div>
     </div>
+    <Dialog v-model="dialog" :available="tasks" :selected="selectedTasks" />
   </v-navigation-drawer>
-  <Dialog v-model="drawer" />
 </template>
 
 <script setup lang="ts">
 import Dialog from './taskPicker.vue';
-const model = defineModel({ default: true });
-const title = ref('');
-const selectedTasks = ref<task[]>([]);
-const drawer = ref(true);
-type task = {
+type taskType = {
   id: number;
   title: string;
   type: 'rubric' | 'criteria' | 'group';
   methodName: string;
   value: number;
+  isGroup?: boolean;
 };
 
-const tasks: task[] = [
-  {
-    id: 1,
-    title: 'Criar uma protótipagem para a página de dashboard',
-    type: 'rubric',
-    methodName: 'Gestão de projetos',
-    value: 3,
-  },
-  {
-    id: 2,
-    title: 'Criar uma protótipagem para a página de dashboard',
-    type: 'criteria',
-    methodName: 'Gestão de projetos',
-    value: 1,
-  },
-  {
-    id: 3,
-    title: 'Criar uma protótipagem para a página de dashboard',
-    type: 'group',
-    methodName: 'Gestão de projetos',
-    value: 3,
-  },
-  {
-    id: 4,
-    title: 'Criar uma protótipagem para a página de dashboard',
-    type: 'rubric',
-    methodName: 'Gestão de projetos',
-    value: 2,
-  },
-  {
-    id: 5,
-    title: 'Criar uma protótipagem para a página de dashboard',
-    type: 'rubric',
-    methodName: 'Gestão de projetos',
-    value: 1,
-  },
-];
+type assessmentType = {
+  id: number;
+  name: string;
+  tasks: taskType[];
+};
 
-selectedTasks.value = tasks;
+const props = defineProps<{
+  availableTasks: taskType[];
+}>();
 
-const updateTaskWeight = (task: task, update: 'up' | 'down') => {
+const model = defineModel({ default: false });
+const name = ref('');
+const selectedTasks = ref<taskType[]>([]);
+const dialog = ref(false);
+
+const openDrawer = (assessment?: assessmentType) => {
+  model.value = true;
+  name.value = assessment?.name || '';
+  selectedTasks.value = assessment?.tasks || [];
+};
+
+defineExpose({ openDrawer });
+
+const tasks = ref<taskType[]>([...(props.availableTasks || [])]);
+
+const updateTaskWeight = (task: taskType, update: 'up' | 'down') => {
   const index = selectedTasks.value.findIndex((t) => t.id === task.id);
   if (update === 'up' && task.value < 9) {
     selectedTasks.value[index].value += 1;
   } else if (update === 'down' && task.value > 1) {
-    {
-      selectedTasks.value[index].value -= 1;
-    }
+    selectedTasks.value[index].value -= 1;
   }
 };
 </script>
