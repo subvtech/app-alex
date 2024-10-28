@@ -167,6 +167,7 @@ const learningPlanStore = useLearningPlanStore();
 const teacherDrawer = ref(false);
 const slideTransition = (i: number) => (tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up');
 
+const route = useRoute();
 const groupsArray = ['draft', 'published', 'finished', 'archived'];
 const groups = {};
 
@@ -483,6 +484,12 @@ const openDrawer = (id: number) => {
   editTaskId.value = id;
   teacherDrawer.value = true;
 };
+
+onMounted(() => {
+  if (route.query?.taskId) {
+    openDrawer(parseInt(route.query.taskId.toString()));
+  }
+});
 
 const handleChangeValues = (values: Partial<TaskSimple>) => {
   const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);

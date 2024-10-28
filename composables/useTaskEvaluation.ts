@@ -59,6 +59,9 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
                 },
               ],
               type: evaluationGroupType.value,
+              disabled_at: {
+                $null: true,
+              },
             },
             populate: ['evaluation_criterias'],
           });
