@@ -198,15 +198,12 @@ const user = useStrapiUser();
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 
-const { getTaskEvaluatonData, getTaskSubmissionEvaluation } = useTaskEvaluation(
-  learningPlanId,
-  taskId,
-  user,
-  submissionId,
-);
+const { getTaskEvaluatonData, getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation } =
+  useTaskEvaluation(learningPlanId, taskId, user, submissionId);
 
 const { data: taskEvaluationData } = getTaskEvaluatonData();
 const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
+const { mutate: updateEvaluationGrades } = gradeSubmissionEvaluationCriteriasMutation();
 
 const queryClient = useQueryClient();
 
@@ -215,15 +212,24 @@ const onCriteriaGrading = (grade, criteriaId) => {
 
   const criteriaIdx = evaluationData.criteria_evaluations.findIndex((c) => c.id === criteriaId);
 
-  if (grade > 100) {
-    grade = 100;
-  } else if (grade < 0) {
-    grade = 0;
+  let realGrade;
+
+  if (parseInt(grade) > 10) {
+    realGrade = '10';
+  } else if (parseInt(grade) < 0) {
+    realGrade = '0';
+  } else {
+    realGrade = grade;
   }
 
-  console.log(grade);
-
+  evaluationData.criteria_evaluations[criteriaIdx].grade = realGrade;
   queryClient.setQueryData(['taskSumbmissionEvaluationData', submissionId], evaluationData);
+
+  updateEvaluationGrades({
+    evaluationId: evaluationData?.id,
+    criteriaEvaluations: evaluationData?.criteria_evaluations,
+    grade: finalGrade.value,
+  });
 };
 
 const finalGrade = computed(() => {

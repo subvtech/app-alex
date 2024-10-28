@@ -99,6 +99,16 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
         },
       });
     },
+    gradeSubmissionEvaluationCriteriasMutation() {
+      return useMutation({
+        mutationFn: ({ evaluationId, criteriaEvaluations, totalGrade }: any) => {
+          return update('task-submission-evaluations', evaluationId, {
+            grade: totalGrade,
+            criteria_grades: criteriaEvaluations,
+          });
+        },
+      });
+    },
     taskGradeCompositionMutation(sucessConfirmation) {
       return useMutation({
         mutationFn: (data: any) => {
