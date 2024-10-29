@@ -260,23 +260,37 @@ const user = useStrapiUser();
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 
-const { getTaskEvaluatonData, getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation } =
-  useTaskEvaluation(learningPlanId, taskId, user, submissionId);
+const { getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation } = useTaskEvaluation(
+  learningPlanId,
+  taskId,
+  user,
+  submissionId,
+);
 
-const { data: taskEvaluationData } = getTaskEvaluatonData();
 const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
 const { mutate: updateEvaluationGrades } = gradeSubmissionEvaluationCriteriasMutation();
 
-// const rubricGradeLevels = computed(() => {
-//   return taskEvaluationData.value.evaluation_group.rubric_grade_levels.map((l) => {
-//     return {
-//       ...l,
-//       grade_level_criterias: l.grade_level_criterias.map((c) => {
-//         return { id: c.criteria.id, justification: c.justification };
-//       }),
-//     };
-//   });
-// });
+const rubricGradeLevels = computed(() => {
+  return taskSubmissionEvaluationData.value.evaluation_group.rubric_grade_levels.map((l) => {
+    return {
+      ...l,
+      grade_level_criterias: l.grade_level_criterias.map((c) => {
+        return { id: c.criteria.id, justification: c.justification };
+      }),
+    };
+  });
+});
+
+const criteriaWithGradeLevels = computed(() => {
+  return taskSubmissionEvaluationData.value.criteria_evaluations.map((ce) => {
+    const gradeLevels = rubricGradeLevels.value.map((g) => {
+      const criteriaId = ce.criteria.criteria.id;
+      const { justification } = g.grade_level_criterias.find((glc) => glc.id === criteriaId);
+      return { ...g, justification };
+    });
+    return { ...ce, gradeLevels };
+  });
+});
 
 const queryClient = useQueryClient();
 
