@@ -1,11 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 
 const { find, findOne, create, update } = useStrapiUtils();
+const strapi = useStrapi();
 
 export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: null | Ref<any> = null) => {
   const learningPlanGradesQuery = ['grades', learningPlanId];
   const taskEvaluationDataQuery = ['taskEvaluationData', taskId];
   const taskSubmissionEvaluationDataQuery = ['taskSumbmissionEvaluationData', submissionId];
+
+  const userEvaluationCriteriaQuery = ['criteria', user];
 
   const queryClient = useQueryClient();
   return {
@@ -83,6 +86,71 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
           return composition.data[0] || null;
         },
         enabled: () => submissionId?.value > 0,
+      });
+    },
+
+    getUserEvaluations() {
+      return useQuery({
+        queryKey: userEvaluationCriteriaQuery,
+        queryFn: async () => {
+          const res = await find('evaluation-criterias', {
+            filters: {
+              user: user.value?.id ?? null,
+            },
+          });
+
+          return res.data;
+        },
+      });
+    },
+
+    createUserEvaluationMutation() {
+      return useMutation({
+        mutationFn: ({ name, description }) => {
+          return create('evaluation-criterias', {
+            name,
+            description,
+            public: false,
+            user: user.value?.id ?? null,
+          });
+        },
+        onError(e) {
+          console.error(e);
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: userEvaluationCriteriaQuery });
+        },
+      });
+    },
+
+    updateUserEvaluationMutation() {
+      return useMutation({
+        mutationFn: ({ id, name, description }) => {
+          return update('evaluation-criterias', id, {
+            name,
+            description,
+          });
+        },
+        onError(e) {
+          console.error(e);
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: userEvaluationCriteriaQuery });
+        },
+      });
+    },
+
+    deleteUserEvaluationMutation() {
+      return useMutation({
+        mutationFn: (id) => {
+          return strapi.delete('evaluation-criterias', id);
+        },
+        onError(e) {
+          console.error(e);
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: userEvaluationCriteriaQuery });
+        },
       });
     },
 

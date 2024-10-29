@@ -52,9 +52,15 @@ const criteria = ref<Criteria>({ ...defaultCriteria });
 const isLoading = ref(false);
 const showDialog = ref(false);
 
+const user = useStrapiUser();
+const { createUserEvaluationMutation, updateUserEvaluationMutation } = useTaskEvaluation(0, 0, user);
 const { handleSubmit } = useForm({
   // validationSchema: evaluationsCriteriaRules,
 });
+const { setMessage } = useMessageStore();
+
+const { mutateAsync: createUserEvaluation } = createUserEvaluationMutation();
+const { mutateAsync: updateUserEvaluation } = updateUserEvaluationMutation();
 
 const openDialog = (newCriteria: Criteria) => {
   if (newCriteria) {
@@ -69,14 +75,33 @@ const openDialog = (newCriteria: Criteria) => {
 const onSubmit = handleSubmit(async () => {
   isLoading.value = true;
 
-  if (criteria.value.id) {
-    console.log('Update');
-  } else {
-    console.log('Create');
-  }
+  try {
+    // Checa se tem algum input faltando
+    if (!criteria.value.name) {
+      setMessage('Por favor, informe o nome do critério', 'warning', true);
+      // eslint-disable-next-line no-throw-literal
+      throw 'Missing input (Name)';
+    } else if (!criteria.value.description) {
+      setMessage('Por favor, informe a descrição do critério', 'warning', true);
+      // eslint-disable-next-line no-throw-literal
+      throw 'Missing input (Description)';
+    }
 
-  isLoading.value = false;
-  showDialog.value = false;
+    //
+    if (criteria.value.id) {
+      await updateUserEvaluation({ ...criteria.value });
+      setMessage('Critério atualizado com sucesso', 'success', true);
+    } else {
+      await createUserEvaluation({ ...criteria.value });
+      setMessage('Critério criado com sucesso', 'success', true);
+    }
+
+    showDialog.value = false;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    isLoading.value = false;
+  }
 });
 
 defineExpose({ openDialog });

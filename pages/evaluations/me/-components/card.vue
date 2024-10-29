@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import createCriteria from './daialogs/createCriteria.vue';
+const user = useStrapiUser();
+const { deleteUserEvaluationMutation } = useTaskEvaluation(0, 0, user);
+const { setMessage } = useMessageStore();
+
+const { mutateAsync: deleteUserEvaluation } = deleteUserEvaluationMutation();
+
 const createCriteriaRef = ref(createCriteria);
 
 interface CardProps {
@@ -22,7 +28,15 @@ const dropdownItems = (item: CardProps['item']) => {
     {
       text: 'Delete',
       icon: 'mdi-delete',
-      onClick: () => {},
+      onClick: async () => {
+        try {
+          await deleteUserEvaluation(item.id);
+          setMessage('Critério deletado com sucesso', 'success', true);
+        } catch (e) {
+          console.error(e);
+          setMessage('Falha ao deletar critério', 'error', true);
+        }
+      },
     },
   ];
 };

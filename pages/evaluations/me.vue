@@ -65,7 +65,11 @@ import createCriteria from './me/-components/daialogs/createCriteria.vue';
 const search = ref('');
 const page = ref(1);
 const { t } = useI18n();
+const user = useStrapiUser();
 const createCriteriaRef = ref(createCriteria);
+const { getUserEvaluations } = useTaskEvaluation(0, 0, user);
+
+const { data: cards } = getUserEvaluations();
 
 const showDialog = () => {
   createCriteriaRef?.value.openDialog();
@@ -103,8 +107,8 @@ const tabs = [
 const showingData = (groupedItems: any, items: Array<any>) => {
   const itemsPerPage = search.value === '' ? itemsPerPageValue : groupedItems.length;
   const from = (page.value - 1) * itemsPerPage + 1;
-  const to = page.value * itemsPerPage > items.length ? items.length : page.value * itemsPerPage;
-  const total = items.length;
+  const to = page.value * itemsPerPage > (items?.length ?? 0) ? items?.length ?? 0 : page.value * itemsPerPage;
+  const total = items?.length ?? 0;
   const message = t('pages.evaluations.showingData', {
     from,
     to,
@@ -120,37 +124,6 @@ const showingData = (groupedItems: any, items: Array<any>) => {
 const setTableData = (items: readonly Item[]): Criteria[] => {
   return items.map((item) => item.raw);
 };
-
-const cards = [
-  {
-    id: 1,
-    name: 'Card 1',
-    description: 'Description of card 1',
-    public: true,
-    user: {
-      id: 1,
-      name: 'User 1',
-      email: 'user1@example.com',
-    },
-  },
-  {
-    id: 2,
-    name: 'Card 2',
-    description: 'Description of card 2',
-    public: false,
-    user: {
-      id: 2,
-      name: 'User 2',
-      email: 'user2@example.com',
-    },
-  },
-  {
-    id: 3,
-    name: 'Card 3',
-    description: 'Description of card 3',
-    public: true,
-  },
-];
 </script>
 
 <style lang="scss" scoped></style>

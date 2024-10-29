@@ -58,7 +58,10 @@
 
       <!-- Pagination -->
       <template #bottom
-        ><div class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px]">
+        ><div
+          v-if="items.length"
+          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px]"
+        >
           <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
             {{ paginationText }}
           </p>
@@ -93,7 +96,7 @@ const createModal = ref<boolean>(false);
 
 const totalItems = ref<number>(0);
 const items = ref([
-  { name: 'Lucas', criteria: ['Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho'] },
+  // { name: 'Lucas', criteria: ['Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho'] },
 ]);
 
 const paginationText = computed<string>(() => {
