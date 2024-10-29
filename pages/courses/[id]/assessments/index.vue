@@ -22,76 +22,52 @@ type assessment = {
 };
 
 const learningPlanStore = useLearningPlanStore();
+const learningPlanId = computed(() => learningPlanStore.learningPlan?.id);
+const user = useStrapiUser();
 // const { t } = useI18n();
 const i18n = useI18n();
-const assessments = ref<assessment[]>();
+// const assessments = ref<assessment[]>();
 const page = ref(1);
 const search = ref('');
 const isLoading = ref(false);
 const drawer = ref();
 
-const testAssessments = [
-  {
-    name: 'Titulo do assessment, que fala sobre o que é o assessment e o que ele faz',
-    tasks: [
-      { id: 1, title: 'Ler artigo 1', type: 'rubric', methodName: 'rubric', value: 3 },
-      { id: 2, title: 'Ler artigo 2', type: 'rubric', methodName: 'rubric', value: 4 },
-      { id: 3, title: 'Fazer relatório', type: 'criteria', methodName: 'criteria', value: 5 },
-      { id: 4, title: 'Fazer apresentação', type: 'criteria', methodName: 'criteria', value: 6 },
-      { id: 5, title: 'Revisar relatório', type: 'group', methodName: 'group', value: 2, isGroup: true },
-      { id: 6, title: 'Revisar apresentação', type: 'group', methodName: 'group', value: 3, isGroup: true },
-      { id: 7, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
-      { id: 8, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
-      { id: 9, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
-      { id: 10, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
-      { id: 11, title: 'Revisar artigo', type: 'rubric', methodName: 'rubric', value: 4 },
-    ],
-    lastUpdate: '25/09/2024 às 13:32',
-    id: 1,
-  },
-  {
-    name: 'Assessment 2',
-    tasks: [
-      { id: 1, title: 'Task 1', type: 'rubric', methodName: 'rubric', value: 2 },
-      { id: 2, title: 'Task 2', type: 'criteria', methodName: 'criteria', value: 3 },
-      { id: 3, title: 'Task 3', type: 'group', methodName: 'group', value: 4, isGroup: true },
-      { id: 4, title: 'Task 4', type: 'rubric', methodName: 'rubric', value: 5 },
-      { id: 5, title: 'Task 5', type: 'criteria', methodName: 'criteria', value: 6 },
-    ],
-    lastUpdate: '25/09/2024 às 13:32',
-    id: 2,
-  },
-  {
-    name: 'Assessment 3',
-    tasks: [
-      { id: 1, title: 'Task 1', type: 'group', methodName: 'group', value: 2, isGroup: true },
-      { id: 2, title: 'Task 2', type: 'rubric', methodName: 'rubric', value: 3 },
-      { id: 3, title: 'Task 3', type: 'criteria', methodName: 'criteria', value: 4 },
-    ],
-    lastUpdate: '26/09/2024 às 14:00',
-    id: 3,
-  },
-  {
-    name: 'Assessment 4',
-    tasks: [
-      { id: 1, title: 'Task 1', type: 'rubric', methodName: 'rubric', value: 2 },
-      { id: 2, title: 'Task 2', type: 'criteria', methodName: 'criteria', value: 3 },
-      { id: 3, title: 'Task 3', type: 'group', methodName: 'group', value: 4, isGroup: true },
-      { id: 4, title: 'Task 4', type: 'rubric', methodName: 'rubric', value: 5 },
-    ],
-    lastUpdate: '27/09/2024 às 15:45',
-    id: 4,
-  },
-  {
-    name: 'Assessment 5',
-    tasks: [
-      { id: 1, title: 'Task 1', type: 'rubric', methodName: 'rubric', value: 3 },
-      { id: 2, title: 'Task 2', type: 'criteria', methodName: 'criteria', value: 4 },
-    ],
-    lastUpdate: '28/09/2024 às 16:30',
-    id: 5,
-  },
-];
+const { getLearningPlanGrades, createGradeMutation } = useTaskEvaluation(learningPlanId, null, user);
+
+const { data: learningPlanGrades } = getLearningPlanGrades();
+
+const onCreateAsessment = () => {
+  console.log('testeee');
+  // assessments.value[assessments.value.length - 1]
+  drawer.value.openDrawer();
+};
+const { mutate: createGradeAssessment, isPending: creatingGradeAssessment } = createGradeMutation(onCreateAsessment);
+
+const createAssessment = () => {
+  createGradeAssessment({ learningplan: learningPlanId.value });
+};
+
+const assessments = computed<assessment[]>(() => {
+  return learningPlanGrades.value?.map((grade) => {
+    return {
+      name: grade.title,
+      id: grade.id,
+      lastUpdated: grade.updatedAt,
+      tasks: grade.grade_compositions[0].grade_composition_tasks.map((gct) => {
+        const { task } = gct;
+        const { evaluation_group } = task;
+        return {
+          id: task.id,
+          title: task.title,
+          type: evaluation_group.type === 'standard' ? 'group' : 'rubric',
+          methodName: evaluation_group.name,
+          isGroup: evaluation_group.type === 'standard',
+          value: gct.weight,
+        };
+      }),
+    };
+  });
+});
 
 const header = [
   {
@@ -128,8 +104,6 @@ const getRemainingTasks = (tasks: tasksType[]) => {
   const taskTitles = tasks.map((task) => task.title);
   return taskTitles.join(', ');
 };
-
-assessments.value = testAssessments;
 
 // Todo: Delete functionality
 const dropdownItems = (assessments: assessment) => [
@@ -171,7 +145,8 @@ const dropdownItems = (assessments: assessment) => [
         v-if="learningPlanStore.userIsFacilitator"
         prepend-icon="mdi-plus"
         size="large"
-        @click="drawer.openDrawer()"
+        :loading="creatingGradeAssessment"
+        @click="createAssessment"
       >
         {{ $t('pages.assessments.newAssessment') }}</alex-custom-button
       >
@@ -202,10 +177,13 @@ const dropdownItems = (assessments: assessment) => [
               <tr v-for="item in items" :key="item.id" class="text-5 text-no-wrap bg-white">
                 <td class="tw-w-[400px]">
                   <span class="text-gray-800 text-body-3 ellipsis lines-1 tw-break-words">
-                    {{ item.name }}
+                    {{ item.name || 'Sem titulo' }}
                   </span>
                 </td>
                 <td class="tw-w-[540px] tw-overflow-x-scroll">
+                  <span v-if="!item.tasks?.length" class="text-gray-800 text-body-3 ellipsis lines-1 tw-break-words">
+                    Sem Tarefas Associadas
+                  </span>
                   <template v-for="(task, index) in item.tasks" :key="task">
                     <v-tooltip
                       v-if="index <= 4"

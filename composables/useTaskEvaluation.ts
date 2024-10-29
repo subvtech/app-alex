@@ -15,7 +15,7 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
         queryFn: async () => {
           const { data } = await find('grades', {
             filters: { learningplan: { id: learningPlanId.value } },
-            populate: ['grade_compositions'],
+            populate: ['grade_compositions.grade_composition_tasks.task.evaluation_group'],
           });
           return data;
         },
@@ -149,6 +149,24 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: taskEvaluationDataQuery });
           successConfirmation.value = false;
+        },
+      });
+    },
+    createGradeMutation(sucessCallback: any = null) {
+      return useMutation({
+        mutationFn: ({ learningplan }: any) => {
+          return create('grades', { weight: 1, learningplan });
+        },
+        onSuccess(result) {
+          queryClient.setQueryData(learningPlanGradesQuery, (oldData) => {
+            const oldGrades: any = structuredClone(oldData);
+
+            return oldGrades?.length ? [...oldGrades, result.data] : [result.data];
+          });
+
+          if (sucessCallback) {
+            sucessCallback();
+          }
         },
       });
     },
