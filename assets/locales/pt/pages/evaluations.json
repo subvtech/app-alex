@@ -11,7 +11,7 @@
   "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
   "update": "Atualizar",
   "rubrics": {
-    "name": "Nome da rubrica",
+    "name": "Nome",
     "criteria": "Critérios",
     "search": "Encontrar rubricas",
     "new": "Nova rubrica",

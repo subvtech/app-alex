@@ -11,7 +11,7 @@
   "showingData": "Showing from %{from} to %{to} of %{total} %{entity}",
   "update": "Update",
   "rubrics": {
-    "name": "Rubric Name",
+    "name": "Name",
     "criteria": "Criteria",
     "search": "Find rubrics",
     "new": "New rubric",

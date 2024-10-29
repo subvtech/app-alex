@@ -1,10 +1,10 @@
 <template>
   <div class="bg-white rounded w-100">
     <!-- Header -->
-    <div class="pa-6 d-flex tw-items-center tw-justify-between ga-6">
+    <div class="pa-6 d-flex tw-items-center sm:tw-justify-between tw-justify-center tw-flex-wrap ga-6">
       <alex-inputs-text-field
         v-model="search"
-        class="rubric-textfield tw-flex-[0_0_320px]"
+        class="rubric-textfield tw-max-w-[320px] tw-flex-[1_1_150px]"
         :placeholder="$t(`${i18Dir}.search`)"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
@@ -23,12 +23,12 @@
       :items="filteredItems"
       :items-per-page="itemsPerPage"
     >
-      <template #headers="{ columns, isSorted, getSortIcon, toggleSort }"
+      <template #headers="{ columns, getSortIcon, toggleSort }"
         ><tr>
           <template v-for="column in columns" :key="column.key">
             <td>
-              <div class="tw-cursor-pointer" @click="() => toggleSort(column)">
-                <span class="text-body-2 text-gray-600 mr-2">{{ column.title }}</span>
+              <div class="tw-cursor-pointer d-flex align-center" @click="() => toggleSort(column)">
+                <span class="text-body-2 text-gray-600 mr-2 tw-leading-none">{{ column.title }}</span>
 
                 <!-- Sort icons -->
                 <v-icon :icon="getSortIcon(column)" color="#ABB2B9"></v-icon>
@@ -58,7 +58,7 @@
 
       <!-- Pagination -->
       <template #bottom
-        ><div class="d-flex tw-justify-between align-center tw-flex-wrap pa-6 ga-2">
+        ><div class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px]">
           <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
             {{ paginationText }}
           </p>
@@ -92,7 +92,9 @@ const activePage = ref<number>(1);
 const createModal = ref<boolean>(false);
 
 const totalItems = ref<number>(0);
-const items = ref([]);
+const items = ref([
+  { name: 'Lucas', criteria: ['Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho'] },
+]);
 
 const paginationText = computed<string>(() => {
   const from = (activePage.value - 1) * itemsPerPage;
