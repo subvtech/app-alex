@@ -6,9 +6,22 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
   const learningPlanGradesQuery = ['grades', learningPlanId];
   const taskEvaluationDataQuery = ['taskEvaluationData', taskId];
   const taskSubmissionEvaluationDataQuery = ['taskSumbmissionEvaluationData', submissionId];
+  const learningPlanTasksQuery = ['tasks', learningPlanId];
 
   const queryClient = useQueryClient();
   return {
+    getLearningPlanTasks() {
+      return useQuery({
+        queryKey: learningPlanTasksQuery,
+        queryFn: async () => {
+          const { data } = await find('tasks', {
+            filters: { learningplan: { id: learningPlanId.value } },
+            // populate: ['grade_compositions.grade_composition_tasks.task.evaluation_group'],
+          });
+          return data;
+        },
+      });
+    },
     getLearningPlanGrades() {
       return useQuery({
         queryKey: learningPlanGradesQuery,

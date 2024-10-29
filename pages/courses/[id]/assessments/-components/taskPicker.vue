@@ -7,7 +7,7 @@
       label="Quais tarefas deseja associar?"
       placeholder="Selecione as tarefas"
       no-data-text="Nenhuma tarefa com modo de avaliação associado foi encontrada"
-      :items="availableTasks"
+      :items="props.available"
       item-title="title"
       item-value="id"
       multiple
@@ -20,12 +20,12 @@
             <div class="px-6 py-4 w-100">
               <p class="text-body-2 ellipsis lines-1 text-primary-0 mb-2">{{ task?.title }}</p>
               <div class="text-body-5 text-gray-600">
-                <alex-custom-chip
+                <!-- <alex-custom-chip
                   prepend-icon="mdi-calendar"
                   :text="formattedDate(task.date)"
                   class="px-2 mr-2"
                   status="secondary"
-                />
+                /> -->
                 <span v-if="task?.isGroup">
                   <v-icon size="16" icon="mdi-account-multiple" />
                   Grupo
@@ -56,11 +56,10 @@ const props = defineProps<{
   selected: any[];
 }>();
 
-const availableTasks = ref([...(props.available || [])]);
 const selectedTasks = ref([...(props.selected || [])]);
 
 const formattedDate = (date: string): string => {
-  return format(new Date(date), 'dd MMM yyyy', { locale: i18n.locale.value === 'en' ? enIN : ptBR });
+  return format(new Date(date.split('T')[0]), 'dd MMM yyyy', { locale: i18n.locale.value === 'en' ? enIN : ptBR });
 };
 
 const associateTasks = () => {

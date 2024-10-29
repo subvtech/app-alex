@@ -98,7 +98,7 @@
         </div>
       </div>
     </div>
-    <Dialog v-model="dialog" :available="tasks" :selected="selectedTasks" />
+    <Dialog v-model="dialog" :available="availableTasks" :selected="selectedTasks" />
   </v-navigation-drawer>
 </template>
 
@@ -107,9 +107,9 @@ import Dialog from './taskPicker.vue';
 type taskType = {
   id: number;
   title: string;
-  type: 'rubric' | 'criteria' | 'group';
-  methodName: string;
-  value: number;
+  type?: 'rubric' | 'criteria' | 'group';
+  methodName?: string;
+  value?: number;
   isGroup?: boolean;
 };
 
@@ -135,8 +135,6 @@ const openDrawer = (assessment?: assessmentType) => {
 };
 
 defineExpose({ openDrawer });
-
-const tasks = ref<taskType[]>([...(props.availableTasks || [])]);
 
 const updateTaskWeight = (task: taskType, update: 'up' | 'down') => {
   const index = selectedTasks.value.findIndex((t) => t.id === task.id);

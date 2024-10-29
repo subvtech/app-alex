@@ -32,9 +32,23 @@ const search = ref('');
 const isLoading = ref(false);
 const drawer = ref();
 
-const { getLearningPlanGrades, createGradeMutation } = useTaskEvaluation(learningPlanId, null, user);
+const { getLearningPlanGrades, createGradeMutation, getLearningPlanTasks } = useTaskEvaluation(
+  learningPlanId,
+  null,
+  user,
+);
 
 const { data: learningPlanGrades } = getLearningPlanGrades();
+const { data: tasks } = getLearningPlanTasks();
+
+const availableTasks = computed<tasksType[]>(() => {
+  return tasks.value?.map((t) => ({
+    id: t.id,
+    title: t.title,
+    isGroup: t.type === 'group',
+    date: t.createdAt,
+  }));
+});
 
 const onCreateAsessment = () => {
   console.log('testeee');
@@ -61,7 +75,7 @@ const assessments = computed<assessment[]>(() => {
           title: task.title,
           type: evaluation_group.type === 'standard' ? 'group' : 'rubric',
           methodName: evaluation_group.name,
-          isGroup: evaluation_group.type === 'standard',
+          isGroup: task.type === 'group',
           value: gct.weight,
         };
       }),
@@ -235,7 +249,7 @@ const dropdownItems = (assessments: assessment) => [
       </div>
     </div>
     <!-- TODO: Pass available tasks (todas as tasks do curso que tenham forma de avaliação associadas ) -->
-    <TaskDrawer ref="drawer" :available-tasks="[]" />
+    <TaskDrawer ref="drawer" :available-tasks="availableTasks" />
   </div>
 </template>
 
