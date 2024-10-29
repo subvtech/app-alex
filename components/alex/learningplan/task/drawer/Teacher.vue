@@ -137,7 +137,13 @@
           <div class="pa-3">
             <h5 class="text-h5 text-secondary-0 mb-2">Composição da Nota</h5>
             <span v-if="!gradeTaskComposition" class="text-body-4 text-gray-500">Selecione uma avaliação</span>
-            <alex-custom-chip v-else :text="gradeTaskComposition?.grade_composition?.grade?.title" status="secondary" />
+            <alex-custom-chip
+              v-else
+              :text="gradeTaskComposition?.grade_composition?.grade?.title"
+              status="secondary"
+              class="tw-max-w-full"
+              text-classes="ellipsis lines-1"
+            />
           </div>
         </div>
 
@@ -151,7 +157,13 @@
           <div class="pa-3">
             <h5 class="text-h5 text-secondary-0 mb-2">Tipo avaliativo</h5>
             <span v-if="!taskEvaluationGroup" class="text-body-4 text-gray-500">Selecione os critérios</span>
-            <alex-custom-chip v-else :text="taskEvaluationGroupText" status="secondary" />
+            <alex-custom-chip
+              v-else
+              :text="taskEvaluationGroupText"
+              status="secondary"
+              class="tw-max-w-full"
+              text-classes="ellipsis lines-1"
+            />
           </div>
         </div>
         <alex-custom-dialog
