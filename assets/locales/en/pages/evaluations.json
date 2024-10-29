@@ -9,5 +9,18 @@
   "my_evaluations": "My Evaluations",
   "search_criteria": "Search Criteria",
   "showingData": "Showing from %{from} to %{to} of %{total} %{entity}",
-  "update": "Update"
+  "update": "Update",
+  "rubrics": {
+    "name": "Rubric Name",
+    "criteria": "Criteria",
+    "search": "Find rubrics",
+    "new": "New rubric",
+    "pagination": "Showing %{from} to %{to} of %{total} total courses",
+    "createTitle": "Create new rubric",
+    "create": "Create",
+    "cancel": "Cancel",
+    "typeName": "Type the rubric name",
+    "empty": "It seems there are no rubrics created",
+    "emptyAlt": "No rubrics"
+  }
 }

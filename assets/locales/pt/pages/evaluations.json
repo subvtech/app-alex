@@ -9,5 +9,18 @@
   "my_evaluations": "Minhas avaliações",
   "search_criteria": "Encontrar critério",
   "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
-  "update": "Atualizar"
+  "update": "Atualizar",
+  "rubrics": {
+    "name": "Nome da rubrica",
+    "criteria": "Critérios",
+    "search": "Encontrar rubricas",
+    "new": "Nova rubrica",
+    "pagination": "Mostrando do %{from} ao %{to} de um total de %{total} cursos",
+    "createTitle": "Criar nova rubrica",
+    "create": "Criar",
+    "cancel": "Cancelar",
+    "typeName": "Digite o nome da rubrica",
+    "empty": "Parece que não há rubricas criadas",
+    "emptyAlt": "Sem rubricas"
+  }
 }

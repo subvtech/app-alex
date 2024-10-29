@@ -5,7 +5,7 @@
       <alex-inputs-text-field
         v-model="search"
         class="rubric-textfield tw-flex-[0_0_320px]"
-        placeholder="Econtrar rúbricas"
+        :placeholder="$t(`${i18Dir}.search`)"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         name="search"
@@ -13,7 +13,7 @@
         density="comfortable"
       />
 
-      <alex-custom-button text="Nova rúbrica" size="large" @click="() => (createModal = true)" />
+      <alex-custom-button :text="$t(`${i18Dir}.new`)" size="large" @click="() => (createModal = true)" />
     </div>
 
     <!-- Content -->
@@ -31,16 +31,7 @@
                 <span class="text-body-2 text-gray-600 mr-2">{{ column.title }}</span>
 
                 <!-- Sort icons -->
-                <v-icon
-                  :icon="
-                    (() => {
-                      const sortIcon = getSortIcon(column);
-                      console.log('Sort icon', sortIcon, column);
-                      return sortIcon;
-                    })()
-                  "
-                  color="#ABB2B9"
-                ></v-icon>
+                <v-icon :icon="getSortIcon(column)" color="#ABB2B9"></v-icon>
               </div>
             </td>
           </template></tr
@@ -69,8 +60,7 @@
       <template #bottom
         ><div class="d-flex tw-justify-between align-center tw-flex-wrap pa-6 ga-2">
           <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
-            Mostrando do {{ (activePage - 1) * itemsPerPage }} ao
-            {{ Math.min(activePage * itemsPerPage, totalItems) }} de um total de {{ totalItems }} cursos
+            {{ paginationText }}
           </p>
           <alex-custom-pagination
             v-model="activePage"
@@ -88,15 +78,33 @@
 import CreateModal from './-components/Create.vue';
 import Empty from './-components/EmptyState.vue';
 
+const itemsPerPage = 10;
+const i18Dir = 'pages.evaluations.rubrics';
+const { t } = useI18n();
+
+const headers = [
+  { title: t(`${i18Dir}.name`), key: 'name' },
+  { title: t(`${i18Dir}.criteria`), key: 'criteria' },
+];
+
 const search = ref<string>('');
 const activePage = ref<number>(1);
-const createModal = ref<boolean>(true);
+const createModal = ref<boolean>(false);
 
 const totalItems = ref<number>(0);
-const items = ref([
-  { id: 1, name: 'Rúbrica do Lucas', criteria: ['Testando 1', 'Teste', 'Teste 2'] },
-  { id: 2, name: 'Rúbrica do Breno', criteria: ['Testando 1', 'Teste'] },
-]);
+const items = ref([]);
+
+const paginationText = computed<string>(() => {
+  const from = (activePage.value - 1) * itemsPerPage;
+  const to = Math.min(activePage.value * itemsPerPage, totalItems.value);
+  const total = totalItems.value;
+
+  return t(`${i18Dir}.pagination`, {
+    from,
+    to,
+    total,
+  });
+});
 
 const filteredItems = computed(() => {
   return items.value.filter(({ name, criteria }) => {
@@ -111,18 +119,6 @@ const filteredItems = computed(() => {
     return false;
   });
 });
-
-const itemsPerPage = 10;
-
-const headers = [
-  { title: 'Nome da rúbrica', key: 'name' },
-  { title: 'Critérios', key: 'criteria' },
-];
-
-const getSortIcon = (value) => {
-  console.log(value);
-  return 'mdi-search';
-};
 </script>
 <style>
 .rubric-textfield .v-input__details {
