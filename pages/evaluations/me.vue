@@ -12,117 +12,44 @@
       />
     </v-row>
     <v-col class="tw-bg-white tw-rounded">
-      <alex-custom-tabs :tabs="tabs" class="px-6"> </alex-custom-tabs>
-      <div class="w-100 tw-h-[1px] bg-gray-100"></div>
-      <div class="tw-flex tw-p-6 tw-justify-between">
-        <alex-inputs-text-field
-          v-model="search"
-          name="search"
-          :placeholder="$t('pages.evaluations.search_criteria')"
-          prepend-inner-icon="mdi-magnify"
-          density="comfortable"
-          class="tw-w-[320px]"
-        />
-        <alex-custom-button size="large" @click="showDialog">
-          Novo critério
-          <createCriteria ref="createCriteriaRef" />
-        </alex-custom-button>
-      </div>
-      <v-data-iterator
-        v-model:search="search"
-        v-model:page="page"
-        :items="cards"
-        :items-per-page="itemsPerPageValue"
-        class="d-flex tw-flex-col tw-flex-grow h-full"
+      <alex-custom-tabs
+        :tabs="tabs"
+        class="px-6"
+        v-model="selectedOption"
+        @update:model-value="() => onChangeTab(selectedOption)"
       >
-        <template #default="{ items }">
-          <div class="d-flex flex-wrap gap-6 w-100 px-6">
-            <Card v-for="(item, index) in setTableData(items)" :key="item.id" :item="item" />
-          </div>
-        </template>
-        <template #footer="{ pageCount, groupedItems }">
-          <div class="d-flex w-full th-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3">
-            <p class="show-cardlist text-body-3 text-gray-600">
-              {{ showingData(groupedItems, cards) }}
-            </p>
-
-            <alex-custom-pagination
-              v-model="page"
-              :length="pageCount"
-              :total-visible="itemsPerPageValue"
-              class="extra-mb"
-            />
-          </div>
-        </template>
-      </v-data-iterator>
+      </alex-custom-tabs>
+      <div class="w-100 tw-h-[1px] bg-gray-100"></div>
+      <div>
+        <NuxtPage />
+      </div>
     </v-col>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import Card from './me/-components/card.vue';
-import createCriteria from './me/-components/daialogs/createCriteria.vue';
-const search = ref('');
-const page = ref(1);
 const { t } = useI18n();
-const user = useStrapiUser();
-const createCriteriaRef = ref(createCriteria);
-const { getUserEvaluations } = useTaskEvaluation(0, 0, user);
+const selectedOption = ref<options>('criteria');
 
-const { data: cards } = getUserEvaluations();
-
-const showDialog = () => {
-  createCriteriaRef?.value.openDialog();
-};
-
-interface Criteria {
-  id: number;
-  name: string;
-  description: string;
-  public: boolean;
-  user?: User;
-}
-
-const itemsPerPageValue = 20;
-
-interface Item {
-  raw: Criteria;
-}
+type options = 'criteria' | 'groups' | 'headings';
 
 const tabs = [
   {
     label: t('pages.evaluations.criteria'),
-    value: '1',
+    value: 'criteria',
   },
   {
     label: t('pages.evaluations.groups'),
-    value: '2',
+    value: 'groups',
   },
   {
     label: t('pages.evaluations.headings'),
-    value: '3',
+    value: 'headings',
   },
 ];
 
-const showingData = (groupedItems: any, items: Array<any>) => {
-  const itemsPerPage = search.value === '' ? itemsPerPageValue : groupedItems.length;
-  const from = (page.value - 1) * itemsPerPage + 1;
-  const to = page.value * itemsPerPage > (items?.length ?? 0) ? items?.length ?? 0 : page.value * itemsPerPage;
-  const total = items?.length ?? 0;
-  const message = t('pages.evaluations.showingData', {
-    from,
-    to,
-    total,
-    entity: t('pages.evaluations.criteria'),
-  });
-  if (to === 0) {
-    return t('pages.classes.noData');
-  }
-  return message;
-};
-
-const setTableData = (items: readonly Item[]): Criteria[] => {
-  return items.map((item) => item.raw);
+const onChangeTab = (value: string) => {
+  navigateTo(`/evaluations/me/${value}`);
 };
 </script>
 
