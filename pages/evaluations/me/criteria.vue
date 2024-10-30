@@ -66,6 +66,12 @@ const setTableData = (items: readonly Item[]): Criteria[] => {
       <createCriteria ref="createCriteriaRef" />
     </alex-custom-button>
   </div>
+  <!-- TODO: Trocar imagem de empty state-->
+  <alex-custom-empty-placeholder
+    v-if="cards?.length === 0"
+    :empty-text-message="t('pages.evaluations.no_criteria')"
+    empty-text-image="/svg/EmptyAbout.svg"
+  />
   <v-data-iterator
     v-model:search="search"
     v-model:page="page"
