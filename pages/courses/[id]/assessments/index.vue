@@ -51,7 +51,6 @@ const availableTasks = computed<tasksType[]>(() => {
 });
 
 const onCreateAsessment = () => {
-  console.log('testeee');
   // assessments.value[assessments.value.length - 1]
   drawer.value.openDrawer();
 };
@@ -67,7 +66,7 @@ const assessments = computed<assessment[]>(() => {
       name: grade.title,
       id: grade.id,
       lastUpdated: grade.updatedAt,
-      tasks: grade.grade_compositions[0].grade_composition_tasks.map((gct) => {
+      tasks: grade.grade_compositions[0]?.grade_composition_tasks.map((gct) => {
         const { task } = gct;
         const { evaluation_group } = task;
         return {
@@ -110,7 +109,6 @@ const formattedDate = (strDate: string | Date) => {
   const isPortuguese = i18n.locale.value === 'pt';
   const dateFormat = isPortuguese ? "dd/MM/yyyy 'às' HH:mm" : "MM/dd/yyyy 'at' HH:mm";
   const locale = isPortuguese ? ptBR : enIN;
-
   return format(date, dateFormat, { locale });
 };
 
@@ -223,7 +221,7 @@ const dropdownItems = (assessments: assessment) => [
                 </td>
                 <td class="tw-w-[540px]">
                   <span class="text-gray-700 text-body-1">
-                    {{ formattedDate(new Date()) }}
+                    {{ formattedDate(item.lastUpdated) }}
                   </span>
                 </td>
                 <td>

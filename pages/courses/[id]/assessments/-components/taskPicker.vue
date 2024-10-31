@@ -14,19 +14,20 @@
       hide-details
       return-object
     >
-      <template #item="{ props: task }">
+      <template #item="{ props: task, item }">
         <v-list-item class="pa-1" v-bind="task" title="">
           <template #default>
             <div class="px-6 py-4 w-100">
               <p class="text-body-2 ellipsis lines-1 text-primary-0 mb-2">{{ task?.title }}</p>
               <div class="text-body-5 text-gray-600">
-                <!-- <alex-custom-chip
+                <alex-custom-chip
                   prepend-icon="mdi-calendar"
-                  :text="formattedDate(task.date)"
+                  :text="formattedDate(item.raw?.date)"
                   class="px-2 mr-2"
                   status="secondary"
-                /> -->
-                <span v-if="task?.isGroup">
+                  size="x-small"
+                />
+                <span v-if="item.raw?.isGroup">
                   <v-icon size="16" icon="mdi-account-multiple" />
                   Grupo
                 </span>

@@ -138,6 +138,9 @@ defineExpose({ openDrawer });
 
 const updateTaskWeight = (task: taskType, update: 'up' | 'down') => {
   const index = selectedTasks.value.findIndex((t) => t.id === task.id);
+  if (!selectedTasks.value[index].value || !task.value) {
+    return;
+  }
   if (update === 'up' && task.value < 9) {
     selectedTasks.value[index].value += 1;
   } else if (update === 'down' && task.value > 1) {
