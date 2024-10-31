@@ -34,8 +34,10 @@
     :persistent="true"
     :max-width="1760"
     :retain-focus="false"
+    body-classes="bg-white pa-0"
+    main-button-text="Associar"
+    secondary-button-text="Recusar entrega"
     no-click-animation
-    no-footer
   >
     <template #header>
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
@@ -46,10 +48,38 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <v-tabs v-model="tab">
-      <v-tab value="content"> Conteudo </v-tab>
-      <v-tab value="evaluation"> Avaliação </v-tab>
-    </v-tabs>
+    <div class="w-full tw-border-b pa-6 d-flex">
+      <!-- TODO: Passar as informações do estudante, se for um grupo remover o email e a foto de perfil -->
+      <v-avatar
+        :size="40"
+        image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAmpNJ11PRen9vRjdesWmQdy1lW1UX49G8wg&s"
+        color="gray-100"
+        class="mr-4"
+      >
+        <template v-if="student?.avatar" #default>
+          <p class="text-gray-300 text-body-3">EN</p>
+        </template>
+      </v-avatar>
+      <div>
+        <p class="text-gray-700 text-body-2">Robert Judson Feitoza Mello</p>
+        <p class="text-body-3 text-gray-500">brenojac@email.com</p>
+      </div>
+      <alex-custom-chip text="Turma A" class="ml-auto" size="small" status="blue" />
+    </div>
+    <alex-custom-tabs
+      v-model="tab"
+      class="tw-border-b px-6 pb-[2px]"
+      :tabs="[
+        {
+          label: 'Conteudo',
+          value: 'content',
+        },
+        {
+          label: 'Avaliação',
+          value: 'evaluation',
+        },
+      ]"
+    />
     <v-tabs-window v-model="tab">
       <v-tabs-window-item value="content">
         <div class="mx-auto editor my-6 px-sm-6 px-md-0 w-100">
@@ -64,25 +94,57 @@
                 :show-loader="true"
               />
             </div>
-            <div class="d-flex flex-wrap tw-max-w-[400px] sm:tw-w-[400px] tw-border pa-3">
-              <div class="tw-w-full">Avalição de Entrega</div>
-              <div class="tw-w-full">
-                Tipo: {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }}
+            <div class="d-flex gap-2 flex-wrap tw-w-[400px] tw-border pa-6 rounded-lg text-body-1 text-gray-800">
+              <h3 class="text-gray-800 text-h3 mb-4">Avaliação de Entrega</h3>
+              <div class="w-100 d-flex justify-space-between">
+                Tipo:
+                <alex-custom-chip
+                  status="secondary"
+                  :text="
+                    taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo de critérios'
+                  "
+                />
               </div>
-              <div class="tw-w-full">
+              <div class="w-100 d-flex justify-space-between align-center">
                 {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }} :
-                {{ taskSubmissionEvaluationData?.evaluation_group?.name }}
+                <alex-custom-chip status="secondary" :text="taskSubmissionEvaluationData?.evaluation_group?.name" />
               </div>
-              <div class="tw-w-full">Analise da tarefa</div>
+              <h5 class="text-gray-800 text-h5 mt-4">
+                {{
+                  taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Analise da tarefa' : 'Critérios'
+                }}
+              </h5>
               <div
                 v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
                 :key="`criteria-${i}`"
-                class="tw-w-full"
+                class="w-100 d-flex justify-space-between align-center"
               >
-                {{ evaluation_criteria.criteria.criteria.name }}: {{ evaluation_criteria.grade || 'Nao avaliado' }} x
-                {{ evaluation_criteria.criteria.weight }}
+                <span>
+                  {{ evaluation_criteria.criteria.criteria.name }}
+                </span>
+                <span class="text-gray-600 text-body-3">
+                  <alex-custom-chip
+                    text-classes="text-body-3 text-gray-600"
+                    :text="evaluation_criteria.grade || 0"
+                    variant="outlined"
+                    status="secondary"
+                  />
+                  x
+                  <alex-custom-chip
+                    text-classes="text-body-3 text-gray-600"
+                    :text="evaluation_criteria.criteria.weight"
+                    status="secondary"
+                  />
+                </span>
               </div>
-              <div class="tw-w-full">Nota final: {{ finalGrade }}</div>
+              <div class="d-flex justify-space-between align-center w-100 mt-4">
+                <span class="text-gray-800 text-h5">Nota final: </span>
+                <alex-custom-chip
+                  :text="`${finalGrade}/10`"
+                  status="secondary"
+                  text-classes="text-gray-600 text-body-2"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -110,8 +172,10 @@
                     }}</span>
                     <alex-inputs-text-field
                       v-else
+                      :model-value="evaluation_criteria.grade"
+                      :name="`criteria-evaluation-grade-${evaluation_criteria.id}`"
                       type="number"
-                      @update:modelValue="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
+                      @update:model-value="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
                     />
                   </div>
                 </template>
@@ -139,7 +203,7 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
 import lodash from 'lodash';
-import { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
+import type { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
 interface submissionProps {
   title: string;
   deadline: string;
@@ -196,15 +260,37 @@ const user = useStrapiUser();
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 
-const { getTaskEvaluatonData, getTaskSubmissionEvaluation } = useTaskEvaluation(
+const { getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation } = useTaskEvaluation(
   learningPlanId,
   taskId,
   user,
   submissionId,
 );
 
-const { data: taskEvaluationData } = getTaskEvaluatonData();
 const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
+const { mutate: updateEvaluationGrades } = gradeSubmissionEvaluationCriteriasMutation();
+
+const rubricGradeLevels = computed(() => {
+  return taskSubmissionEvaluationData.value.evaluation_group.rubric_grade_levels.map((l) => {
+    return {
+      ...l,
+      grade_level_criterias: l.grade_level_criterias.map((c) => {
+        return { id: c.criteria.id, justification: c.justification };
+      }),
+    };
+  });
+});
+
+const criteriaWithGradeLevels = computed(() => {
+  return taskSubmissionEvaluationData.value.criteria_evaluations.map((ce) => {
+    const gradeLevels = rubricGradeLevels.value.map((g) => {
+      const criteriaId = ce.criteria.criteria.id;
+      const { justification } = g.grade_level_criterias.find((glc) => glc.id === criteriaId);
+      return { ...g, justification };
+    });
+    return { ...ce, gradeLevels };
+  });
+});
 
 const queryClient = useQueryClient();
 
@@ -212,9 +298,25 @@ const onCriteriaGrading = (grade, criteriaId) => {
   const evaluationData = structuredClone(toRaw(taskSubmissionEvaluationData.value));
 
   const criteriaIdx = evaluationData.criteria_evaluations.findIndex((c) => c.id === criteriaId);
-  evaluationData.criteria_evaluations[criteriaIdx].grade = grade;
 
+  let realGrade;
+
+  if (Number.parseInt(grade) > 10) {
+    realGrade = '10';
+  } else if (Number.parseInt(grade) < 0) {
+    realGrade = '0';
+  } else {
+    realGrade = grade;
+  }
+
+  evaluationData.criteria_evaluations[criteriaIdx].grade = realGrade;
   queryClient.setQueryData(['taskSumbmissionEvaluationData', submissionId], evaluationData);
+
+  updateEvaluationGrades({
+    evaluationId: evaluationData?.id,
+    criteriaEvaluations: evaluationData?.criteria_evaluations,
+    grade: finalGrade.value,
+  });
 };
 
 const finalGrade = computed(() => {
@@ -227,7 +329,7 @@ const finalGrade = computed(() => {
     (c) => (c.grade || 0) * (c.criteria?.weight || 0),
   );
 
-  const totalGrade = grades.reduce((total, grade) => total + grade);
+  const totalGrade = grades?.reduce((total, grade) => total + grade, 0);
 
   return totalGrade / totalWeight;
 });

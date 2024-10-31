@@ -41,9 +41,23 @@
     @update-task-status="(status) => $emit('update-task-status', status)"
     @update-submission="() => $emit('update-submission')"
   />
+  <alex-custom-confirm-dialog
+    v-model="openConfirmDialog"
+    title="Tipo de avaliação não definido!"
+    subtitle="Deseja associar um tipo de avaliação para esta tarefa?"
+    submit-button-text="Associar Tipo Avaliacao"
+    cancel-button-text="
+      Cancelar
+    "
+    :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+    @submit="setTaskEvaluationGroup"
+    @cancel="openConfirmDialog = false"
+  />
 </template>
 
 <script setup lang="ts">
+import ConfirmDialog from '~/components/alex/custom/ConfirmDialog.vue';
+
 interface Submission {
   mark?: number | null;
   maxMark?: number | null;
@@ -89,6 +103,8 @@ const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 const submission = toRef(props, 'content');
 const submissionId = computed(() => submission.value?.id);
+
+const openConfirmDialog = ref(false);
 
 const { getTaskEvaluatonData, getTaskSubmissionEvaluation, createSubmissionEvaluationMutation } = useTaskEvaluation(
   learningPlanId,
@@ -215,10 +231,17 @@ const text = computed(() => {
   };
 });
 
+const setTaskEvaluationGroup = async () => {
+  await navigateTo({ path: `/courses/${learningPlanId.value}/tasks`, query: { taskId: taskId.value } });
+};
+
 const openDialog = async () => {
-  if (!taskSubmissionData.value) {
+  if (props.status === 'in_review' && !taskEvaluationData.value.evaluation_group) {
+    openConfirmDialog.value = true;
+    return;
+  } else if (!taskSubmissionData.value && props.status === 'in_review')
     await createTaskSubmissionEvaluation({ groupId: taskEvaluationData.value?.evaluation_group?.id });
-  }
+
   dialog.value.openDialog();
 };
 </script>

@@ -132,12 +132,18 @@
           @click="openGradeCompositionModal"
         >
           <div class="px-3 py-3 bg-gray-blue tw-border-r d-flex align-center">
-            <v-icon size="32" icon="alex:FactCheck" color="secondary-0"></v-icon>
+            <v-icon size="32" icon="alex:CollectionBookmark" color="secondary-0"></v-icon>
           </div>
           <div class="pa-3">
             <h5 class="text-h5 text-secondary-0 mb-2">Composição da Nota</h5>
             <span v-if="!gradeTaskComposition" class="text-body-4 text-gray-500">Selecione uma avaliação</span>
-            <alex-custom-chip v-else :text="gradeTaskComposition?.grade_composition?.grade?.title" status="secondary" />
+            <alex-custom-chip
+              v-else
+              :text="gradeTaskComposition?.grade_composition?.grade?.title"
+              status="secondary"
+              class="tw-max-w-full"
+              text-classes="ellipsis lines-1"
+            />
           </div>
         </div>
 
@@ -151,7 +157,13 @@
           <div class="pa-3">
             <h5 class="text-h5 text-secondary-0 mb-2">Tipo avaliativo</h5>
             <span v-if="!taskEvaluationGroup" class="text-body-4 text-gray-500">Selecione os critérios</span>
-            <alex-custom-chip v-else :text="taskEvaluationGroupText" status="secondary" />
+            <alex-custom-chip
+              v-else
+              :text="taskEvaluationGroupText"
+              status="secondary"
+              class="tw-max-w-full"
+              text-classes="ellipsis lines-1"
+            />
           </div>
         </div>
         <alex-custom-dialog
@@ -177,6 +189,7 @@
             v-model="evaluationGroupData.groupId"
             name="evaluationGroupId"
             label="Critérios avaliativos"
+            placeholder="Selecione os critérios avaliativos"
             required
             :items="evaluationGroups"
             item-title="name"
@@ -220,6 +233,7 @@
             v-model="gradeAssociatonData.gradeId"
             name="grade"
             label="Qual avaliação deseja associar ?"
+            placeholder="Selecione uma avaliação"
             required
             :items="grades"
             item-title="title"
@@ -268,8 +282,7 @@
 </template>
 
 <script setup lang="ts">
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-const queryClient = useQueryClient();
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isAfter, isBefore } from 'date-fns';
 import type { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import type { MentionUserPropsArray } from '~/components/TipTap/index.vue';
@@ -277,6 +290,7 @@ import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import type { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { orderEvents } from '~/utils';
 import type { RestrictionValue } from '../Restrictions.vue';
+const queryClient = useQueryClient();
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 const openGradeCompositionDialog = ref(false);
