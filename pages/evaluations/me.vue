@@ -31,7 +31,7 @@
 const { t } = useI18n();
 const selectedOption = ref<options>('criteria');
 
-type options = 'criteria' | 'groups' | 'headings';
+type options = 'criteria' | 'groups' | 'rubrics';
 
 const tabs = [
   {
@@ -44,7 +44,7 @@ const tabs = [
   },
   {
     label: t('pages.evaluations.headings'),
-    value: 'headings',
+    value: 'rubrics',
   },
 ];
 

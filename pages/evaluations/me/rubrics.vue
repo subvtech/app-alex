@@ -31,7 +31,7 @@
                 <span class="text-body-2 text-gray-600 mr-2 tw-leading-none">{{ column.title }}</span>
 
                 <!-- Sort icons -->
-                <v-icon :icon="getSortIcon(column)" color="#ABB2B9"></v-icon>
+                <v-icon v-if="column.sortable" :icon="getSortIcon(column)" color="#ABB2B9"></v-icon>
               </div>
             </td>
           </template></tr
@@ -54,6 +54,28 @@
         </div>
       </template>
 
+      <template #item.options="{ value }">
+        <div class="d-flex align-center tw-justify-end">
+          <alex-custom-dropdown
+            :items="[
+              {
+                text: 'Editar',
+                onClick: () => editRubric(value),
+              },
+              {
+                text: 'Excluir',
+                warning: true,
+                onClick: () => deleteRubric(value),
+              },
+            ]"
+          >
+            <template #activator="{ props }">
+              <v-icon v-bind="props" class="tw-ml-auto" color="gray-600">mdi-dots-vertical</v-icon>
+            </template>
+          </alex-custom-dropdown>
+        </div></template
+      >
+
       <template #no-data><Empty /></template>
 
       <!-- Pagination -->
@@ -68,36 +90,41 @@
           <alex-custom-pagination
             v-model="activePage"
             class="tw-flex-1"
-            :length="totalItems / itemsPerPage || 1"
+            :length="Math.floor(totalItems / itemsPerPage) || 1"
             total-visible="5"
           /></div
       ></template>
     </v-data-table>
 
-    <CreateModal v-model="createModal" />
+    <CreateModal v-model="createModal" :edit-content="editContent" @update="() => getData()" />
   </div>
 </template>
 <script setup lang="ts">
-import CreateModal from './-components/Create.vue';
-import Empty from './-components/EmptyState.vue';
+import CreateModal from './-components/rubrics/Create.vue';
+import Empty from './-components/rubrics/EmptyState.vue';
 
 const itemsPerPage = 10;
 const i18Dir = 'pages.evaluations.rubrics';
+
 const { t } = useI18n();
+const { find } = useStrapiUtils();
+const strapi = useStrapi();
+const user = useStrapiUser();
+const { setMessage } = useMessageStore();
 
 const headers = [
   { title: t(`${i18Dir}.name`), key: 'name' },
   { title: t(`${i18Dir}.criteria`), key: 'criteria' },
+  { key: 'options', sortable: false },
 ];
 
 const search = ref<string>('');
 const activePage = ref<number>(1);
 const createModal = ref<boolean>(false);
+const editContent = ref<null | any>(null);
 
 const totalItems = ref<number>(0);
-const items = ref([
-  // { name: 'Lucas', criteria: ['Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho', 'Hohoho'] },
-]);
+const items = ref([]);
 
 const paginationText = computed<string>(() => {
   const from = (activePage.value - 1) * itemsPerPage;
@@ -112,7 +139,12 @@ const paginationText = computed<string>(() => {
 });
 
 const filteredItems = computed(() => {
-  return items.value.filter(({ name, criteria }) => {
+  const slicedItems = items.value.slice(
+    (activePage.value - 1) * itemsPerPage,
+    Math.min(activePage.value * itemsPerPage, totalItems.value),
+  );
+
+  return slicedItems.filter(({ name, criteria }) => {
     if (name.toLowerCase().includes(search.value.toLocaleLowerCase())) {
       return true;
     }
@@ -123,6 +155,56 @@ const filteredItems = computed(() => {
 
     return false;
   });
+});
+
+const getData = () => {
+  find('evaluation-groups', {
+    filters: {
+      type: 'rubric',
+      user: user.value?.id ?? null,
+    },
+    populate: ['evaluation_criterias', 'rubric_grade_levels.grade_level_criterias'],
+    // ['evaluation_criterias', 'rubric_grade_levels.grade_level_criterias'],
+  })
+    .then(({ data }) => {
+      console.log('Data', data);
+      items.value = data.map((rubric) => ({
+        name: rubric.name,
+        criteria: rubric.evaluation_criterias.map(({ name }) => name),
+        options: rubric,
+      }));
+      totalItems.value = items.value.length;
+    })
+    .catch(() => {
+      setMessage('Falha ao carregar rubricas', 'error', true);
+    });
+};
+
+const editRubric = (rubric) => {
+  editContent.value = rubric;
+  createModal.value = true;
+};
+
+const deleteRubric = (rubric) => {
+  strapi
+    .delete('evaluation-groups', rubric.id)
+    .then(() => {
+      setMessage('Rubrica deletada com sucesso', 'success', true);
+      getData();
+    })
+    .catch(() => {
+      setMessage('Falha ao deletar rubrica', 'error', true);
+    });
+};
+
+onMounted(() => {
+  getData();
+});
+
+watch(createModal, (open) => {
+  if (!open) {
+    editContent.value = null;
+  }
 });
 </script>
 <style>
