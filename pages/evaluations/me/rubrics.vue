@@ -163,16 +163,31 @@ const getData = () => {
       type: 'rubric',
       user: user.value?.id ?? null,
     },
-    populate: ['evaluation_criterias', 'rubric_grade_levels.grade_level_criterias'],
-    // ['evaluation_criterias', 'rubric_grade_levels.grade_level_criterias'],
+    populate: {
+      task_submission_evaluations: true,
+      evaluation_criterias: {
+        sort: 'id:asc',
+      },
+      rubric_grade_levels: {
+        populate: {
+          grade_level_criterias: {
+            populate: {
+              evaluation_criterion: true,
+            },
+            sort: 'id:asc',
+          },
+        },
+      },
+    },
   })
     .then(({ data }) => {
-      console.log('Data', data);
-      items.value = data.map((rubric) => ({
-        name: rubric.name,
-        criteria: rubric.evaluation_criterias.map(({ name }) => name),
-        options: rubric,
-      }));
+      items.value = data
+        .filter(({ disabled_at }) => !disabled_at)
+        .map((rubric) => ({
+          name: rubric.name,
+          criteria: rubric.evaluation_criterias.map(({ name }) => name),
+          options: rubric,
+        }));
       totalItems.value = items.value.length;
     })
     .catch(() => {

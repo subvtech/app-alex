@@ -31,6 +31,8 @@ const defaultRow = {
 const content = ref<rubricRow[]>([...props.data, ...(props.editable ? [{ ...defaultRow }] : [])]);
 
 const onCriteriaSelect = (criteriaIndex: number, index: number) => {
+  // return;
+  console.log('Selecionando');
   const contentVal = content.value;
   contentVal[index].criterion = dropdownItems.value[criteriaIndex];
   content.value = contentVal;
@@ -39,6 +41,18 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
     content.value = [...content.value, { ...defaultRow }];
   }
 };
+
+// Update dropdown if i pass data props
+
+onMounted(() => {
+  setTimeout(() => {
+    console.log(content.value);
+  }, 100);
+});
+
+watch(content, (val) => {
+  console.log('Content mudou', val);
+});
 
 const removeRow = (index: number) => {
   content.value = content.value.splice(index, 1);
