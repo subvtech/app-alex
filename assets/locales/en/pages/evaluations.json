@@ -11,6 +11,9 @@
   "search_criteria": "Search Criteria",
   "showingData": "Showing from %{from} to %{to} of %{total} %{entity}",
   "update": "Update",
+  "criteriaAssociated": "Criterion cannot be deleted because it already belongs to a rubric",
+  "criteriaDeleteSuccess": "Criterion deleted successfully",
+  "criteriaDeleteFail": "Failed to delete criterion",
   "rubrics": {
     "name": "Name",
     "criteria": "Criteria",
@@ -22,6 +25,21 @@
     "cancel": "Cancel",
     "typeName": "Type the rubric name",
     "empty": "It seems there are no rubrics created",
-    "emptyAlt": "No rubrics"
+    "emptyAlt": "No rubrics",
+    "edit": "Edit",
+    "delete": "Delete",
+    "editRubric": "Edit rubric",
+    "loadFail": "rubrics failed to load",
+    "associated": "Rubric cannot be deleted because it is already associated with an assessment",
+    "deleteSuccess": "Rubric deleted successfully",
+    "deleteFail": "Failed to delete rubric",
+    "editSuccess": "Rubric edited successfully",
+    "editFail": "Failed to edit rubric",
+    "createSuccess": "Rubric created successfully",
+    "createFail": "Failed to create rubric",
+    "saveFail": "Failed to save rubric",
+    "missingName": "Please define a name for the rubric",
+    "selectCriteria": "Please select at least one criterion",
+    "emptyField": "The rubric has an empty field"
   }
 }

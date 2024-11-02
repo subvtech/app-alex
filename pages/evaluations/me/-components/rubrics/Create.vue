@@ -1,10 +1,10 @@
 <template>
   <alex-custom-dialog
     v-model="open"
-    :title="$t(`${i18Dir}.createTitle`)"
-    :main-button-text="$t(`${i18Dir}.create`)"
+    :title="props.editContent ? $t(`${i18Dir}.editRubric`) : $t(`${i18Dir}.createTitle`)"
+    :main-button-text="props.editContent ? $t(`${i18Dir}.edit`) : $t(`${i18Dir}.create`)"
     :secondary-button-text="$t(`${i18Dir}.cancel`)"
-    main-button-icon="mdi-plus"
+    :main-button-icon="props.editContent ? 'mdi-pencil' : 'mdi-plus'"
     secondary-button-icon="mdi-close"
     @on-main-action="saveRubric"
     @on-secondary-action="open = false"
@@ -34,7 +34,9 @@ const gradeToField = {
 const name = ref<string>('');
 const rubrics = ref<null | any>(null);
 
+const { t } = useI18n();
 const user = useStrapiUser();
+const { update } = useStrapi();
 const strapiClient = useStrapiClient();
 const { getUserEvaluations } = useTaskEvaluation(0, 0, user);
 const { setMessage } = useMessageStore();
@@ -58,18 +60,37 @@ const formattedData = computed(() => {
     return [];
   }
 
-  return [];
+  const rows = props.editContent?.rubric_grade_levels?.[0]?.grade_level_criterias?.length ?? 0;
+  const data: any = [];
+
+  for (let i = 0; i < rows; i++) {
+    data.push({});
+  }
+
+  props.editContent.rubric_grade_levels.forEach((gradeLevel) => {
+    const field = gradeToField[gradeLevel.grade.toString()];
+
+    gradeLevel.grade_level_criterias?.forEach((criteria, index) => {
+      data[index][field] = criteria.justification;
+      data[index].criterion = {
+        id: criteria?.evaluation_criterion?.id ?? 0,
+        text: criteria?.evaluation_criterion?.name ?? '',
+      };
+    });
+  });
+
+  return data;
 });
 
 const checkContent = (content) => {
   if (content.length === 1) {
-    setMessage('Selecione ao menos um critério', 'warning', true);
+    setMessage(t(`${i18Dir}.selectCriteria`), 'warning', true);
     return false;
   }
 
   content.forEach((row) => {
     if (row.criterion.id && (!row.bad || !row.good || !row.reasonable || !row.excellent)) {
-      setMessage('A rúbrica possui algum campo vazio', 'warning', true);
+      setMessage(t(`${i18Dir}.emptyField`), 'warning', true);
       return false;
     }
   });
@@ -79,11 +100,12 @@ const checkContent = (content) => {
 
 const saveRubric = () => {
   if (!rubrics.value) {
-    setMessage('Falha ao salvar rubrica', 'error', true);
+    setMessage(t(`${i18Dir}.saveFail`), 'error', true);
+    return;
   }
 
   if (!name.value) {
-    setMessage('Defina um nome para a rubrica', 'warning', true);
+    setMessage(t(`${i18Dir}.missingName`), 'warning', true);
     return;
   }
 
@@ -104,23 +126,66 @@ const saveRubric = () => {
     evaluation_criterias: criteria,
   };
 
-  strapiClient(`/evaluation-groups/create-group`, {
-    method: 'POST',
-    body: {
-      group: evaluationGroup,
-      content,
-    },
-  })
-    .then(() => {
-      setMessage('Rubrica criada com sucesso', 'success', true);
-      emit('update');
-    })
-    .catch(() => {
-      setMessage('Falha ao criar rubrica', 'error', true);
-    })
-    .finally(() => {
-      open.value = false;
+  if (!props.editContent || props?.editContent?.task_submission_evaluations?.length) {
+    createRubric(evaluationGroup, content);
+  } else if (props.editContent) {
+    editRubric(evaluationGroup, content);
+  }
+};
+
+const createRubric = async (evaluationGroup, content) => {
+  try {
+    await strapiClient(`/evaluation-groups/create-group`, {
+      method: 'POST',
+      body: {
+        group: evaluationGroup,
+        content,
+      },
     });
+
+    // Caso a rubrica já esteja associada a uma avaliação, será criada
+    // uma nova e a original será marcada como desabilitada (disabled_at)
+    if (props.editContent) {
+      await update('evaluation-groups', props.editContent.id, {
+        disabled_at: new Date(),
+      });
+    }
+
+    setMessage(props.editContent ? t(`${i18Dir}.editSuccess`) : t(`${i18Dir}.createSuccess`), 'success', true);
+    emit('update');
+  } catch (e) {
+    console.error(e);
+    setMessage(props.editContent ? t(`${i18Dir}.editFail`) : t(`${i18Dir}.createFail`), 'error', true);
+  } finally {
+    open.value = false;
+  }
+};
+
+const editRubric = async (evaluationGroup, content) => {
+  try {
+    await update('evaluation-groups', props.editContent.id, {
+      name: name.value,
+      evaluation_criterias: evaluationGroup.evaluation_criterias,
+      rubric_grade_levels: [],
+    });
+
+    await strapiClient(`/evaluation-groups/edit-group`, {
+      method: 'PUT',
+      body: {
+        id: props.editContent.id,
+        group: evaluationGroup,
+        content,
+      },
+    });
+
+    setMessage(t(`${i18Dir}.editSuccess`), 'success', true);
+    emit('update');
+  } catch (e) {
+    console.error(e);
+    setMessage(t(`${i18Dir}.editFail`), 'error', true);
+  } finally {
+    open.value = false;
+  }
 };
 
 watch(open, (open) => {
@@ -130,31 +195,5 @@ watch(open, (open) => {
   }
 
   name.value = props.editContent?.name ?? '';
-
-  // Format rubrics table content
-  if (!props.editContent) {
-    return;
-  }
-
-  const rows = props.editContent?.rubric_grade_levels?.[0]?.grade_level_criterias?.length ?? 0;
-  const data: any = [];
-
-  for (let i = 0; i < rows; i++) {
-    data.push({});
-  }
-
-  console.log(props.editContent);
-
-  props.editContent.rubric_grade_levels.forEach((level) => {
-    const field = gradeToField[level.grade.toString()];
-    console.log('Field', field);
-
-    level.grade_level_criterias.forEach((criteria, index) => {
-      console.log(`- ${criteria.justification} (${index})`);
-      data[index][field] = criteria.justification;
-    });
-  });
-
-  console.log('Formatted:', data);
 });
 </script>
