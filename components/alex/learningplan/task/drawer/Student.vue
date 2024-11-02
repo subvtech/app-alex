@@ -15,7 +15,7 @@
     </template>
 
     <template #default>
-      <div v-if="student" class="user-info text-gray-800">
+      <div v-if="student" class="user-info text-gray-800 mb-4">
         <v-avatar
           :size="80"
           :image="student.avatar || undefined"
@@ -31,7 +31,7 @@
         <h2 class="text-h2 ellipsis lines-1">{{ student.name }}</h2>
         <p class="text-subtitle-2 ellipsis lines-1">{{ studentClass }}</p>
       </div>
-      <div v-if="group" class="tw-flex tw-flex-col tw-gap-2 text-gray-800">
+      <div v-if="group" class="tw-flex tw-flex-col tw-gap-2 text-gray-800 mb-6">
         <alex-custom-chip class="tw-w-fit" :text="studentClass" />
         <h2 class="text-h2 ellipsis lines-1">{{ group.title }}</h2>
         <div class="tw-flex tw-items-center tw-gap-2">
@@ -72,7 +72,7 @@
           <alex-learningplan-task-date v-model="finishAt" edit />
         </div>
       </div>
-      <div class="task-submission">
+      <div class="task-submission my-6">
         <template v-if="submission">
           <h4 class="text-h4">
             {{ $t('components.courses.tasks.submission.submission') }}
@@ -129,6 +129,9 @@
                 :content="mostRecentSubmission"
                 :task-status="status"
                 :doc_name="docName"
+                :student="student"
+                :group="group"
+                :class="studentClass"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
@@ -214,11 +217,12 @@
 </template>
 
 <script setup lang="ts">
-import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
+import type { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
 
-interface Student {
+export interface Student {
   name: string;
   avatar?: string | null;
+  email?: string;
 }
 interface Submission {
   description: string;

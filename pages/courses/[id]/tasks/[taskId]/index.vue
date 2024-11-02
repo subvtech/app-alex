@@ -3,11 +3,7 @@
     <alex-learningplan-task-header-loader />
     <alex-learningplan-task-kanban-loader />
   </div>
-  <section
-    v-else-if="
-      !taskStore.loading && taskStore.task && learningPlanStore.learningPlan?.id
-    "
-  >
+  <section v-else-if="!taskStore.loading && taskStore.task && learningPlanStore.learningPlan?.id">
     <alex-learningplan-task-header
       :id="taskStore.task.id"
       :title="taskStore.task.title"
@@ -25,9 +21,7 @@
       ref="kanban"
       v-model="tasks"
       type="professor"
-      :classes="
-        getClassesOfTaskMembers(taskStore.task.task_members as TaskMember[])
-      "
+      :classes="getClassesOfTaskMembers(taskStore.task.task_members as TaskMember[])"
       :columns="[
         {
           title: $t('components.learningPlan.drawer.task.status.toDo'),
@@ -60,19 +54,14 @@
           studentDetailsId = item.id;
         }
       "
-      @card-insert="
-        (newIndex, value, newStatus) =>
-          handleUpdateStatus(newIndex, value as Task, newStatus)
-      "
+      @card-insert="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value as Task, newStatus)"
     />
     <alex-learningplan-task-drawer-student
       v-if="studentDetails"
       v-model="studentDrawer"
       :task-id="taskId"
       :submission="{
-        constraints: taskStore.task.allowed_editor_plugins
-          ? taskStore.task.allowed_editor_plugins?.split(',')
-          : [],
+        constraints: taskStore.task.allowed_editor_plugins ? taskStore.task.allowed_editor_plugins?.split(',') : [],
         description: taskStore.task.submission_description,
       }"
       :task="{
@@ -102,6 +91,7 @@
           ? {
               name: studentDetails.learning_plan_member?.user.fullname || '',
               avatar: studentDetails.learning_plan_member?.user?.avatar?.url,
+              email: studentDetails.learning_plan_member?.user.email,
             }
           : undefined
       "
@@ -142,10 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  InsertCardProps,
-  Task,
-} from '@/components/alex/learningplan/task/kanban/index.vue';
+import type { InsertCardProps, Task } from '@/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
@@ -159,8 +146,8 @@ const { t } = useI18n();
 const { id, taskId: taskIdValue } = route.params;
 const { setMessage } = useMessageStore();
 const strapi = useStrapi();
-const taskId = computed(() => parseInt(taskIdValue.toString()));
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const taskId = computed(() => Number.parseInt(taskIdValue.toString()));
+const learningPlanId = computed(() => Number.parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref<Task[]>([]);
 const studentDetailsId = ref<number>(-1);
@@ -169,9 +156,7 @@ const studentDetails = computed(() => {
   if (!taskStore.task?.task_members) {
     return null;
   }
-  const member = taskStore.task?.task_members.find(
-    (member) => member.id === studentDetailsId.value,
-  );
+  const member = taskStore.task?.task_members.find((member) => member.id === studentDetailsId.value);
 
   return member || null;
 });
@@ -220,12 +205,7 @@ const handleChangeAlterFromReview = (val: boolean) => {
 
   taskStore.task.can_change_from_review = val;
 };
-const handleUpdateStatus = async (
-  newIndex: number,
-  item: Task,
-  newStatus: string,
-  emitEvt: boolean = false,
-) => {
+const handleUpdateStatus = async (newIndex: number, item: Task, newStatus: string, emitEvt = false) => {
   if (!kanban.value) {
     return;
   }
@@ -241,9 +221,7 @@ const handleUpdateStatus = async (
     kanban.value.setCanDrag(false);
     const submissionValidationStatus = ['in_review', 'in_progress'];
     const time = new Date();
-    const lastSubmission = taskMember.submissions?.length
-      ? taskMember?.submissions[0]
-      : undefined;
+    const lastSubmission = taskMember.submissions?.length ? taskMember?.submissions[0] : undefined;
     if (taskMember?.task?.submission_required) {
       if (newStatus === 'in_review' && !lastSubmission) {
         throw new Error('missingSubmission');
@@ -257,13 +235,10 @@ const handleUpdateStatus = async (
         });
 
         // Valor atualizado da ultima submissão, caso tenha sido alterado
-        const lastSubVal =
-          lastSubRes.data && lastSubRes.data[0].attributes.submission;
+        const lastSubVal = lastSubRes.data && lastSubRes.data[0].attributes.submission;
 
         await strapi.update('task-submissions', lastSubmission.id, {
-          submission: lastSubVal
-            ? lastSubVal.submission
-            : lastSubmission.submission,
+          submission: lastSubVal ? lastSubVal.submission : lastSubmission.submission,
           submitted_at: time.toISOString(),
         });
       }
@@ -277,10 +252,7 @@ const handleUpdateStatus = async (
     await strapi.update<TaskMember>('task-members', taskMember.id, {
       status: newStatus as TaskMemberStatus,
       ...(submissionValidationStatus.includes(newStatus) && {
-        last_submission_at:
-          newStatus === 'in_progress' && taskMember.submissions
-            ? null
-            : time.toISOString(),
+        last_submission_at: newStatus === 'in_progress' && taskMember.submissions ? null : time.toISOString(),
       }),
     });
   } catch (error) {
@@ -291,11 +263,7 @@ const handleUpdateStatus = async (
       return task;
     });
     if ((error as any)?.message === 'missingSubmission') {
-      setMessage(
-        t('components.learningPlan.drawer.task.errors.missingSubmission'),
-        'error',
-        true,
-      );
+      setMessage(t('components.learningPlan.drawer.task.errors.missingSubmission'), 'error', true);
       return;
     }
     setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
@@ -326,9 +294,7 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
 
 const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
   const classes = taskMembers.flatMap((taskMember) =>
-    taskMember.learning_plan_member?.learning_class
-      ? taskMember.learning_plan_member?.learning_class.name
-      : [],
+    taskMember.learning_plan_member?.learning_class ? taskMember.learning_plan_member?.learning_class.name : [],
   );
   return Array.from(new Set(classes));
 };
@@ -414,9 +380,7 @@ function setTasks() {
       },
     }),
     studentClass:
-      task?.learning_plan_member?.learning_class?.name ||
-      task.learning_plan_group?.learning_class?.name ||
-      '',
+      task?.learning_plan_member?.learning_class?.name || task.learning_plan_group?.learning_class?.name || '',
     submissions: task.task_submissions,
     task: taskStore.task,
   }));

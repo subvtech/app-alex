@@ -38,6 +38,9 @@
     :read-only="readOnly"
     :doc-name="shouldBeCollaborative"
     :member-type="type"
+    :group="group"
+    :student="student"
+    :studentClass="class"
     @update-task-status="(status) => $emit('update-task-status', status)"
     @update-submission="() => $emit('update-submission')"
   />
@@ -56,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import ConfirmDialog from '~/components/alex/custom/ConfirmDialog.vue';
+import type { Student } from '../drawer/Student.vue';
 
 interface Submission {
   mark?: number | null;
@@ -70,6 +73,9 @@ interface Submission {
   taskMemberId: number;
   taskStatus: TaskMemberStatus;
   docName?: string;
+  group?: LearningPlanGroupSimple;
+  student?: Student;
+  class?: string;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';
@@ -92,6 +98,9 @@ const props = withDefaults(defineProps<SubimissionProps>(), {
   restrictions: undefined,
   content: undefined,
   docName: undefined,
+  group: undefined,
+  student: undefined,
+  class: undefined,
 });
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];

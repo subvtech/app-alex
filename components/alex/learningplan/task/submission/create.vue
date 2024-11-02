@@ -5,6 +5,7 @@
     :persistent="true"
     :max-width="1080"
     :retain-focus="false"
+    :full-screen="fullscreen"
     no-click-animation
     no-footer
   >
@@ -32,7 +33,6 @@
     v-else
     v-model="dialog"
     :persistent="true"
-    :max-width="1760"
     :retain-focus="false"
     body-classes="bg-white pa-0"
     main-button-text="Associar"
@@ -40,7 +40,17 @@
     no-click-animation
   >
     <template #header>
-      <alex-custom-dialog-header :title="title" @on-close="dialog = false">
+      <alex-custom-dialog-header
+        :title="title"
+        :maximizable="true"
+        @on-close="dialog = false"
+        @on-maximize="
+          () => {
+            fullscreen = !fullscreen;
+            console.log('fullscreen', fullscreen);
+          }
+        "
+      >
         <template #default>
           <div class="ml-auto">
             <alex-learningplan-task-date-chip :date="deadline" :is-published="true" />
@@ -48,30 +58,29 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <div class="w-full tw-border-b pa-6 d-flex">
-      <!-- TODO: Passar as informações do estudante, se for um grupo remover o email e a foto de perfil -->
-      <v-avatar
-        :size="40"
-        image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAmpNJ11PRen9vRjdesWmQdy1lW1UX49G8wg&s"
-        color="gray-100"
-        class="mr-4"
-      >
-        <template v-if="student?.avatar" #default>
-          <p class="text-gray-300 text-body-3">EN</p>
+    <div v-if="student || group" class="w-full tw-border-b pa-6 d-flex">
+      <v-avatar v-if="student" :size="40" :image="student?.avatar || ''" color="gray-100" class="mr-4">
+        <template v-if="!student?.avatar" #default>
+          <p class="text-gray-300 text-body-3">
+            {{ student?.name?.split(' ')[0][0] }}{{ student?.name?.split(' ')[1]?.[0] || '' }}
+          </p>
         </template>
       </v-avatar>
-      <div>
-        <p class="text-gray-700 text-body-2">Robert Judson Feitoza Mello</p>
-        <p class="text-body-3 text-gray-500">brenojac@email.com</p>
+      <div v-else class="mr-4 bg-secondary-0 pa-2 rounded-pill tw-w-[40px] tw-h-[40px]">
+        <v-icon size="24" color="white"> mdi-account-group </v-icon>
       </div>
-      <alex-custom-chip text="Turma A" class="ml-auto" size="small" status="blue" />
+      <div>
+        <p class="text-gray-700 text-body-2">{{ student?.name || group?.title }}</p>
+        <p class="text-body-3 text-gray-500">{{ student?.email || studentsFirstName }}</p>
+      </div>
+      <alex-custom-chip v-if="studentClass" :text="studentClass" class="ml-auto" size="small" status="blue" />
     </div>
     <alex-custom-tabs
       v-model="tab"
       class="tw-border-b px-6 pb-[2px]"
       :tabs="[
         {
-          label: 'Conteudo',
+          label: 'Conteúdo',
           value: 'content',
         },
         {
@@ -204,6 +213,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import lodash from 'lodash';
 import type { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
+import type { Student } from '../drawer/Student.vue';
 interface submissionProps {
   title: string;
   deadline: string;
@@ -216,6 +226,9 @@ interface submissionProps {
   learningPlanId?: number;
   taskId?: number;
   memberType?: 'student' | 'professor';
+  group?: LearningPlanGroupSimple;
+  student?: Student;
+  studentClass?: string;
 }
 
 const props = withDefaults(defineProps<submissionProps>(), {
@@ -228,6 +241,9 @@ const props = withDefaults(defineProps<submissionProps>(), {
   learningPlanId: 0,
   taskId: 0,
   memberType: 'student',
+  group: undefined,
+  student: undefined,
+  studentClass: '',
 });
 
 const isReadOnly = ref(props.readOnly);
@@ -237,6 +253,10 @@ type Emits = {
   'update-submission': [];
 };
 
+const studentsFirstName = computed(() => {
+  return props.group?.group_members.map((m) => m.student_member.user.fullname.split(' ')[0]).join(', ');
+});
+
 const saveTime = 6; // Tempo em que a request vai ser repetida (em s)
 let saveInterval;
 
@@ -244,6 +264,7 @@ const emit = defineEmits<Emits>();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const dialog = ref(false);
+const fullscreen = ref(false);
 const prevEditorContent = ref('');
 const editorContent = ref<any | undefined>(undefined);
 const isLoading = ref(false);
