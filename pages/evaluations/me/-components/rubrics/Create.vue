@@ -166,7 +166,7 @@ const editRubric = async (evaluationGroup, content) => {
   try {
     await update('evaluation-groups', props.editContent.id, {
       name: name.value,
-      evaluation_criterias: [],
+      evaluation_criterias: evaluationGroup.evaluation_criterias,
       rubric_grade_levels: [],
     });
 

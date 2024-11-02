@@ -30,6 +30,11 @@ const dropdownItems = (item: CardProps['item']) => {
       icon: 'mdi-delete',
       onClick: async () => {
         try {
+          if (item.evaluation_groups.length) {
+            setMessage('Critério não pode ser deletado porque já pertence a rubrica', 'error', true);
+            return;
+          }
+
           await deleteUserEvaluation(item.id);
           setMessage('Critério deletado com sucesso', 'success', true);
         } catch (e) {

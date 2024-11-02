@@ -201,6 +201,11 @@ const editRubric = (rubric) => {
 };
 
 const deleteRubric = (rubric) => {
+  if (rubric.task_submission_evaluations.length) {
+    setMessage('Rubrica não pode ser deletada pois já está associada a avaliação', 'error', true);
+    return;
+  }
+
   strapi
     .delete('evaluation-groups', rubric.id)
     .then(() => {
