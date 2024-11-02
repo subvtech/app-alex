@@ -1,0 +1,27 @@
+{
+  "create": "Criar",
+  "criteria": "Critérios",
+  "criteria_description": "Descrição do critério",
+  "criteria_name": "Nome do critério",
+  "groups": "Grupos",
+  "headings": "Rubricas",
+  "home": "Home",
+  "my_evaluations": "Minhas avaliações",
+  "no_criteria": "Parece que não há critérios criados",
+  "search_criteria": "Encontrar critério",
+  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
+  "update": "Atualizar",
+  "rubrics": {
+    "name": "Nome",
+    "criteria": "Critérios",
+    "search": "Encontrar rubricas",
+    "new": "Nova rubrica",
+    "pagination": "Mostrando do %{from} ao %{to} de um total de %{total} cursos",
+    "createTitle": "Criar nova rubrica",
+    "create": "Criar",
+    "cancel": "Cancelar",
+    "typeName": "Digite o nome da rubrica",
+    "empty": "Parece que não há rubricas criadas",
+    "emptyAlt": "Sem rubricas"
+  }
+}

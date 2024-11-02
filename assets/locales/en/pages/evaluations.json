@@ -1,0 +1,27 @@
+{
+  "create": "Create",
+  "criteria": "Criteria",
+  "criteria_description": "Criteria Description",
+  "criteria_name": "Criteria Name",
+  "groups": "Goups",
+  "headings": "Rubrics",
+  "home": "Home",
+  "my_evaluations": "My Evaluations",
+  "no_criteria": "It appears that there are no criteria created",
+  "search_criteria": "Search Criteria",
+  "showingData": "Showing from %{from} to %{to} of %{total} %{entity}",
+  "update": "Update",
+  "rubrics": {
+    "name": "Name",
+    "criteria": "Criteria",
+    "search": "Find rubrics",
+    "new": "New rubric",
+    "pagination": "Showing %{from} to %{to} of %{total} total courses",
+    "createTitle": "Create new rubric",
+    "create": "Create",
+    "cancel": "Cancel",
+    "typeName": "Type the rubric name",
+    "empty": "It seems there are no rubrics created",
+    "emptyAlt": "No rubrics"
+  }
+}

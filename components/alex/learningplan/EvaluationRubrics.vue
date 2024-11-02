@@ -31,15 +31,22 @@ const defaultRow = {
 const content = ref<rubricRow[]>([...props.data, ...(props.editable ? [{ ...defaultRow }] : [])]);
 
 const onCriteriaSelect = (criteriaIndex: number, index: number) => {
-  content.value[index].criterion = dropdownItems.value[criteriaIndex];
+  const contentVal = content.value;
+  contentVal[index].criterion = dropdownItems.value[criteriaIndex];
+  content.value = contentVal;
+
   if (index === content.value.length - 1) {
-    content.value.push({ ...defaultRow });
+    content.value = [...content.value, { ...defaultRow }];
   }
 };
 
 const removeRow = (index: number) => {
-  content.value.splice(index, 1);
+  content.value = content.value.splice(index, 1);
 };
+
+const getContent = () => content.value;
+
+defineExpose({ getContent });
 </script>
 
 <template>
