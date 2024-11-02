@@ -11,6 +11,9 @@
   "search_criteria": "Encontrar critério",
   "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
   "update": "Atualizar",
+  "criteriaAssociated": "Critério não pode ser deletado porque já pertence a rubrica",
+  "criteriaDeleteSuccess": "Critério deletado com sucesso",
+  "criteriaDeleteFail": "Falha ao deletar critério",
   "rubrics": {
     "name": "Nome",
     "criteria": "Critérios",
@@ -22,6 +25,21 @@
     "cancel": "Cancelar",
     "typeName": "Digite o nome da rubrica",
     "empty": "Parece que não há rubricas criadas",
-    "emptyAlt": "Sem rubricas"
+    "emptyAlt": "Sem rubricas",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "editRubric": "Editar rubrica",
+    "loadFail": "Falha ao carregar rubricas",
+    "associated": "Rubrica não pode ser deletada pois já está associada a avaliação",
+    "deleteSuccess": "Rubrica deletada com sucesso",
+    "deleteFail": "Falha ao deletar rubrica",
+    "editSuccess": "Rubrica editada com sucesso",
+    "editFail": "Falha ao editar rubrica",
+    "createSuccess": "Rubrica criada com sucesso",
+    "createFail": "Falha ao criar rubrica",
+    "saveFail": "Falha ao salvar rubrica",
+    "missingName": "Defina um nome para a rubrica",
+    "selectCriteria": "Selecione ao menos um critério",
+    "emptyField": "A rúbrica possui algum campo vazio"
   }
 }

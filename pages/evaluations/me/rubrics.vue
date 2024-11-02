@@ -59,11 +59,11 @@
           <alex-custom-dropdown
             :items="[
               {
-                text: 'Editar',
+                text: $t('pages.evaluations.rubrics.edit'),
                 onClick: () => editRubric(value),
               },
               {
-                text: 'Excluir',
+                text: $t('pages.evaluations.rubrics.delete'),
                 warning: true,
                 onClick: () => deleteRubric(value),
               },
@@ -191,7 +191,7 @@ const getData = () => {
       totalItems.value = items.value.length;
     })
     .catch(() => {
-      setMessage('Falha ao carregar rubricas', 'error', true);
+      setMessage(t(`${i18Dir}.loadFail`), 'error', true);
     });
 };
 
@@ -202,18 +202,18 @@ const editRubric = (rubric) => {
 
 const deleteRubric = (rubric) => {
   if (rubric.task_submission_evaluations.length) {
-    setMessage('Rubrica não pode ser deletada pois já está associada a avaliação', 'error', true);
+    setMessage(t(`${i18Dir}.associated`), 'error', true);
     return;
   }
 
   strapi
     .delete('evaluation-groups', rubric.id)
     .then(() => {
-      setMessage('Rubrica deletada com sucesso', 'success', true);
+      setMessage(t(`${i18Dir}.deleteSuccess`), 'success', true);
       getData();
     })
     .catch(() => {
-      setMessage('Falha ao deletar rubrica', 'error', true);
+      setMessage(t(`${i18Dir}.deleteFail`), 'error', true);
     });
 };
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import createCriteria from './daialogs/createCriteria.vue';
+const { t } = useI18n();
 const user = useStrapiUser();
 const { deleteUserEvaluationMutation } = useTaskEvaluation(0, 0, user);
 const { setMessage } = useMessageStore();
@@ -21,25 +22,25 @@ interface CardProps {
 const dropdownItems = (item: CardProps['item']) => {
   return [
     {
-      text: 'Edit',
+      text: t('pages.evaluations.rubrics.edit'),
       icon: 'mdi-pencil',
       onClick: () => createCriteriaRef?.value.openDialog(item),
     },
     {
-      text: 'Delete',
+      text: t('pages.evaluations.rubrics.delete'),
       icon: 'mdi-delete',
       onClick: async () => {
         try {
           if (item.evaluation_groups.length) {
-            setMessage('Critério não pode ser deletado porque já pertence a rubrica', 'error', true);
+            setMessage(t('pages.evaluations.criteriaAssociated'), 'warning', true);
             return;
           }
 
           await deleteUserEvaluation(item.id);
-          setMessage('Critério deletado com sucesso', 'success', true);
+          setMessage(t('pages.evaluations.criteriaDeleteSuccess'), 'success', true);
         } catch (e) {
           console.error(e);
-          setMessage('Falha ao deletar critério', 'error', true);
+          setMessage(t('pages.evaluations.criteriaDeleteFail'), 'error', true);
         }
       },
     },

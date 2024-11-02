@@ -1,8 +1,8 @@
 <template>
   <alex-custom-dialog
     v-model="open"
-    :title="props.editContent ? 'Editar Rubrica' : $t(`${i18Dir}.createTitle`)"
-    :main-button-text="props.editContent ? 'Editar' : $t(`${i18Dir}.create`)"
+    :title="props.editContent ? $t(`${i18Dir}.editRubric`) : $t(`${i18Dir}.createTitle`)"
+    :main-button-text="props.editContent ? $t(`${i18Dir}.edit`) : $t(`${i18Dir}.create`)"
     :secondary-button-text="$t(`${i18Dir}.cancel`)"
     :main-button-icon="props.editContent ? 'mdi-pencil' : 'mdi-plus'"
     secondary-button-icon="mdi-close"
@@ -22,8 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { group } from 'console';
-
 const i18Dir = 'pages.evaluations.rubrics';
 
 const gradeToField = {
@@ -36,6 +34,7 @@ const gradeToField = {
 const name = ref<string>('');
 const rubrics = ref<null | any>(null);
 
+const { t } = useI18n();
 const user = useStrapiUser();
 const { update } = useStrapi();
 const strapiClient = useStrapiClient();
@@ -85,13 +84,13 @@ const formattedData = computed(() => {
 
 const checkContent = (content) => {
   if (content.length === 1) {
-    setMessage('Selecione ao menos um critério', 'warning', true);
+    setMessage(t(`${i18Dir}.selectCriteria`), 'warning', true);
     return false;
   }
 
   content.forEach((row) => {
     if (row.criterion.id && (!row.bad || !row.good || !row.reasonable || !row.excellent)) {
-      setMessage('A rúbrica possui algum campo vazio', 'warning', true);
+      setMessage(t(`${i18Dir}.emptyField`), 'warning', true);
       return false;
     }
   });
@@ -101,12 +100,12 @@ const checkContent = (content) => {
 
 const saveRubric = () => {
   if (!rubrics.value) {
-    setMessage('Falha ao salvar rubrica', 'error', true);
+    setMessage(t(`${i18Dir}.saveFail`), 'error', true);
     return;
   }
 
   if (!name.value) {
-    setMessage('Defina um nome para a rubrica', 'warning', true);
+    setMessage(t(`${i18Dir}.missingName`), 'warning', true);
     return;
   }
 
@@ -152,11 +151,11 @@ const createRubric = async (evaluationGroup, content) => {
       });
     }
 
-    setMessage(props.editContent ? 'Rubrica editada com sucesso' : 'Rubrica criada com sucesso', 'success', true);
+    setMessage(props.editContent ? t(`${i18Dir}.editSuccess`) : t(`${i18Dir}.createSuccess`), 'success', true);
     emit('update');
   } catch (e) {
     console.error(e);
-    setMessage(props.editContent ? 'Falha ao editar rubrica' : 'Falha ao criar rubrica', 'error', true);
+    setMessage(props.editContent ? t(`${i18Dir}.editFail`) : t(`${i18Dir}.createFail`), 'error', true);
   } finally {
     open.value = false;
   }
@@ -179,11 +178,11 @@ const editRubric = async (evaluationGroup, content) => {
       },
     });
 
-    setMessage('Rubrica editada com sucesso', 'success', true);
+    setMessage(t(`${i18Dir}.editSuccess`), 'success', true);
     emit('update');
   } catch (e) {
     console.error(e);
-    setMessage('Falha ao editar rubrica', 'error', true);
+    setMessage(t(`${i18Dir}.editFail`), 'error', true);
   } finally {
     open.value = false;
   }
