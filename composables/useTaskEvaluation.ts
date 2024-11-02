@@ -116,6 +116,9 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
             filters: {
               user: user.value?.id ?? null,
             },
+            populate: {
+              evaluation_groups: true,
+            },
           });
 
           return res.data;

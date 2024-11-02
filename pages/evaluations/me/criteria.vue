@@ -8,6 +8,7 @@ const { t } = useI18n();
 const user = useStrapiUser();
 const createCriteriaRef = ref(createCriteria);
 const { getUserEvaluations } = useTaskEvaluation(0, 0, user);
+const { setMessage } = useMessageStore();
 
 const { data: cards } = getUserEvaluations();
 
