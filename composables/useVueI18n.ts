@@ -68,6 +68,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'task',
     'admin',
     'users',
+    'evaluations',
     'assessments',
   ]);
   const components = await useImportLanguages('components', lang, [

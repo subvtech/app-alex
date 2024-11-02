@@ -210,6 +210,11 @@ const defaultMenus: Menu[] = [
         title: 'Meus Projetos',
         to: '/projects/me',
       },
+      {
+        icon:'alex:FactCheck',
+        title:i18n.t('layouts.default.evaluations'),
+        to:'/evaluations'
+      }
       // {
       //   icon: 'mdi-clipboard-multiple-outline',
       //   title: i18n.t('layouts.default.myProjects'),
