@@ -52,6 +52,19 @@
     "loadFail": "Falha ao carregar grupos",
     "search": "Encontrar grupo",
     "type": "Selecionar tipo",
-    "new": "Novo critério"
+    "new": "Novo critério",
+    "failLoadCriteria": "Falha ao carregar critérios",
+    "missName": "Digite um nome para o grupo",
+    "missCriteria": "Selecione ao menos um critério",
+    "editSuccess": "Grupo editado com sucesso",
+    "editFail": "Falha ao editar grupo",
+    "createSuccess": "Grupo criado com sucesso",
+    "createFail": "Falha ao criar grupo",
+    "editTitle": "Editar grupo",
+    "createTitle": "Criar grupo",
+    "name": "Nome do grupo",
+    "typeName": "Digite o nome do grupo",
+    "associatedCriteria": "Critérios avaliativos associados",
+    "selectCriteria": "Selecione os critérios avaliativos"
   }
 }

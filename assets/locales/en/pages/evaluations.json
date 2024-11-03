@@ -52,6 +52,19 @@
     "loadFail": "Failed to load groups",
     "search": "Find group",
     "type": "Select type",
-    "new": "New criterion"
+    "new": "New criterion",
+    "failLoadCriteria": "Failed to load criteria",
+    "missName": "Please enter a group name",
+    "missCriteria": "Please select at least one criterion",
+    "editSuccess": "Group edited successfully",
+    "editFail": "Failed to edit group",
+    "createSuccess": "Group created successfully",
+    "createFail": "Failed to create group",
+    "editTitle": "Edit group",
+    "createTitle": "Create group",
+    "name": "Group name",
+    "typeName": "Enter group name",
+    "associatedCriteria": "Associated evaluation criteria",
+    "selectCriteria": "Select evaluation criteria"
   }
 }

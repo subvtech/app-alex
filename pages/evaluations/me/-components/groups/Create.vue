@@ -1,7 +1,7 @@
 <template>
   <alex-custom-dialog
     v-model="open"
-    :title="props.editContent ? 'Editar grupo' : 'Criar grupo'"
+    :title="props.editContent ? $t(`${i18Dir}.editTitle`) : $t(`${i18Dir}.createTitle`)"
     :main-button-text="
       props.editContent ? $t(`pages.evaluations.rubrics.edit`) : $t(`pages.evaluations.rubrics.create`)
     "
@@ -11,25 +11,50 @@
     ><alex-inputs-text-field
       v-model="name"
       class="w-100"
-      label="Nome do grupo"
-      placeholder="Digite o nome do grupo"
+      :label="$t(`${i18Dir}.name`)"
+      :placeholder="$t(`${i18Dir}.typeName`)"
       variant="outlined"
       size="default"
       density="comfortable"
-      required />
+      required
+    />
 
     <alex-inputs-select
-      v-model="criteria"
+      v-model="selectedCriteria"
       class="w-100"
       :items="criteriaOptions"
       item-title="name"
       item-value="id"
-      label="Critérios avaliativos associados"
-      placeholder="Selecione os critérios avaliativos"
+      :label="$t(`${i18Dir}.associatedCriteria`)"
+      :placeholder="$t(`${i18Dir}.selectCriteria`)"
       density="comfortable"
       clearable
-      multiple
-  /></alex-custom-dialog>
+      @update:model-value="
+        (criterion) => {
+          if (criterion) {
+            criteria = [...new Set([...criteria, criterion])];
+          }
+          selectedCriteria = undefined;
+        }
+      "
+    />
+    <!-- Criteria chips -->
+    <div class="d-flex tw-flex-wrap ga-2">
+      <alex-custom-chip
+        v-for="criterion in criteria"
+        :key="criterion"
+        :text="criteriaOptions.find(({ id }) => id === criterion)?.name ?? 'a'"
+        status="secondary"
+        clickable
+        closable
+        @click:close="
+          () => {
+            criteria = criteria.filter((id) => id !== criterion);
+          }
+        "
+      />
+    </div>
+  </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
@@ -40,9 +65,12 @@ interface ModalProps {
   editContent: null | any;
 }
 
+const i18Dir = 'pages.evaluations.groupsSec';
+
 const { setMessage } = useMessageStore();
 const { create, update } = useStrapi();
 const { find } = useStrapiUtils();
+const { t } = useI18n();
 
 const props = defineProps<ModalProps>();
 
@@ -51,6 +79,7 @@ const open = defineModel<boolean>({ required: true });
 const emit = defineEmits(['update']);
 
 const name = ref<string>('');
+const selectedCriteria = ref<number | undefined>(undefined);
 const criteria = ref<any>([]);
 
 const criteriaOptions = ref<any>([]);
@@ -61,18 +90,18 @@ const getCriteria = async () => {
     criteriaOptions.value = res.data;
   } catch (e) {
     console.error(e);
-    setMessage('Falha ao pesquisar critérios', 'error', true);
+    setMessage(t(`${i18Dir}.failLoadCriteria`), 'error', true);
   }
 };
 
 const saveGroup = () => {
   if (!name.value) {
-    setMessage('Digite um nome para o grupo', 'warning', true);
+    setMessage(t(`${i18Dir}.missName`), 'warning', true);
     return;
   }
 
   if (!criteria.value.length) {
-    setMessage('O grupo precisa de ao menos um critério', 'error', true);
+    setMessage(t(`${i18Dir}.missCriteria`), 'error', true);
     return;
   }
 
@@ -85,11 +114,11 @@ const editGroup = async () => {
       name: name.value,
       evaluation_criterias: criteria.value,
     });
-    setMessage('Grupo editado com sucesso', 'success', true);
+    setMessage(t(`${i18Dir}.editSuccess`), 'success', true);
     emit('update');
   } catch (e) {
     console.error(e);
-    setMessage('Falha ao editar grupo de critérios', 'error', true);
+    setMessage(t(`${i18Dir}.editFail`), 'error', true);
   } finally {
     open.value = false;
   }
@@ -102,11 +131,11 @@ const createGroup = async () => {
       type: 'standard',
       evaluation_criterias: criteria.value,
     });
-    setMessage('Grupo de critérios criado com sucesso', 'success', true);
+    setMessage(t(`${i18Dir}.createSuccess`), 'success', true);
     emit('update');
   } catch (e) {
     console.error(e);
-    setMessage('Falha ao criar grupo de critérios', 'error', true);
+    setMessage(t(`${i18Dir}.createFail`), 'error', true);
   } finally {
     open.value = false;
   }
@@ -127,6 +156,6 @@ watch(open, (open) => {
   }
 
   name.value = props.editContent.name;
-  criteria.value = props.editContent.evaluation_criterias;
+  criteria.value = props.editContent.evaluation_criterias.map(({ id }) => id);
 });
 </script>
