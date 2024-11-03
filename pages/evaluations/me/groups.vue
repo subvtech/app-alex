@@ -89,7 +89,7 @@
         </div></template
       >
 
-      <template #no-data><Empty /></template>
+      <template #no-data><Empty :empty-message="$t('pages.evaluations.groupsSec.empty')" /></template>
 
       <!-- Pagination -->
       <template #bottom
@@ -115,7 +115,7 @@
 <script setup lang="ts">
 import { useStrapiUtils } from '~/composables/useStrapiUtils';
 import { useMessageStore } from '~/stores/message';
-import Empty from './-components/groups/EmptyState.vue';
+import Empty from './-components/EmptyState.vue';
 import Create from './-components/groups/Create.vue';
 
 const { t } = useI18n();

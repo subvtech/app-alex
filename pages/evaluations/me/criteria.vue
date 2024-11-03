@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Card from './-components/card.vue';
+import Empty from './-components/EmptyState.vue';
 import createCriteria from './-components/daialogs/createCriteria.vue';
 
 const search = ref('');
@@ -63,16 +64,13 @@ const setTableData = (items: readonly Item[]): Criteria[] => {
       class="tw-w-[320px]"
     />
     <alex-custom-button size="large" @click="showDialog">
-      Novo critério
+      {{ t('pages.evaluations.new_criteria') }}
       <createCriteria ref="createCriteriaRef" />
     </alex-custom-button>
   </div>
-  <!-- TODO: Trocar imagem de empty state-->
-  <alex-custom-empty-placeholder
-    v-if="cards?.length === 0"
-    :empty-text-message="t('pages.evaluations.no_criteria')"
-    empty-text-image="/svg/EmptyAbout.svg"
-  />
+  <div v-if="cards?.length === 0">
+    <Empty :emptyMessage="$t('pages.evaluations.no_criteria')" />
+  </div>
   <v-data-iterator
     v-model:search="search"
     v-model:page="page"

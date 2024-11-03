@@ -16,7 +16,7 @@
       </alex-custom-tabs>
       <div class="w-100 tw-h-[1px] bg-gray-100"></div>
       <div>
-        <NuxtPage />
+        <NuxtPage :key="selectedOption" />
       </div>
     </v-col>
   </v-container>
@@ -28,6 +28,7 @@ type options = 'criteria' | 'groups' | 'rubrics';
 const { t } = useI18n();
 const selectedOption = ref<options>('criteria');
 const route = useRoute();
+const router = useRouter();
 
 const tabs = [
   {
@@ -47,60 +48,32 @@ const tabs = [
 const breadCrumbs = ref<never[]>([]);
 
 const onChangeTab = async (value: string) => {
-  await navigateTo(`/evaluations/me/${value}`);
+  selectedOption.value = value as options;
+  navigateTo(`/evaluations/me/${value}`);
+  updateBreadcrumbs(value as options);
 };
 
-onMounted(() => {
-  const finalRoute = route?.fullPath?.split('/')?.at(-1) as options | undefined;
-
-  const tab = tabs.find(({ value }) => value === finalRoute);
-
-  if (finalRoute && tab) {
-    selectedOption.value = finalRoute;
-  }
-
-  const items = [
+const updateBreadcrumbs = (tabValue: options) => {
+  const tab = tabs.find(({ value }) => value === tabValue);
+  breadCrumbs.value = [
     { disabled: false, title: t('pages.evaluations.home'), to: '/' },
     { disabled: false, title: t('pages.evaluations.my_evaluations'), to: '/evaluations/me' },
-  ];
+    { disabled: true, title: tab?.label || '', to: `/evaluations/me/${tabValue}` },
+  ] as never[];
+};
 
-  if (tab) {
-    items.push({
-      disabled: true,
-      title: tab.label,
-      to: `/evaluations/me/${finalRoute}`,
-    });
+const syncTabWithRoute = () => {
+  const finalRoute = route.fullPath.split('/').at(-1) as options | undefined;
+  if (!finalRoute || !tabs.some((tab) => tab.value === finalRoute)) {
+    router.push('/evaluations/me/criteria');
+  } else {
+    selectedOption.value = finalRoute;
+    updateBreadcrumbs(finalRoute);
   }
+};
 
-  breadCrumbs.value = items as never[];
-});
-
-watch(
-  () => route.fullPath,
-  (path) => {
-    // Updates breadcrumbs
-    const finalRoute = path?.split('/')?.at(-1) as options | undefined;
-    const tab = tabs.find((tab) => tab.value === finalRoute);
-
-    if (!tab) {
-      return;
-    }
-
-    const newItems = breadCrumbs.value;
-
-    if (newItems.length === 3) {
-      newItems.pop();
-    }
-
-    newItems.push({
-      disabled: true,
-      title: tab.label,
-      to: `/evaluations/me/${tab.value}`,
-    } as never);
-
-    breadCrumbs.value = newItems;
-  },
-);
+onMounted(syncTabWithRoute);
+watch(() => route.fullPath, syncTabWithRoute);
 </script>
 
 <style lang="scss" scoped></style>

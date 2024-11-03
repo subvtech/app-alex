@@ -5,6 +5,13 @@
       src="public/svg/EmptyRubric.svg"
       :alt="$t('pages.evaluations.rubrics.emptyAlt')"
     />
-    <p class="text-h3 text-gray-400">Parece que não há grupos de critérios criados</p>
+    <p class="text-h3 text-gray-400">{{ emptyMessage }}</p>
   </div>
 </template>
+<script setup lang="ts">
+type props = {
+  emptyMessage: string;
+};
+
+const props = defineProps<props>();
+</script>

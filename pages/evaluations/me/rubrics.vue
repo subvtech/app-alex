@@ -76,7 +76,7 @@
         </div></template
       >
 
-      <template #no-data><Empty /></template>
+      <template #no-data><Empty :empty-message="$t('pages.evaluations.rubrics.empty')" /></template>
 
       <!-- Pagination -->
       <template #bottom
@@ -100,7 +100,7 @@
 </template>
 <script setup lang="ts">
 import CreateModal from './-components/rubrics/Create.vue';
-import Empty from './-components/rubrics/EmptyState.vue';
+import Empty from './-components/EmptyState.vue';
 
 const itemsPerPage = 10;
 const i18Dir = 'pages.evaluations.rubrics';
