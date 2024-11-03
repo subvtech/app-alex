@@ -5,7 +5,6 @@
       breadcrumbsVClasses="pt-2 flex-wrap"
       :title="$t('pages.evaluations.my_evaluations')"
       :items="breadCrumbs"
-      arrow-back
     />
     <v-col class="tw-bg-white tw-rounded">
       <alex-custom-tabs

@@ -82,7 +82,7 @@
       <template #bottom
         ><div
           v-if="items.length"
-          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px] tw-text-center md:tw-text-start"
+          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap py-6 tw-gap-[8px] tw-text-center md:tw-text-start"
         >
           <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
             {{ paginationText }}

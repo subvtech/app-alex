@@ -95,7 +95,7 @@
       <template #bottom
         ><div
           v-if="items.length"
-          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px] tw-text-center md:tw-text-start"
+          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap py-6 tw-gap-[8px] tw-text-center md:tw-text-start"
         >
           <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
             {{ paginationText }}
@@ -107,6 +107,8 @@
           /></div
       ></template>
     </v-data-table>
+
+    <Create v-model="createModal" :edit-content="editContent" @update="() => getData()" />
   </div>
 </template>
 
@@ -114,6 +116,7 @@
 import { useStrapiUtils } from '~/composables/useStrapiUtils';
 import { useMessageStore } from '~/stores/message';
 import Empty from './-components/groups/EmptyState.vue';
+import Create from './-components/groups/Create.vue';
 
 const { t } = useI18n();
 const { find } = useStrapiUtils();
@@ -191,7 +194,6 @@ const getData = () => {
     },
   })
     .then(({ data }) => {
-      console.log('Data', data);
       items.value = data.map((group) => ({
         name: group.name,
         criteria: group.evaluation_criterias.map(({ name }) => name),
@@ -207,6 +209,8 @@ const getData = () => {
 
 const editGroup = (group) => {
   console.log(group);
+  createModal.value = true;
+  editContent.value = group;
 };
 
 const deleteGroup = async (group) => {
@@ -225,8 +229,9 @@ const deleteGroup = async (group) => {
   }
 };
 
-// Create
+// Create | Edit
 const createModal = ref<boolean>(false);
+const editContent = ref<any | null>(null);
 
 // Pagination
 const itemsPerPage = 10;
@@ -253,6 +258,12 @@ onMounted(() => {
 watch(totalItems, (val) => {
   if (activePage.value > Math.floor(val / itemsPerPage) || 1) {
     activePage.value = Math.floor(val / itemsPerPage) || 1;
+  }
+});
+
+watch(createModal, (open) => {
+  if (!open) {
+    editContent.value = null;
   }
 });
 </script>
