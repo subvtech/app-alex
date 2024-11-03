@@ -41,5 +41,17 @@
     "missingName": "Please define a name for the rubric",
     "selectCriteria": "Please select at least one criterion",
     "emptyField": "The rubric has an empty field"
+  },
+  "groupsSec": {
+    "public": "Public",
+    "private": "Private",
+    "pagination": "Showing from %{from} to %{to} of a total of %{total} groups",
+    "associated": "Group cannot be deleted because it is already associated with an assessment",
+    "deleteSuccess": "Group deleted successfully",
+    "deleteFail": "Failed to delete group",
+    "loadFail": "Failed to load groups",
+    "search": "Find group",
+    "type": "Select type",
+    "new": "New criterion"
   }
 }

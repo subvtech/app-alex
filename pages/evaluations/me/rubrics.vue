@@ -82,14 +82,13 @@
       <template #bottom
         ><div
           v-if="items.length"
-          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px]"
+          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px] tw-text-center md:tw-text-start"
         >
           <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
             {{ paginationText }}
           </p>
           <alex-custom-pagination
             v-model="activePage"
-            class="tw-flex-1"
             :length="Math.floor(totalItems / itemsPerPage) || 1"
             total-visible="5"
           /></div
@@ -127,8 +126,8 @@ const totalItems = ref<number>(0);
 const items = ref([]);
 
 const paginationText = computed<string>(() => {
-  const from = (activePage.value - 1) * itemsPerPage;
-  const to = Math.min(activePage.value * itemsPerPage, totalItems.value);
+  const from = (activePage.value - 1) * itemsPerPage + 1;
+  const to = Math.min(activePage.value * itemsPerPage, totalItems.value) - 1;
   const total = totalItems.value;
 
   return t(`${i18Dir}.pagination`, {

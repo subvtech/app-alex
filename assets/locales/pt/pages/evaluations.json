@@ -41,5 +41,17 @@
     "missingName": "Defina um nome para a rubrica",
     "selectCriteria": "Selecione ao menos um critério",
     "emptyField": "A rúbrica possui algum campo vazio"
+  },
+  "groupsSec": {
+    "public": "Público",
+    "private": "Privado",
+    "pagination": "Mostrando do %{from} ao %{to} de um total de %{total} grupos",
+    "associated": "Grupo não pode ser deletado pois já está associado a avaliação",
+    "deleteSuccess": "Grupo deletado com sucesso",
+    "deleteFail": "Falha ao deletar grupo",
+    "loadFail": "Falha ao carregar grupos",
+    "search": "Encontrar grupo",
+    "type": "Selecionar tipo",
+    "new": "Novo critério"
   }
 }

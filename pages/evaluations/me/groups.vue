@@ -5,7 +5,7 @@
       <alex-inputs-text-field
         v-model="search"
         class="criteria-group-textfield sm:tw-max-w-[320px] sm:tw-flex-[1_1_150px]"
-        placeholder="Encontrar grupo"
+        :placeholder="$t(`${i18Dir}.search`)"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         name="search"
@@ -15,20 +15,25 @@
       <alex-inputs-select
         v-model="type"
         class="criteria-group-select sm:tw-max-w-[240px] sm:tw-flex-[1_1_150px]"
-        :items="['Público', 'Privado']"
-        placeholder="Selecionar tipo"
+        :items="[$t(`${i18Dir}.public`), $t(`${i18Dir}.private`)]"
+        :placeholder="$t(`${i18Dir}.type`)"
         density="comfortable"
         clearable
       />
 
-      <alex-custom-button class="sm:tw-ml-auto" text="Novo critério" size="large" @click="() => (createModal = true)" />
+      <alex-custom-button
+        class="sm:tw-ml-auto"
+        :text="$t(`${i18Dir}.new`)"
+        size="large"
+        @click="() => (createModal = true)"
+      />
     </div>
 
     <!-- Content -->
     <v-data-table
       class="criteria-groups-table px-6 pb-6"
       :headers="headers"
-      :items="filteredItems"
+      :items="slicedItems"
       :items-per-page="itemsPerPage"
     >
       <template #headers="{ columns, getSortIcon, toggleSort }"
@@ -90,14 +95,13 @@
       <template #bottom
         ><div
           v-if="items.length"
-          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px]"
+          class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap pa-6 tw-gap-[8px] tw-text-center md:tw-text-start"
         >
           <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
             {{ paginationText }}
           </p>
           <alex-custom-pagination
             v-model="activePage"
-            class="tw-flex-1"
             :length="Math.floor(totalItems / itemsPerPage) || 1"
             total-visible="5"
           /></div
@@ -107,20 +111,21 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { useStrapiUtils } from '~/composables/useStrapiUtils';
 import { useMessageStore } from '~/stores/message';
 import Empty from './-components/groups/EmptyState.vue';
 
 const { t } = useI18n();
-const { find } = useStrapi();
+const { find } = useStrapiUtils();
 const { setMessage } = useMessageStore();
+const strapi = useStrapi();
 
-const i18Dir = 'pages.evaluations.rubrics';
+const i18Dir = 'pages.evaluations.groupsSec';
 
 // Data
 const headers = [
-  { title: t(`${i18Dir}.name`), key: 'name' },
-  { title: t(`${i18Dir}.criteria`), key: 'criteria' },
+  { title: t(`pages.evaluations.rubrics.name`), key: 'name' },
+  { title: t(`pages.evaluations.rubrics.criteria`), key: 'criteria' },
   { key: 'options', sortable: false },
 ];
 
@@ -128,7 +133,52 @@ const items = ref([]);
 const search = ref<string>('');
 const type = ref<string | null>(null);
 
-const filteredItems = computed(() => items.value);
+const filteredItems = computed(() => {
+  let filtered: never[] = items.value;
+
+  // Filter by type
+  let typeFilter: null | 'private' | 'public' = null;
+
+  if (type.value === t(`${i18Dir}.private`)) {
+    typeFilter = 'private';
+  } else if (type.value === t(`${i18Dir}.public`)) {
+    typeFilter = 'public';
+  }
+
+  filtered = items.value.filter((item) => {
+    if (typeFilter === 'public') {
+      return !!item.public;
+    } else if (typeFilter === 'private') {
+      return !item.public;
+    }
+
+    return true;
+  });
+
+  // Filter by name or criteria
+  filtered = filtered.filter(({ name, criteria }) => {
+    if (name.toLowerCase().includes(search.value.toLocaleLowerCase())) {
+      return true;
+    }
+
+    if (criteria.some((value) => value.toLowerCase().includes(search.value.toLowerCase()))) {
+      return true;
+    }
+
+    return false;
+  });
+
+  return filtered;
+});
+
+const slicedItems = computed(() => {
+  return filteredItems.value.slice(
+    (activePage.value - 1) * itemsPerPage,
+    Math.min(activePage.value * itemsPerPage, totalItems.value),
+  );
+});
+
+const totalItems = computed<number>(() => filteredItems.value.length);
 
 const getData = () => {
   find('evaluation-groups', {
@@ -136,15 +186,22 @@ const getData = () => {
       type: 'standard',
     },
     populate: {
+      task_submission_evaluations: true,
       evaluation_criterias: true,
     },
   })
     .then(({ data }) => {
       console.log('Data', data);
+      items.value = data.map((group) => ({
+        name: group.name,
+        criteria: group.evaluation_criterias.map(({ name }) => name),
+        public: group.public,
+        options: group,
+      }));
     })
     .catch((e) => {
       console.error(e);
-      setMessage('Falha ao pesquisar grupos de critérios', 'error', true);
+      setMessage(t(`${i18Dir}.loadFail`), 'error', true);
     });
 };
 
@@ -152,8 +209,20 @@ const editGroup = (group) => {
   console.log(group);
 };
 
-const deleteGroup = (group) => {
-  console.log(group);
+const deleteGroup = async (group) => {
+  if (group.task_submission_evaluations.length) {
+    setMessage(t(`${i18Dir}.associated`), 'warning', true);
+    return;
+  }
+
+  try {
+    await strapi.delete('evaluation-groups', group.id);
+    await getData();
+    setMessage(t(`${i18Dir}.deleteSuccess`), 'success', true);
+  } catch (e) {
+    console.error(e);
+    setMessage(t(`${i18Dir}.deleteFail`), 'error', true);
+  }
 };
 
 // Create
@@ -163,13 +232,28 @@ const createModal = ref<boolean>(false);
 const itemsPerPage = 10;
 
 const activePage = ref<number>(0);
-const totalItems = ref<number>(0);
 
-const paginationText = computed<string>(() => 'Depois eu faço');
+const paginationText = computed<string>(() => {
+  const from = (activePage.value - 1) * itemsPerPage + 1;
+  const to = Math.min(activePage.value * itemsPerPage, totalItems.value);
+  const total = totalItems.value;
+
+  return t(`${i18Dir}.pagination`, {
+    from,
+    to,
+    total,
+  });
+});
 
 // Events
 onMounted(() => {
   getData();
+});
+
+watch(totalItems, (val) => {
+  if (activePage.value > Math.floor(val / itemsPerPage) || 1) {
+    activePage.value = Math.floor(val / itemsPerPage) || 1;
+  }
 });
 </script>
 
