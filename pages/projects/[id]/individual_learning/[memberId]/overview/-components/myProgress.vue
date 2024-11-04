@@ -30,6 +30,7 @@ type Objective = {
 const props = withDefaults(
   defineProps<{
     data: Objective[];
+    percentage: number;
   }>(),
   {
     data: () => [],
@@ -102,7 +103,7 @@ watch(
               <span
                 class="tw-w-[40px] tw-h-[30px] d-flex tw-justify-center align-center rounded gap-1 text-body-1 bg-secondary--2 text-secondary-0"
               >
-                {{ `${selectedGoal?.percentage ?? 100}%` }}
+                {{ `${props?.percentage ?? 100}%` }}
               </span>
               {{ $t(`${i18Dir}.finishedTasks`) }}
             </div>

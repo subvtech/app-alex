@@ -34,15 +34,38 @@ const emptyMessage = computed(() => {
   return hasError.value ? t('errors.default') : t('pages.projects.individual_learning.empty_members');
 });
 
+const getPercentage = (amount: number, total: number): number => {
+  const result = amount > 0 ? Math.floor((amount / total) * 100) : 0;
+  return !Number.isNaN(result) ? result : 100;
+};
+
 const fetchMembers = async () => {
   loading.value = true;
 
   try {
     const res = await findOne<LearningPlanSimple>('learningplans', Number(route.params.id), {
-      populate: ['members.user.avatar'],
+      populate: ['members.user.avatar', 'members.task_members.task.learning_goals'],
     });
 
-    members.value = res.data.members.map((r) => ({ ...r.user }));
+    members.value = res.data.members.map((member) => {
+      let goals = 0;
+      let completedGoals = 0;
+
+      member.task_members.forEach((taskMember) => {
+        goals += taskMember.task.learning_goals.length;
+
+        if (taskMember.status === 'done') {
+          completedGoals += taskMember.task.learning_goals.length;
+        }
+      });
+
+      const percentage = !goals && !completedGoals ? 100 : getPercentage(completedGoals, goals);
+
+      return {
+        ...member.user,
+        percentage,
+      };
+    });
   } catch (_) {
     hasError.value = true;
   } finally {
@@ -116,12 +139,12 @@ onMounted(fetchMembers);
                         color="accent"
                         class="tw-mb-2"
                         :height="8"
-                        model-value="50"
+                        :model-value="member.percentage"
                         bg-color="gray-600"
                       />
                       <div class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45">
                         <span>{{ $t('pages.projects.individual_learning.my_goals') }}</span>
-                        <span>50%</span>
+                        <span>{{ member.percentage }}%</span>
                       </div>
                     </div>
                   </CardContent>
