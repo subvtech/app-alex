@@ -87,125 +87,123 @@
         },
       ]"
     />
-    <v-tabs-window v-model="tab" class="w-full">
-      <v-tabs-window-item value="content">
-        <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 d-flex justify-center">
-          <div class="d-flex tw-flex-col-reverse tw-items-center lg:tw-flex-row lg:tw-items-start tw-relative gap-6">
-            <div class="">
-              <tip-tap
-                v-model="editorContent"
-                class="editor"
-                :doc-name="docName"
-                :edit="!isReadOnly"
-                :collaboration="!!docName"
-                :allowed-blocks="props.restrictions ? props.restrictions : []"
-                :show-loader="true"
-              />
-            </div>
-            <div class="d-flex gap-2 flex-wrap tw-w-[400px] tw-border pa-6 rounded-lg text-body-1 text-gray-800">
-              <h3 class="text-gray-800 text-h3 mb-4">Avaliação de Entrega</h3>
-              <div class="w-100 d-flex justify-space-between">
-                Tipo:
-                <alex-custom-chip
-                  status="secondary"
-                  :text="
-                    taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo de critérios'
-                  "
-                />
-              </div>
-              <div class="w-100 d-flex justify-space-between align-center">
-                {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }} :
-                <alex-custom-chip status="secondary" :text="taskSubmissionEvaluationData?.evaluation_group?.name" />
-              </div>
-              <h5 class="text-gray-800 text-h5 mt-4">
-                {{
-                  taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Analise da tarefa' : 'Critérios'
-                }}
-              </h5>
-              <div
-                v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
-                :key="`criteria-${i}`"
-                class="w-100 d-flex justify-space-between align-center"
-              >
-                <span>
-                  {{ evaluation_criteria.criteria.criteria.name }}
-                </span>
-                <span class="text-gray-600 text-body-3">
-                  <alex-custom-chip
-                    text-classes="text-body-3 text-gray-600"
-                    :text="evaluation_criteria.grade || 0"
-                    variant="outlined"
-                    status="secondary"
-                  />
-                  x
-                  <alex-custom-chip
-                    text-classes="text-body-3 text-gray-600"
-                    :text="evaluation_criteria.criteria.weight"
-                    status="secondary"
-                  />
-                </span>
-              </div>
-              <div class="d-flex justify-space-between align-center w-100 mt-4">
-                <span class="text-gray-800 text-h5">Nota final: </span>
-                <alex-custom-chip
-                  :text="`${finalGrade}/10`"
-                  status="secondary"
-                  text-classes="text-gray-600 text-body-2"
-                />
+    <div
+      class="w-full d-flex tw-flex-col-reverse tw-items-center lg:tw-flex-row lg:tw-items-start tw-relative gap-6 tw-justify-center pa-6"
+    >
+      <v-tabs-window v-model="tab">
+        <v-tabs-window-item value="content">
+          <div class="mx-auto px-sm-6 px-md-0 d-flex justify-center">
+            <tip-tap
+              v-model="editorContent"
+              class="editor"
+              :doc-name="docName"
+              :edit="!isReadOnly"
+              :collaboration="!!docName"
+              :allowed-blocks="props.restrictions ? props.restrictions : []"
+              :show-loader="true"
+            />
+          </div>
+        </v-tabs-window-item>
+        <v-tabs-window-item value="evaluation">
+          <div class="mx-auto px-sm-6 px-md-0 w-100 d-flex flex-wrap">
+            <div class="d-flex flex-wrap justify-space-between">
+              <div class="d-flex flex-wrap">
+                <h3 class="text-h3 text-gray-700 w-100">
+                  {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }}:
+                </h3>
+                <p class="text-gray-700 text-subtitle-2">
+                  {{ taskSubmissionEvaluationData?.evaluation_group?.name }}
+                </p>
+                <div class="tw-w-full d-flex flex-wrap gap-2 mt-4 tw-mb-[80px]">
+                  <template v-if="taskSubmissionEvaluationData?.evaluation_group?.type === 'standard'">
+                    <div
+                      v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
+                      :key="`criteria-evaluation-grade-${i}`"
+                      class="tw-border rounded-lg pt-4 tw-w-full sm:tw-w-[300px] tw-max-h-[230px] tw-h-full tw-justify-between d-flex tw-flex-col"
+                    >
+                      <div class="px-4">
+                        <h5 class="text-secondary-0 text-h5 ellipsis lines-1 mb-2">
+                          {{ evaluation_criteria.criteria.criteria.name }}
+                        </h5>
+                        <p class="text-body-3 text-gray-600 ellipsis lines-6 tw-max-h-[115px] tw-h-full mb-2">
+                          {{ evaluation_criteria.criteria.criteria.description }}
+                        </p>
+                      </div>
+                      <div class="tw-border-t">
+                        <span v-if="taskSubmissionEvaluationData.evaluated_at" class="text-center text-gray-600">{{
+                          evaluation_criteria.grade || 'Nao avaliado'
+                        }}</span>
+                        <v-number-input
+                          v-else
+                          :model-value="evaluation_criteria.grade"
+                          :name="`criteria-evaluation-grade-${evaluation_criteria.id}`"
+                          class="w-full text-gray-600"
+                          density="compact"
+                          control-variant="split"
+                          hide-details
+                          variant="outlined"
+                          base-color="transparent"
+                          color="secondary-0"
+                          :min="0"
+                          :max="10"
+                          :step="0.5"
+                          @update:model-value="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
+                        />
+                      </div>
+                    </div>
+                  </template>
+                  <div v-else>Componente de rubrica</div>
+                </div>
               </div>
             </div>
           </div>
+        </v-tabs-window-item>
+      </v-tabs-window>
+      <div class="d-flex gap-2 flex-wrap tw-w-[400px] tw-border pa-6 rounded-lg text-body-1 text-gray-800">
+        <h3 class="text-gray-800 text-h3 mb-4">Avaliação de Entrega</h3>
+        <div class="w-100 d-flex justify-space-between">
+          Tipo:
+          <alex-custom-chip
+            status="secondary"
+            :text="taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo de critérios'"
+          />
         </div>
-      </v-tabs-window-item>
-      <v-tabs-window-item value="evaluation">
-        <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 d-flex flex-wrap">
-          <div class="d-flex flex-wrap justify-space-between">
-            <div class="d-flex flex-wrap">
-              <div class="tw-w-full">
-                {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }}
-              </div>
-              <div class="tw-w-full">
-                {{ taskSubmissionEvaluationData?.evaluation_group?.name }}
-              </div>
-              <div class="tw-w-full d-flex flex-wrap">
-                <template v-if="taskSubmissionEvaluationData?.evaluation_group?.type === 'standard'">
-                  <div
-                    v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
-                    :key="`criteria-evaluation-grade-${i}`"
-                    class="tw-w-full"
-                  >
-                    {{ evaluation_criteria.criteria.criteria.name }}:
-                    <span v-if="taskSubmissionEvaluationData.evaluated_at">{{
-                      evaluation_criteria.grade || 'Nao avaliado'
-                    }}</span>
-                    <alex-inputs-text-field
-                      v-else
-                      :model-value="evaluation_criteria.grade"
-                      :name="`criteria-evaluation-grade-${evaluation_criteria.id}`"
-                      type="number"
-                      @update:model-value="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
-                    />
-                  </div>
-                </template>
-                <div v-else>Componente de rubrica</div>
-              </div>
-            </div>
-            <div class="d-flex flex-wrap tw-max-w-[400px] sm:tw-w-[400px] tw-border pa-3">
-              <div class="tw-w-full">Criterios</div>
-              <div
-                v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
-                :key="`criteria-evaluation-${i}`"
-                class="tw-w-full"
-              >
-                {{ evaluation_criteria.criteria.criteria.name }}: {{ evaluation_criteria.grade || 'Nao avaliado' }} x
-                {{ evaluation_criteria.criteria.weight }}
-              </div>
-              <div class="tw-w-full">Nota final: {{ finalGrade }}</div>
-            </div>
-          </div>
+        <div class="w-100 d-flex justify-space-between align-center">
+          {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }} :
+          <alex-custom-chip status="secondary" :text="taskSubmissionEvaluationData?.evaluation_group?.name" />
         </div>
-      </v-tabs-window-item>
-    </v-tabs-window>
+        <h5 class="text-gray-800 text-h5 mt-4">
+          {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Analise da tarefa' : 'Critérios' }}
+        </h5>
+        <div
+          v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
+          :key="`criteria-${i}`"
+          class="w-100 d-flex justify-space-between align-center"
+        >
+          <span>
+            {{ evaluation_criteria.criteria.criteria.name }}
+          </span>
+          <span class="text-gray-600 text-body-3">
+            <alex-custom-chip
+              text-classes="text-body-3 text-gray-600"
+              :text="evaluation_criteria.grade || 0"
+              variant="outlined"
+              status="secondary"
+            />
+            x
+            <alex-custom-chip
+              text-classes="text-body-3 text-gray-600"
+              :text="evaluation_criteria.criteria.weight"
+              status="secondary"
+            />
+          </span>
+        </div>
+        <div class="d-flex justify-space-between align-center w-100 mt-4">
+          <span class="text-gray-800 text-h5">Nota final: </span>
+          <alex-custom-chip :text="`${finalGrade}/10`" status="secondary" text-classes="text-gray-600 text-body-2" />
+        </div>
+      </div>
+    </div>
   </alex-custom-dialog>
 </template>
 <script setup lang="ts">
@@ -500,5 +498,9 @@ defineExpose({
 
 .border-top-gray-100 {
   border-top: 1px solid rgb(var(--v-theme-gray-100)) !important;
+}
+
+:global(.v-input__control .v-field) {
+  padding: 0 16px !important;
 }
 </style>
