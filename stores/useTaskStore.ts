@@ -45,11 +45,7 @@ export const useTaskStore = defineStore('task', () => {
     },
   };
 
-  async function loadTaskData(
-    id: number,
-    learningplanID: number,
-    showMessageIfNotFound = true,
-  ) {
+  async function loadTaskData(id: number, learningplanID: number, showMessageIfNotFound = true) {
     try {
       loading.value = true;
       const response = await find<TaskSimple>('tasks', {
@@ -65,11 +61,7 @@ export const useTaskStore = defineStore('task', () => {
       task.value = response.data[0];
       return response;
     } catch (e: any) {
-      if (
-        (e?.error?.name === 'NotFoundError' ||
-          e?.message === 'NotFoundError') &&
-        showMessageIfNotFound
-      ) {
+      if ((e?.error?.name === 'NotFoundError' || e?.message === 'NotFoundError') && showMessageIfNotFound) {
         setMessage(i18n.t('pages.tasks.notFound'), 'red', true);
       }
     } finally {
@@ -102,11 +94,7 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
-
-  async function updateTaskContractAddress(
-    taskId: number,
-    contractAddress: string | null,
-  ) {
+  async function updateTaskContractAddress(taskId: number, contractAddress: string | null) {
     try {
       const response = await update(`tasks/${taskId}`, {
         contract_address: contractAddress,
@@ -115,8 +103,7 @@ export const useTaskStore = defineStore('task', () => {
       console.log(response);
       const { data } = response;
       if (task.value) {
-        task.value.contract_address =
-          data.attributes.contract_address || null;
+        task.value.contract_address = data.attributes.contract_address || null;
       }
       return response;
     } catch (e: any) {
@@ -128,8 +115,6 @@ export const useTaskStore = defineStore('task', () => {
     console.log({ taskStudents: task.value });
     return task.value;
   });
-
-
 
   return { loadTaskData, taskStudents, task, loading, updateTaskContractAddress, updateTaskMembers };
 });

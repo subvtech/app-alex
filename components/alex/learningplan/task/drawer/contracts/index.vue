@@ -28,25 +28,13 @@
 
             <div class="d-flex flex-column gap-1 my-2">
               <alex-learningplan-task-drawer-contracts-button
-                :tooltip-text="
-                  $t('components.learningPlan.contract.warning.tooltip.once')
-                "
-                :text="
-                  $t('components.learningPlan.contract.reward.rewardStudents')
-                "
+                :tooltip-text="$t('components.learningPlan.contract.warning.tooltip.once')"
+                :text="$t('components.learningPlan.contract.reward.rewardStudents')"
                 variant="warning"
                 :loading="loading"
-                :disabled="
-                  itsNotFinished ||
-                  isRewardCompleted ||
-                  taskWallets.length === 0
-                "
+                :disabled="itsNotFinished || isRewardCompleted || taskWallets.length === 0"
                 show-hint
-                :hint="
-                  $t(
-                    'components.learningPlan.contract.warning.elligibleStudents',
-                  )
-                "
+                :hint="$t('components.learningPlan.contract.warning.elligibleStudents')"
                 @click:button="handleRewardStudents"
               />
             </div>
@@ -54,9 +42,7 @@
 
           <div class="flex flex-column gap-1 mt-6">
             <p class="text-h4 text-gray-800">
-              {{
-                $t('components.learningPlan.contract.warning.secondThoughts')
-              }}
+              {{ $t('components.learningPlan.contract.warning.secondThoughts') }}
             </p>
             <p class="text-body-3 text-gray-500">
               {{ $t('components.learningPlan.contract.warning.editContract') }}

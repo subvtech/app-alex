@@ -250,7 +250,7 @@ const title = ref(props.title);
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
 const { members } = toRefs(props);
-
+const { deployContract } = useContracts(contractAddress);
 const type = ref<TaskType | null>(props.type);
 const startDate = ref(props.startDate);
 const endDate = ref(props.endDate);
@@ -409,8 +409,6 @@ const notifyFieldError = (field: string) => {
 const notifyError = () => {
   setMessage(t('components.learningPlan.drawer.task.errors.genericSave'), 'error', true);
 };
-
-const deployContract = ref<(() => Promise<string | undefined>) | null>(null);
 
 const updateTaskValues = async (
   taskId: number,
