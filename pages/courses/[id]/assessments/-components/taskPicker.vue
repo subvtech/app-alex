@@ -1,5 +1,10 @@
 <template>
-  <alex-custom-dialog v-model="openDialog" :loading="isLoading" @on-main-action="() => associateTasks()">
+  <alex-custom-dialog
+    v-model="openDialog"
+    :loading="isLoading"
+    @on-main-action="() => associateTasks()"
+    @on-secondary-action="openDialog = false"
+  >
     <alex-inputs-select
       v-model="selectedTasks"
       name="tasks"
@@ -12,7 +17,6 @@
       item-value="id"
       multiple
       hide-details
-      return-object
     >
       <template #item="{ props: task, item }">
         <v-list-item class="pa-1" v-bind="task" title="">
@@ -54,10 +58,11 @@ const openDialog = defineModel({ default: false });
 const isLoading = ref(false);
 const props = defineProps<{
   available: any[];
-  selected: any[];
 }>();
 
-const selectedTasks = ref([...(props.selected || [])]);
+const selectedTasks = ref([]);
+
+const emit = defineEmits(['onAssociateTasks']);
 
 const formattedDate = (date: string): string => {
   return format(new Date(date.split('T')[0]), 'dd MMM yyyy', { locale: i18n.locale.value === 'en' ? enIN : ptBR });
@@ -65,10 +70,6 @@ const formattedDate = (date: string): string => {
 
 const associateTasks = () => {
   isLoading.value = true;
-  // TODO - Implementar a lógica de associação de tarefas
-  setTimeout(() => {
-    isLoading.value = false;
-    openDialog.value = false;
-  }, 2000);
+  emit('onAssociateTasks', selectedTasks.value);
 };
 </script>

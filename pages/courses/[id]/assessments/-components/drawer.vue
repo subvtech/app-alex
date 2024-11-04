@@ -93,12 +93,12 @@
           </div>
           <div class="bg-gray-200 w-100 tw-h-[2px]" :thickness="2" />
           <div class="tw-h-14 tw-w-14 bg-white rounded-lg mx-auto d-flex justify-center align-center my-6">
-            {{ selectedTasks.length }}
+            {{ totalWeight }}
           </div>
         </div>
       </div>
     </div>
-    <Dialog v-model="dialog" :available="availableTasks" :selected="selectedTasks" />
+    <Dialog v-model="dialog" :available="assessmentAvailableTasks" @on-associate-tasks="onAssociateTasks" />
   </v-navigation-drawer>
 </template>
 
@@ -111,40 +111,80 @@ type taskType = {
   methodName?: string;
   value?: number;
   isGroup?: boolean;
+  compositionId?: number;
 };
 
 type assessmentType = {
   id: number;
   name: string;
+  compositionId: number;
   tasks: taskType[];
 };
 
 const props = defineProps<{
   availableTasks: taskType[];
+  assessments: assessmentType[];
 }>();
 
+const assessmentAvailableTasks = computed(() => {
+  const tasksIds = selectedTasks.value.map((t) => t.id);
+  return (props.availableTasks || []).filter((t) => !tasksIds.includes(t.id));
+});
+
 const model = defineModel({ default: false });
+const selectedAssessmentId = ref<number>();
+const assessment = computed(() => (props.assessments || []).find((a) => a.id === selectedAssessmentId.value));
 const name = ref('');
-const selectedTasks = ref<taskType[]>([]);
+const selectedTasks = computed<taskType[]>(() => assessment.value?.tasks || []);
 const dialog = ref(false);
+
+const learningPlanStore = useLearningPlanStore();
+const learningPlanId = computed(() => learningPlanStore.learningPlan?.id);
+
+const { addTaskToGradeCompositionMutation, updateGradeTitleMutation, updateTaskCompositionWeight } = useTaskEvaluation(
+  learningPlanId,
+  null,
+  null,
+);
 
 const openDrawer = (assessment?: assessmentType) => {
   model.value = true;
+  selectedAssessmentId.value = assessment?.id;
   name.value = assessment?.name || '';
-  selectedTasks.value = assessment?.tasks || [];
 };
 
 defineExpose({ openDrawer });
 
-const updateTaskWeight = (task: taskType, update: 'up' | 'down') => {
-  const index = selectedTasks.value.findIndex((t) => t.id === task.id);
-  if (!selectedTasks.value[index].value || !task.value) {
-    return;
+const totalWeight = computed(() =>
+  selectedTasks.value.reduce((total, currentTask) => total + (currentTask?.value || 1), 0),
+);
+
+const updateTaskWeight = async (task: taskType, update: 'up' | 'down') => {
+  let weight = task.value || 1;
+
+  if (update === 'up' && weight < 9) {
+    weight += 1;
+  } else if (update === 'down' && weight > 1) {
+    weight -= 1;
   }
-  if (update === 'up' && task.value < 9) {
-    selectedTasks.value[index].value += 1;
-  } else if (update === 'down' && task.value > 1) {
-    selectedTasks.value[index].value -= 1;
-  }
+
+  await updateTaskComposition({ taskCompositionId: task.compositionId, weight });
 };
+
+const { mutateAsync: addTaskToGradeComposition } = addTaskToGradeCompositionMutation();
+const { mutateAsync: updateGradeTitle } = updateGradeTitleMutation();
+const { mutateAsync: updateTaskComposition } = updateTaskCompositionWeight();
+
+const onAssociateTasks = async (tasksIds) => {
+  await addTaskToGradeComposition({ tasksIds, gradeCompositionId: assessment.value?.compositionId });
+  dialog.value = false;
+};
+
+useOnStopTyping(
+  name,
+  async () => await updateGradeTitle({ id: selectedAssessmentId.value, title: name.value }),
+  600,
+  false,
+  false,
+);
 </script>

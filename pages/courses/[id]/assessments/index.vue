@@ -12,11 +12,13 @@ type tasksType = {
   methodName: string;
   value: number;
   isGroup?: boolean;
+  compositionId?: number;
 };
 
 type assessment = {
   name: string;
   tasks: tasksType[];
+  compositionId: number;
   lastUpdate: string;
   id: number;
 };
@@ -66,11 +68,13 @@ const assessments = computed<assessment[]>(() => {
       name: grade.title,
       id: grade.id,
       lastUpdated: grade.updatedAt,
+      compositionId: grade.grade_compositions[0]?.id,
       tasks: grade.grade_compositions[0]?.grade_composition_tasks.map((gct) => {
         const { task } = gct;
         const { evaluation_group } = task;
         return {
           id: task.id,
+          compositionId: gct.id,
           title: task.title,
           type: evaluation_group.type === 'standard' ? 'group' : 'rubric',
           methodName: evaluation_group.name,
@@ -247,7 +251,7 @@ const dropdownItems = (assessments: assessment) => [
       </div>
     </div>
     <!-- TODO: Pass available tasks (todas as tasks do curso que tenham forma de avaliação associadas ) -->
-    <TaskDrawer ref="drawer" :available-tasks="availableTasks" />
+    <TaskDrawer ref="drawer" :available-tasks="availableTasks" :assessments="assessments" />
   </div>
 </template>
 
