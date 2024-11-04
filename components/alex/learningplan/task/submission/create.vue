@@ -5,7 +5,6 @@
     :persistent="true"
     :max-width="1080"
     :retain-focus="false"
-    :full-screen="fullscreen"
     no-click-animation
     no-footer
   >
@@ -18,9 +17,10 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <div class="mx-auto editor my-6 px-sm-6 px-md-0 w-100">
+    <div class="mx-auto my-6 px-sm-6 px-md-0 w-100">
       <tip-tap
         v-model="editorContent"
+        class="editor"
         :doc-name="docName"
         :edit="!isReadOnly"
         :collaboration="!!docName"
@@ -35,21 +35,19 @@
     :persistent="true"
     :retain-focus="false"
     body-classes="bg-white pa-0"
-    main-button-text="Associar"
+    main-button-text="Avaliar"
     secondary-button-text="Recusar entrega"
+    :max-width="1680"
+    :fullscreen="fullscreen"
     no-click-animation
   >
     <template #header>
       <alex-custom-dialog-header
         :title="title"
         :maximizable="true"
+        :is-fullscreen="fullscreen"
         @on-close="dialog = false"
-        @on-maximize="
-          () => {
-            fullscreen = !fullscreen;
-            console.log('fullscreen', fullscreen);
-          }
-        "
+        @toggle-fullscreen="toggleMaximize"
       >
         <template #default>
           <div class="ml-auto">
@@ -89,13 +87,14 @@
         },
       ]"
     />
-    <v-tabs-window v-model="tab">
+    <v-tabs-window v-model="tab" class="w-full">
       <v-tabs-window-item value="content">
-        <div class="mx-auto editor my-6 px-sm-6 px-md-0 w-100">
-          <div class="d-flex justify-space-between">
-            <div>
+        <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 d-flex justify-center">
+          <div class="d-flex tw-flex-col-reverse tw-items-center lg:tw-flex-row lg:tw-items-start tw-relative gap-6">
+            <div class="">
               <tip-tap
                 v-model="editorContent"
+                class="editor"
                 :doc-name="docName"
                 :edit="!isReadOnly"
                 :collaboration="!!docName"
@@ -472,6 +471,10 @@ const loadEditorData = () => {
   editorContent.value = props.lastSubmission?.submission;
 };
 
+const toggleMaximize = () => {
+  fullscreen.value = !fullscreen.value;
+};
+
 watch(dialog, (value) => {
   if (!value) {
     lastSaveDate.value = null;
@@ -482,15 +485,15 @@ watch(dialog, (value) => {
     }
   }
 });
+
 defineExpose({
   openDialog,
 });
 </script>
 
 <style scoped>
-#editor,
 .editor {
-  max-width: 785px !important;
+  width: 785px !important;
   position: relative;
   min-height: 400px;
 }

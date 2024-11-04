@@ -1,17 +1,15 @@
 <template>
   <v-dialog
-    :max-width="maxWidth"
-    transition="dialog-center-transition"
+    transition="fade-transition"
     data-testid="alex-dialog"
-    class="custom-alex-dialog"
+    :class="!isFullscreen ? 'custom-alex-dialog' : ''"
+    :fullscreen="isFullscreen"
     :model-value="modelValue"
     :activator="activator"
+    :max-width="isFullscreen ? '100%' : maxWidth"
     @update:model-value="handleChange"
   >
-    <template
-      v-if="hasCustomActivator"
-      #activator="{ isActive, props: activatorProps }"
-    >
+    <template v-if="hasCustomActivator" #activator="{ isActive, props: activatorProps }">
       <slot name="activator" :is-active="isActive" :props="activatorProps" />
     </template>
     <slot
@@ -26,17 +24,17 @@
       data-testid="alex-dialog-header"
       :title="title"
       :highlighted-title="highlightedTitle"
+      :maximizable="maximizable"
+      :is-fullscreen="isFullscreen"
       @on-close="() => emits('update:modelValue', false)"
+      @toggle-fullscreen="toggleMaximize"
     />
-    <v-container class="pa-1 gap-4 overflow-y-auto alex-scrollbar-white">
+    <div class="pa-1 gap-4 overflow-y-auto alex-scrollbar-white w-100 tw-h-full bg-white">
       <v-row dense>
         <v-col v-if="stepper" dense :class="bodyStyles" class="rounded-b-lg">
           <alex-inputs-stepper
             :steps-config="stepsConfig"
-            :step-class="[
-              'd-flex flex-column max-height-stepper pa-6',
-              stepClass,
-            ]"
+            :step-class="['d-flex flex-column max-height-stepper pa-6', stepClass]"
             :stepper-indicator-class="`px-${mobile ? '2' : '6'} pt-6 pb-1`"
             :loading="loading"
             @on-success="emits('onMainAction')"
@@ -44,15 +42,7 @@
             <template v-for="slot in slotsList" #[slot]>
               <slot :name="slot" />
             </template>
-            <template
-              #controls="{
-                isFirstStep,
-                isLastStep,
-                isValid,
-                onPrevStep,
-                loading: controlsLoading,
-              }"
-            >
+            <template #controls="{ isFirstStep, isLastStep, isValid, onPrevStep, loading: controlsLoading }">
               <slot
                 v-if="hasFooter"
                 name="footer"
@@ -70,11 +60,7 @@
                   <alex-custom-button
                     type="submit"
                     size="large"
-                    :text="
-                      isLastStep
-                        ? $t('components.dialog.create')
-                        : $t('components.dialog.next')
-                    "
+                    :text="isLastStep ? $t('components.dialog.create') : $t('components.dialog.next')"
                     :append-icon="!isLastStep ? 'mdi-chevron-right' : undefined"
                     :prepend-icon="isLastStep ? 'mdi-plus' : undefined"
                     :loading="controlsLoading"
@@ -97,7 +83,7 @@
           <slot />
         </v-col>
       </v-row>
-    </v-container>
+    </div>
     <slot
       v-if="slots.footer !== undefined && !stepper"
       name="footer"
@@ -120,8 +106,8 @@
 </template>
 
 <script setup lang="ts">
+import type { StepsConfig } from '@/components/alex/inputs/stepper/index.vue';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
-import { StepsConfig } from '@/components/alex/inputs/stepper/index.vue';
 
 interface HeaderProps {
   modelValue: boolean;
@@ -141,6 +127,8 @@ interface HeaderProps {
   stepsConfig?: Record<string, Partial<StepsConfig>>;
   loading?: boolean;
   maxWidth?: number;
+  maximizable?: boolean;
+  fullscreen?: boolean;
 }
 const props = withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
@@ -159,17 +147,17 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   stepClass: undefined,
   loading: undefined,
   maxWidth: 720,
+  maximizable: false,
+  fullscreen: false,
 });
 const { mobile } = useDisplay();
-const emits = defineEmits([
-  'update:modelValue',
-  'update:loading',
-  'onMainAction',
-  'onSecondaryAction',
-]);
+const emits = defineEmits(['update:modelValue', 'update:loading', 'onMainAction', 'onSecondaryAction']);
 const handleChange = (value: boolean) => {
   emits('update:modelValue', value);
 };
+
+const isFullscreen = ref(props.fullscreen);
+
 const slots = useSlots();
 const hasCustomActivator = computed(() => !!slots.activator);
 const hasHeader = computed(() => !!slots.header);
@@ -191,5 +179,16 @@ const slotsList = computed(() =>
       .map((slot) => slot[0])
       .filter((slot) => slot.includes('step')),
   ),
+);
+
+const toggleMaximize = () => {
+  isFullscreen.value = !isFullscreen.value;
+};
+
+watch(
+  () => props.fullscreen,
+  (newVal) => {
+    isFullscreen.value = newVal;
+  },
 );
 </script>
