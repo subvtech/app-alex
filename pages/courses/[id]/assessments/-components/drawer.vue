@@ -93,7 +93,7 @@
           </div>
           <div class="bg-gray-200 w-100 tw-h-[2px]" :thickness="2" />
           <div class="tw-h-14 tw-w-14 bg-white rounded-lg mx-auto d-flex justify-center align-center my-6">
-            {{ selectedTasks.length }}
+            {{ totalWeight }}
           </div>
         </div>
       </div>
@@ -154,6 +154,10 @@ const openDrawer = (assessment?: assessmentType) => {
 };
 
 defineExpose({ openDrawer });
+
+const totalWeight = computed(() =>
+  selectedTasks.value.reduce((total, currentTask) => total + (currentTask?.value || 1), 0),
+);
 
 const updateTaskWeight = async (task: taskType, update: 'up' | 'down') => {
   let weight = task.value || 1;

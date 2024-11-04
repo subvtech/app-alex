@@ -114,7 +114,16 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
         queryFn: async () => {
           const res = await find('evaluation-criterias', {
             filters: {
-              user: user.value?.id ?? null,
+              $or: [
+                {
+                  public: true,
+                },
+                {
+                  user: {
+                    id: user.value?.id,
+                  },
+                },
+              ],
             },
             populate: {
               evaluation_groups: true,
