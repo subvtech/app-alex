@@ -254,5 +254,45 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
         },
       });
     },
+    addTaskToGradeCompositionMutation() {
+      return useMutation({
+        mutationFn: ({ tasksIds, gradeCompositionId }: any) => {
+          return update('grade-compositions', gradeCompositionId, { addTasks: tasksIds });
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: learningPlanGradesQuery });
+        },
+      });
+    },
+    updateTaskCompositionWeight() {
+      return useMutation({
+        mutationFn: ({ taskCompositionId, weight }: any) => {
+          return update('grade-composition-tasks', taskCompositionId, { weight });
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: learningPlanGradesQuery });
+        },
+      });
+    },
+    updateGradeTitleMutation() {
+      return useMutation({
+        mutationFn: ({ title, id }: any) => {
+          return update('grades', id, { title });
+        },
+        onSuccess(result: any) {
+          const { id, title } = result.data;
+          queryClient.setQueryData(learningPlanGradesQuery, (grades) => {
+            const gradesData: any = structuredClone(grades);
+
+            return gradesData.map((grade) => {
+              if (grade.id === id) {
+                grade.title = title;
+              }
+              return grade;
+            });
+          });
+        },
+      });
+    },
   };
 };
