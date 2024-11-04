@@ -90,12 +90,12 @@
     <div
       class="w-full d-flex tw-flex-col-reverse tw-items-center lg:tw-flex-row lg:tw-items-start tw-relative gap-6 tw-justify-center pa-6"
     >
-      <v-tabs-window v-model="tab">
+      <v-tabs-window v-model="tab" class="editor">
         <v-tabs-window-item value="content">
           <div class="mx-auto px-sm-6 px-md-0 d-flex justify-center">
             <tip-tap
               v-model="editorContent"
-              class="editor"
+              class=""
               :doc-name="docName"
               :edit="!isReadOnly"
               :collaboration="!!docName"
@@ -135,7 +135,7 @@
                         }}</span>
                         <v-number-input
                           v-else
-                          :model-value="evaluation_criteria.grade"
+                          :model-value="evaluation_criteria.grade || 0"
                           :name="`criteria-evaluation-grade-${evaluation_criteria.id}`"
                           class="w-full text-gray-600"
                           density="compact"
