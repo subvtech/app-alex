@@ -6,18 +6,28 @@
     :secondary-button-text="$t(`${i18Dir}.cancel`)"
     :main-button-icon="props.editContent ? 'mdi-pencil' : 'mdi-plus'"
     secondary-button-icon="mdi-close"
+    body-classes="bg-white d-flex justify-center align-center flex-column py-6"
+    :max-width="1500"
+    maximizable
     @on-main-action="saveRubric"
     @on-secondary-action="open = false"
   >
-    <alex-inputs-editable-text
-      v-model="name"
-      class="text-h2 text-gray-500 py-2 mb-4 tw-resize-none"
-      tag="h2"
-      :placeholder="$t(`${i18Dir}.typeName`)"
-      cant-edit
-    />
-    <!-- Passar 'data' -->
-    <alex-learningplan-evaluation-rubrics ref="rubrics" :criteria="formattedCriteria" :data="formattedData" editable />
+    <div>
+      <alex-inputs-editable-text
+        v-model="name"
+        class="text-h2 text-gray-500 py-2 mb-4 tw-resize-none"
+        tag="h2"
+        :placeholder="$t(`${i18Dir}.typeName`)"
+        cant-edit
+      />
+      <!-- Passar 'data' -->
+      <alex-learningplan-evaluation-rubrics
+        ref="rubrics"
+        :criteria="formattedCriteria"
+        :data="formattedData"
+        editable
+      />
+    </div>
   </alex-custom-dialog>
 </template>
 

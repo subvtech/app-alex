@@ -53,7 +53,7 @@ const props = defineProps<CardProps>();
 <template>
   <div class="tw-w-[300px] tw-h-[124px] tw-border tw-bg-white tw-p-4 tw-rounded-lg">
     <div class="tw-flex tw-justify-between">
-      <p class="text-h5 text-secondary-0">{{ item.name }}</p>
+      <p class="text-h5 text-secondary-0 ellipsis lines-1">{{ item.name }}</p>
       <alex-custom-chip v-if="item.public" text="Public" :size="'small'" variant="outlined" status="secondary" />
       <alex-custom-dropdown v-if="!item.public" :items="dropdownItems(item)">
         <template #activator="{ props: propsMenu }">
