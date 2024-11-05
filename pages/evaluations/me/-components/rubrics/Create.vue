@@ -9,6 +9,7 @@
     body-classes="bg-white d-flex justify-center align-center flex-column py-6"
     :max-width="1500"
     maximizable
+    :loading="isLoading"
     @on-main-action="saveRubric"
     @on-secondary-action="open = false"
   >
@@ -50,6 +51,7 @@ const { update } = useStrapi();
 const strapiClient = useStrapiClient();
 const { getUserEvaluations } = useTaskEvaluation(0, 0, user);
 const { setMessage } = useMessageStore();
+const isLoading = ref(false);
 
 const { data: criteria } = getUserEvaluations();
 
@@ -144,8 +146,9 @@ const saveRubric = () => {
 };
 
 const createRubric = async (evaluationGroup, content) => {
+  isLoading.value = true;
   try {
-    await strapiClient(`/evaluation-groups/create-group`, {
+    await strapiClient('/evaluation-groups/create-group', {
       method: 'POST',
       body: {
         group: evaluationGroup,
@@ -163,15 +166,18 @@ const createRubric = async (evaluationGroup, content) => {
 
     setMessage(props.editContent ? t(`${i18Dir}.editSuccess`) : t(`${i18Dir}.createSuccess`), 'success', true);
     emit('update');
+    open.value = false;
   } catch (e) {
     console.error(e);
     setMessage(props.editContent ? t(`${i18Dir}.editFail`) : t(`${i18Dir}.createFail`), 'error', true);
   } finally {
-    open.value = false;
+    isLoading.value = false;
   }
 };
 
+// TODO: Fix Update
 const editRubric = async (evaluationGroup, content) => {
+  isLoading.value = true;
   try {
     await update('evaluation-groups', props.editContent.id, {
       name: name.value,
@@ -179,7 +185,7 @@ const editRubric = async (evaluationGroup, content) => {
       rubric_grade_levels: [],
     });
 
-    await strapiClient(`/evaluation-groups/edit-group`, {
+    await strapiClient('/evaluation-groups/edit-group', {
       method: 'PUT',
       body: {
         id: props.editContent.id,
@@ -190,17 +196,19 @@ const editRubric = async (evaluationGroup, content) => {
 
     setMessage(t(`${i18Dir}.editSuccess`), 'success', true);
     emit('update');
+    open.value = false;
   } catch (e) {
     console.error(e);
     setMessage(t(`${i18Dir}.editFail`), 'error', true);
   } finally {
-    open.value = false;
+    isLoading.value = false;
   }
 };
 
 watch(open, (open) => {
   if (!open) {
     name.value = '';
+    isLoading.value = false;
     return;
   }
 
