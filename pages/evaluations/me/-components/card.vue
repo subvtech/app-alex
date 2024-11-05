@@ -52,7 +52,7 @@ const props = defineProps<CardProps>();
 
 <template>
   <div class="tw-w-[300px] tw-h-[124px] tw-border tw-bg-white tw-p-4 tw-rounded-lg">
-    <div class="tw-flex tw-justify-between">
+    <div class="tw-flex tw-justify-between align-center">
       <p class="text-h5 text-secondary-0 ellipsis lines-1">{{ item.name }}</p>
       <alex-custom-chip v-if="item.public" text="Public" :size="'small'" variant="outlined" status="secondary" />
       <alex-custom-dropdown v-if="!item.public" :items="dropdownItems(item)">
@@ -63,6 +63,7 @@ const props = defineProps<CardProps>();
                 v-bind="{ ...propsMenu, ...optionsTooltipProps }"
                 variant="text"
                 icon="mdi-dots-vertical"
+                color="gray-600"
               />
             </template>
           </v-tooltip>
@@ -70,10 +71,10 @@ const props = defineProps<CardProps>();
       </alex-custom-dropdown>
     </div>
     <div>
-      <p class="text-body-3 text-gray-600 ellipsis lines-4">
+      <p class="text-body-3 text-gray-600 ellipsis lines-3 mt-2">
         {{ item.description }}
       </p>
     </div>
+    <create-criteria ref="createCriteriaRef" />
   </div>
-  <create-criteria ref="createCriteriaRef" />
 </template>
