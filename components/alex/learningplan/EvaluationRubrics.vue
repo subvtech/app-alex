@@ -19,7 +19,11 @@ const props = defineProps<{
   data: rubricRow[];
 }>();
 
-const dropdownItems = ref<criterionType[]>([...(props.criteria || [])]);
+// const dropdownItems = ref<criterionType[]>([...(props.criteria || [])]);
+const dropdownItems = computed(() => {
+  const selectedIds = content.value.map((row) => row.criterion.id);
+  return props.criteria.filter((item) => !selectedIds.includes(item.id));
+});
 
 const defaultRow = {
   criterion: { text: '', id: 0 },
@@ -41,7 +45,7 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
 };
 
 const removeRow = (index: number) => {
-  content.value = content.value.splice(index, 1);
+  content.value.splice(index, 1);
 };
 
 const getContent = () => content.value;
@@ -81,7 +85,7 @@ defineExpose({ getContent });
                     class="criteria-chip"
                     @click="rows.criterion.text && editable ? removeRow(index) : null"
                   >
-                    <span class="text-wrap ellipsis lines-1">
+                    <span class="text-wrap ellipsis lines-1 tw-max-w-[175px]">
                       {{
                         content[index].criterion.text || $t('components.learningPlan.evaluationRubrics.selectCriterion')
                       }}
