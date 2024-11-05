@@ -17,10 +17,9 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <div class="mx-auto my-6 px-sm-6 px-md-0 w-100">
+    <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 editor">
       <tip-tap
         v-model="editorContent"
-        class="editor"
         :doc-name="docName"
         :edit="!isReadOnly"
         :collaboration="!!docName"
