@@ -42,7 +42,6 @@ const emits = defineEmits(['onClose', 'toggleFullscreen']);
 const fullscreenRef = ref(props.isFullscreen);
 
 const toggleFullscreen = () => {
-  console.log('toggleFullscreen');
   fullscreenRef.value = !fullscreenRef.value;
   emits('toggleFullscreen', fullscreenRef.value);
 };
