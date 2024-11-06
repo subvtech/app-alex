@@ -1,12 +1,12 @@
 <template>
-  <v-container fluid class="tw-flex tw-flex-col tw-gap-6">
+  <div fluid class="tw-flex tw-flex-col tw-gap-6 flex-grow-1">
     <alex-custom-breadcrumbs
       class="tw-items-center"
       breadcrumbsVClasses="pt-2 flex-wrap"
       :title="$t('pages.evaluations.my_evaluations')"
       :items="breadCrumbs"
     />
-    <v-col class="tw-bg-white tw-rounded">
+    <v-col class="bg-white tw-rounded d-flex flex-column">
       <alex-custom-tabs
         v-model="selectedOption"
         :tabs="tabs"
@@ -15,11 +15,9 @@
       >
       </alex-custom-tabs>
       <div class="w-100 tw-h-[1px] bg-gray-100"></div>
-      <div>
-        <NuxtPage :key="selectedOption" />
-      </div>
+      <NuxtPage :key="selectedOption" />
     </v-col>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">

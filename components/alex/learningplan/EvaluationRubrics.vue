@@ -18,6 +18,7 @@ const props = withDefaults(
     criteria?: criterionType[];
     data?: rubricRow[];
     editable: boolean;
+    readonly?: boolean;
     headers?: {
       excellent: string;
       good: string;
@@ -30,6 +31,7 @@ const props = withDefaults(
     data: () => [],
     editable: false,
     headers: undefined,
+    readonly: false,
   },
 );
 
@@ -107,7 +109,7 @@ defineExpose({ getContent });
       <v-slide-y-transition group mode="out-in">
         <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
           <td>
-            <div class="w-100 h-100 pt-2" :class="editable && 'edit-chip'">
+            <div class="w-100 h-100 pt-2" :class="editable && !readonly && 'edit-chip'">
               <alex-custom-dropdown
                 :items="dropdownItems"
                 :on-item-select="(item) => onCriteriaSelect(item, index)"
@@ -148,7 +150,7 @@ defineExpose({ getContent });
               @click="onCellSelect(rating as 'excellent' | 'good' | 'reasonable' | 'bad', index)"
             >
               <alex-inputs-radio-button
-                v-if="!editable"
+                v-if="!editable && !readonly"
                 v-model="content[index].selected"
                 :buttons="[{ value: rating }]"
                 hide-details
