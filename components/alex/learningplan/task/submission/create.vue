@@ -469,7 +469,8 @@ const finalGrade = computed(() => {
 
   const totalGrade = grades?.reduce((total, grade) => total + grade, 0);
 
-  return totalGrade / totalWeight;
+  const grade = totalGrade / totalWeight;
+  return grade.toFixed(2);
 });
 
 watch(editorContent, (_, previous) => {
