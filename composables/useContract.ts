@@ -42,6 +42,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
   const isThereBalance = computed(() => contractBalance.value > 0);
   const isThereAContract = computed(() => !!contractAddress.value);
 
+  const deployContract = ref<(() => Promise<string | undefined>) | null>(null);
   const fetchContractBalance = async () => {
     if (!contractAddress.value) return;
     const balance = await getContractBalance();
@@ -284,6 +285,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
     getContractBalance,
     getRewardStudentsFee,
     loading,
+    deployContract,
     getContractReward,
     fetchContractReward,
     hasTheStudentBeenPaid,
