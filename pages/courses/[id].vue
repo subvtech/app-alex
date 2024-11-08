@@ -176,6 +176,12 @@ const generalLinks = computed<TabType[]>(() => [
           classes: 'ml-auto',
         },
       ]
-    : []),
+    : [
+        {
+          label: i18n.t('pages.courses.panel'),
+          value: 6,
+          to: `/courses/${learningPlanId.value}/panel`,
+        },
+      ]),
 ]);
 </script>
