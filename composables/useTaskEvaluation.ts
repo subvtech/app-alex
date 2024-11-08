@@ -79,10 +79,51 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
                 $null: true,
               },
             },
-            populate: ['evaluation_criterias'],
+            populate: {
+              task_submission_evaluations: true,
+              evaluation_criterias: {
+                sort: 'id:asc',
+              },
+              rubric_grade_levels: {
+                populate: {
+                  grade_level_criterias: {
+                    populate: {
+                      evaluation_criterion: true,
+                    },
+                    sort: 'id:asc',
+                  },
+                },
+              },
+            },
           });
 
           return groups.data;
+        },
+      });
+    },
+    createUserEvaluationGroupMutation() {
+      return useMutation({
+        mutationFn: (id) => {
+          return strapi.delete('evaluation-groups', id);
+        },
+        onError(e) {
+          console.error(e);
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: userEvaluationCriteriaQuery });
+        },
+      });
+    },
+    deleteUserEvaluationGroupMutation() {
+      return useMutation({
+        mutationFn: (id) => {
+          return strapi.delete('evaluation-groups', id);
+        },
+        onError(e) {
+          console.error(e);
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: userEvaluationCriteriaQuery });
         },
       });
     },

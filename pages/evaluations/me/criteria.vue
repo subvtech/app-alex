@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Empty from './-components/EmptyState.vue';
 import Card from './-components/card.vue';
 import createCriteria from './-components/daialogs/createCriteria.vue';
+import Empty from './-components/EmptyState.vue';
 
 const search = ref('');
 const page = ref(1);
@@ -88,7 +88,7 @@ const setTableData = (items: readonly Item[]): Criteria[] => {
         <div
           class="d-flex w-full tw-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3 mt-auto"
         >
-          <p class="show-cardlist text-body-3 text-gray-600">
+          <p class="show-cardlist text-body-3 text-gray-600" :class="pageCount === 1 && 'text-center tw-mx-auto'">
             {{ showingData(groupedItems, cards) }}
           </p>
           <alex-custom-pagination

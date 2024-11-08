@@ -95,34 +95,40 @@
       <!-- Pagination -->
       <template #bottom
         ><div
-          v-if="items.length"
+          v-if="filteredItems.length"
           class="d-flex tw-justify-between md:tw-flex-row tw-flex-col align-center tw-flex-wrap py-6 tw-gap-[8px] tw-text-center md:tw-text-start"
         >
-          <p class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none">
+          <p
+            class="tw-flex-1 tw-min-w-[250px] text-body-3 text-gray-600 !tw-leading-none"
+            :class="paginationLength === 1 && 'text-center'"
+          >
             {{ paginationText }}
           </p>
           <alex-custom-pagination
+            v-if="paginationLength > 1"
             v-model="activePage"
-            :length="Math.floor(totalItems / itemsPerPage) || 1"
+            :length="paginationLength"
             total-visible="5"
           /></div
       ></template>
     </v-data-table>
 
-    <Create v-model="createModal" :edit-content="editContent" @update="() => getData()" />
+    <Create v-model="createModal" :edit-content="editContent" @update="refresh" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useStrapiUtils } from '~/composables/useStrapiUtils';
 import { useMessageStore } from '~/stores/message';
 import Empty from './-components/EmptyState.vue';
 import Create from './-components/groups/Create.vue';
 
 const { t } = useI18n();
-const { find } = useStrapiUtils();
 const { setMessage } = useMessageStore();
-const strapi = useStrapi();
+const user = useStrapiUser();
+const { getUserEvaluationGroupsByType, deleteUserEvaluationGroupMutation } = useTaskEvaluation(0, 0, user);
+
+const { data: items, refetch: refresh } = getUserEvaluationGroupsByType('standard');
+const { mutateAsync: deleteUserEvaluationGroup } = deleteUserEvaluationGroupMutation();
 
 const i18Dir = 'pages.evaluations.groupsSec';
 
@@ -133,7 +139,7 @@ const headers = [
   { key: 'options', sortable: false },
 ];
 
-const items = ref([]);
+// const items = ref([]);
 const search = ref<string>('');
 const type = ref<string | null>(null);
 
@@ -149,15 +155,16 @@ const filteredItems = computed(() => {
     typeFilter = 'public';
   }
 
-  filtered = items.value.filter((item) => {
-    if (typeFilter === 'public') {
-      return !!item.public;
-    } else if (typeFilter === 'private') {
-      return !item.public;
-    }
+  filtered =
+    items.value?.filter((item) => {
+      if (typeFilter === 'public') {
+        return !!item.public;
+      } else if (typeFilter === 'private') {
+        return !item.public;
+      }
 
-    return true;
-  });
+      return true;
+    }) ?? [];
 
   // Filter by name or criteria
   filtered = filtered.filter(({ name, criteria }) => {
@@ -172,7 +179,12 @@ const filteredItems = computed(() => {
     return false;
   });
 
-  return filtered;
+  return filtered.map((group) => ({
+    name: group.name,
+    criteria: group.evaluation_criterias.map(({ name }) => name),
+    public: group.public,
+    options: group,
+  }));
 });
 
 const slicedItems = computed(() => {
@@ -184,32 +196,7 @@ const slicedItems = computed(() => {
 
 const totalItems = computed<number>(() => filteredItems.value.length);
 
-const getData = () => {
-  find('evaluation-groups', {
-    filters: {
-      type: 'standard',
-    },
-    populate: {
-      task_submission_evaluations: true,
-      evaluation_criterias: true,
-    },
-  })
-    .then(({ data }) => {
-      items.value = data.map((group) => ({
-        name: group.name,
-        criteria: group.evaluation_criterias.map(({ name }) => name),
-        public: group.public,
-        options: group,
-      }));
-    })
-    .catch((e) => {
-      console.error(e);
-      setMessage(t(`${i18Dir}.loadFail`), 'error', true);
-    });
-};
-
 const editGroup = (group) => {
-  console.log(group);
   createModal.value = true;
   editContent.value = group;
 };
@@ -221,8 +208,8 @@ const deleteGroup = async (group) => {
   }
 
   try {
-    await strapi.delete('evaluation-groups', group.id);
-    await getData();
+    await deleteUserEvaluationGroup(group.id);
+    await refresh();
     setMessage(t(`${i18Dir}.deleteSuccess`), 'success', true);
   } catch (e) {
     console.error(e);
@@ -239,6 +226,11 @@ const itemsPerPage = 10;
 
 const activePage = ref<number>(0);
 
+const paginationLength = computed<number>(() => {
+  const add = totalItems.value % itemsPerPage ? 1 : 0;
+  return Math.floor(totalItems.value / itemsPerPage + add) || 1;
+});
+
 const paginationText = computed<string>(() => {
   const from = (activePage.value - 1) * itemsPerPage + 1;
   const to = Math.min(activePage.value * itemsPerPage, totalItems.value);
@@ -252,10 +244,6 @@ const paginationText = computed<string>(() => {
 });
 
 // Events
-onMounted(() => {
-  getData();
-});
-
 watch(totalItems, (val) => {
   if (activePage.value > Math.floor(val / itemsPerPage) || 1) {
     activePage.value = Math.floor(val / itemsPerPage) || 1;

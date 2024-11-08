@@ -71,6 +71,7 @@ const { setMessage } = useMessageStore();
 const { create, update } = useStrapi();
 const { find } = useStrapiUtils();
 const { t } = useI18n();
+const user = useStrapiUser();
 
 const props = defineProps<ModalProps>();
 
@@ -86,7 +87,11 @@ const criteriaOptions = ref<any>([]);
 
 const getCriteria = async () => {
   try {
-    const res = await find('evaluation-criterias');
+    const res = await find('evaluation-criterias', {
+      filters: {
+        $or: [{ public: true }, { user: user.value?.id ?? null }],
+      },
+    });
     criteriaOptions.value = res.data;
   } catch (e) {
     console.error(e);
@@ -130,6 +135,7 @@ const createGroup = async () => {
       name: name.value,
       type: 'standard',
       evaluation_criterias: criteria.value,
+      user: user.value?.id ?? null,
     });
     setMessage(t(`${i18Dir}.createSuccess`), 'success', true);
     emit('update');
