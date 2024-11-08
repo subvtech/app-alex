@@ -17,7 +17,7 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 editor">
+    <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 editor tw-max-w-full">
       <tip-tap
         v-model="editorContent"
         :doc-name="docName"
@@ -87,11 +87,11 @@
       ]"
     />
     <div
-      class="w-full d-flex tw-flex-col-reverse tw-items-center lg:tw-flex-row lg:tw-items-start tw-relative gap-6 tw-justify-center pa-6"
+      class="w-full d-flex tw-flex-col-reverse tw-items-center lg:tw-flex-row lg:tw-items-start tw-relative gap-6 pa-6"
     >
-      <v-tabs-window v-model="tab" class="editor">
-        <v-tabs-window-item value="content">
-          <div class="mx-auto px-sm-6 px-md-0 d-flex justify-center">
+      <v-tabs-window v-model="tab" class="w-75">
+        <v-tabs-window-item value="content" class="w-100">
+          <div class="mx-auto px-sm-6 px-md-0 d-flex justify-center editor tw-max-w-full">
             <tip-tap
               v-model="editorContent"
               class=""
@@ -104,61 +104,71 @@
           </div>
         </v-tabs-window-item>
         <v-tabs-window-item value="evaluation">
-          <div class="mx-auto px-sm-6 px-md-0 w-100 d-flex flex-wrap">
-            <div class="d-flex flex-wrap justify-space-between">
-              <div class="d-flex flex-wrap">
-                <h3 class="text-h3 text-gray-700 w-100">
-                  {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }}:
-                </h3>
-                <p class="text-gray-700 text-subtitle-2">
-                  {{ taskSubmissionEvaluationData?.evaluation_group?.name }}
-                </p>
-                <div class="tw-w-full d-flex flex-wrap gap-2 mt-4 tw-mb-[80px]">
-                  <template v-if="taskSubmissionEvaluationData?.evaluation_group?.type === 'standard'">
-                    <div
-                      v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
-                      :key="`criteria-evaluation-grade-${i}`"
-                      class="tw-border rounded-lg pt-4 tw-w-full sm:tw-w-[300px] tw-max-h-[230px] tw-h-full tw-justify-between d-flex tw-flex-col"
-                    >
-                      <div class="px-4">
-                        <h5 class="text-secondary-0 text-h5 ellipsis lines-1 mb-2">
-                          {{ evaluation_criteria.criteria.criteria.name }}
-                        </h5>
-                        <p class="text-body-3 text-gray-600 ellipsis lines-6 tw-max-h-[115px] tw-h-full mb-2">
-                          {{ evaluation_criteria.criteria.criteria.description }}
-                        </p>
-                      </div>
-                      <div class="tw-border-t">
-                        <span v-if="taskSubmissionEvaluationData.evaluated_at" class="text-center text-gray-600">{{
-                          evaluation_criteria.grade || 'Nao avaliado'
-                        }}</span>
-                        <v-number-input
-                          v-else
-                          :model-value="evaluation_criteria.grade || 0"
-                          :name="`criteria-evaluation-grade-${evaluation_criteria.id}`"
-                          class="w-full text-gray-600"
-                          density="compact"
-                          control-variant="split"
-                          hide-details
-                          variant="outlined"
-                          base-color="transparent"
-                          color="secondary-0"
-                          :min="0"
-                          :max="10"
-                          :step="0.5"
-                          @update:model-value="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
-                        />
-                      </div>
+          <div class="mx-auto px-sm-6 px-md-0 w-100">
+            <div class="d-flex flex-wrap">
+              <h3 class="text-h3 text-gray-700 w-100">
+                {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }}:
+              </h3>
+              <p class="text-gray-700 text-subtitle-2">
+                {{ taskSubmissionEvaluationData?.evaluation_group?.name }}
+              </p>
+              <div class="tw-w-full flex-wrap gap-2 mt-4 tw-pb-[150px] sm:tw-pb-0">
+                <div v-if="taskSubmissionEvaluationData?.evaluation_group?.type === 'standard'" class="d-flex gap-2">
+                  <div
+                    v-for="(evaluation_criteria, i) in taskSubmissionEvaluationData.criteria_evaluations"
+                    :key="`criteria-evaluation-grade-${i}`"
+                    class="tw-border rounded-lg pt-4 tw-w-full sm:tw-w-[300px] tw-max-h-[230px] tw-justify-between d-flex tw-flex-col"
+                  >
+                    <div class="px-4">
+                      <h5 class="text-secondary-0 text-h5 ellipsis lines-1 mb-2">
+                        {{ evaluation_criteria.criteria.criteria.name }}
+                      </h5>
+                      <p class="text-body-3 text-gray-600 ellipsis lines-6 tw-max-h-[115px] tw-h-full mb-2">
+                        {{ evaluation_criteria.criteria.criteria.description }}
+                      </p>
                     </div>
-                  </template>
-                  <div v-else>Componente de rubrica</div>
+                    <div class="tw-border-t">
+                      <span v-if="taskSubmissionEvaluationData.evaluated_at" class="text-center text-gray-600">{{
+                        evaluation_criteria.grade || 'Nao avaliado'
+                      }}</span>
+                      <v-number-input
+                        v-else
+                        :model-value="evaluation_criteria.grade || 0"
+                        :name="`criteria-evaluation-grade-${evaluation_criteria.id}`"
+                        class="w-full text-gray-600"
+                        density="compact"
+                        control-variant="split"
+                        hide-details
+                        variant="outlined"
+                        base-color="transparent"
+                        color="secondary-0"
+                        :min="0"
+                        :max="10"
+                        :step="0.5"
+                        @update:model-value="(grade) => onCriteriaGrading(grade, evaluation_criteria.id)"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="">
+                  <alex-learningplan-evaluation-rubrics
+                    class="tw-w-full !tw-min-h-full"
+                    :editable="false"
+                    :data="rubricRows"
+                    :headers="headers"
+                    @cell-selected="(data) => onCriteriaGrading(data.grade, data.criterion.id, true)"
+                  />
                 </div>
               </div>
             </div>
           </div>
         </v-tabs-window-item>
       </v-tabs-window>
-      <div class="d-flex gap-2 flex-wrap tw-w-[400px] tw-border pa-6 rounded-lg text-body-1 text-gray-800">
+      <div
+        class="d-flex gap-2 flex-wrap tw-w-[400px] tw-border pa-6 rounded-lg text-body-1 text-gray-800 tw-transition-all"
+        :class="tab === 'evaluation' && 'tw-mt-[68px]'"
+      >
         <h3 class="text-gray-800 text-h3 mb-4">Avaliação de Entrega</h3>
         <div class="w-100 d-flex justify-space-between">
           Tipo:
@@ -226,6 +236,34 @@ interface submissionProps {
   student?: Student;
   studentClass?: string;
 }
+
+type criterionType = {
+  text: string;
+  id: number;
+};
+
+type rubricRow = {
+  criterion: criterionType;
+  excellent: string;
+  good: string;
+  reasonable: string;
+  bad: string;
+  selected?: 'excellent' | 'good' | 'reasonable' | 'bad';
+};
+
+type CriteriaEvaluation = {
+  id: number;
+  grade: number | null;
+  criteria: {
+    id: number;
+    weight: number;
+    criteria: {
+      id: number;
+      name: string;
+      description: string;
+    };
+  };
+};
 
 const props = withDefaults(defineProps<submissionProps>(), {
   title: '',
@@ -298,6 +336,97 @@ const rubricGradeLevels = computed(() => {
   });
 });
 
+const headers = computed(() => {
+  const headers = {
+    excellent: '',
+    good: '',
+    reasonable: '',
+    poor: '',
+  };
+
+  for (const gradeLevel of taskSubmissionEvaluationData.value?.evaluation_group.rubric_grade_levels) {
+    switch (gradeLevel.grade) {
+      case 10:
+        headers.excellent = gradeLevel.title;
+        break;
+      case 7.5:
+        headers.good = gradeLevel.title;
+        break;
+      case 5:
+        headers.reasonable = gradeLevel.title;
+        break;
+      case 2.5:
+        headers.poor = gradeLevel.title;
+        break;
+    }
+  }
+  return headers;
+});
+
+const gradeToRating = (grade: number | null): 'excellent' | 'good' | 'reasonable' | 'bad' | undefined => {
+  switch (grade) {
+    case 10:
+      return 'excellent';
+    case 7.5:
+      return 'good';
+    case 5:
+      return 'reasonable';
+    case 2.5:
+      return 'bad';
+    default:
+      return undefined;
+  }
+};
+
+const rubricRows = computed<rubricRow[]>(() => {
+  const criteriaEvaluationsMap = new Map<number, CriteriaEvaluation>();
+  for (const evaluation of taskSubmissionEvaluationData.value?.criteria_evaluations) {
+    criteriaEvaluationsMap.set(evaluation.criteria.criteria.id, evaluation);
+  }
+
+  const rowsMap = new Map<number, rubricRow>();
+
+  for (const gradeLevel of taskSubmissionEvaluationData.value?.evaluation_group.rubric_grade_levels) {
+    for (const gradeCriteria of gradeLevel.grade_level_criterias) {
+      const criteriaId = gradeCriteria.criteria.id;
+      const evaluation = criteriaEvaluationsMap.get(criteriaId);
+
+      if (evaluation) {
+        if (!rowsMap.has(criteriaId)) {
+          rowsMap.set(criteriaId, {
+            criterion: { text: evaluation.criteria.criteria.name, id: criteriaId },
+            excellent: '',
+            good: '',
+            reasonable: '',
+            bad: '',
+            selected: gradeToRating(evaluation.grade),
+          });
+        }
+
+        const row = rowsMap.get(criteriaId);
+        if (row) {
+          switch (gradeLevel.grade) {
+            case 10:
+              row.excellent = gradeCriteria.justification;
+              break;
+            case 7.5:
+              row.good = gradeCriteria.justification;
+              break;
+            case 5:
+              row.reasonable = gradeCriteria.justification;
+              break;
+            case 2.5:
+              row.bad = gradeCriteria.justification;
+              break;
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(rowsMap.values());
+});
+
 const criteriaWithGradeLevels = computed(() => {
   return taskSubmissionEvaluationData.value.criteria_evaluations.map((ce) => {
     const gradeLevels = rubricGradeLevels.value.map((g) => {
@@ -311,22 +440,14 @@ const criteriaWithGradeLevels = computed(() => {
 
 const queryClient = useQueryClient();
 
-const onCriteriaGrading = (grade, criteriaId) => {
+const onCriteriaGrading = (grade, criteriaId, isRubric?) => {
   const evaluationData = structuredClone(toRaw(taskSubmissionEvaluationData.value));
 
-  const criteriaIdx = evaluationData.criteria_evaluations.findIndex((c) => c.id === criteriaId);
+  const criteriaIdx = isRubric
+    ? evaluationData.criteria_evaluations.findIndex((c) => c.criteria.criteria.id === criteriaId)
+    : evaluationData.criteria_evaluations.findIndex((c) => c.id === criteriaId);
 
-  let realGrade;
-
-  if (Number.parseInt(grade) > 10) {
-    realGrade = '10';
-  } else if (Number.parseInt(grade) < 0) {
-    realGrade = '0';
-  } else {
-    realGrade = grade;
-  }
-
-  evaluationData.criteria_evaluations[criteriaIdx].grade = realGrade;
+  evaluationData.criteria_evaluations[criteriaIdx].grade = grade;
   queryClient.setQueryData(['taskSumbmissionEvaluationData', submissionId], evaluationData);
 
   updateEvaluationGrades({
@@ -348,7 +469,8 @@ const finalGrade = computed(() => {
 
   const totalGrade = grades?.reduce((total, grade) => total + grade, 0);
 
-  return totalGrade / totalWeight;
+  const grade = totalGrade / totalWeight;
+  return grade.toFixed(2);
 });
 
 watch(editorContent, (_, previous) => {

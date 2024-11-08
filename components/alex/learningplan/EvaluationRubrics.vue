@@ -13,13 +13,30 @@ type rubricRow = {
   selected?: 'excellent' | 'good' | 'reasonable' | 'bad';
 };
 
-const props = defineProps<{
-  editable: boolean;
-  criteria: criterionType[];
-  data: rubricRow[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    criteria?: criterionType[];
+    data?: rubricRow[];
+    editable: boolean;
+    readonly?: boolean;
+    headers?: {
+      excellent: string;
+      good: string;
+      reasonable: string;
+      poor: string;
+    };
+  }>(),
+  {
+    criteria: () => [],
+    data: () => [],
+    editable: false,
+    headers: undefined,
+    readonly: false,
+  },
+);
 
-// const dropdownItems = ref<criterionType[]>([...(props.criteria || [])]);
+const emit = defineEmits(['cell-selected']);
+
 const dropdownItems = computed(() => {
   const selectedIds = content.value.map((row) => row.criterion.id);
   return props.criteria.filter((item) => !selectedIds.includes(item.id));
@@ -50,25 +67,49 @@ const removeRow = (index: number) => {
 
 const getContent = () => content.value;
 
+const gradeMapping = {
+  excellent: 10,
+  good: 7.5,
+  reasonable: 5,
+  bad: 2.5,
+};
+
+const onCellSelect = (rating: 'excellent' | 'good' | 'reasonable' | 'bad', index: number) => {
+  content.value[index].selected = rating;
+  const criterion = content.value[index].criterion;
+  const grade = gradeMapping[rating];
+  emit('cell-selected', { criterion, grade });
+};
+
 defineExpose({ getContent });
 </script>
 
 <template>
-  <v-table fixed-header :height="500" class="rubrics-table overflow-auto tw-an">
+  <v-table fixed-header :height="500" class="rubrics-table overflow-auto">
     <thead class="rounded-t-lg bg-gray-800">
       <tr class="text-gray-100 text-h5">
-        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.criterion') }}</th>
-        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.excellent') }} (10)</th>
-        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.good') }} (7.5)</th>
-        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.reasonable') }} (5)</th>
-        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.poor') }} (2.5)</th>
+        <th class="text-left">
+          {{ $t('components.learningPlan.evaluationRubrics.headers.criterion') }}
+        </th>
+        <th class="text-left">
+          {{ headers?.excellent || $t('components.learningPlan.evaluationRubrics.headers.excellent') }} (10)
+        </th>
+        <th class="text-left">
+          {{ headers?.good || $t('components.learningPlan.evaluationRubrics.headers.good') }} (7.5)
+        </th>
+        <th class="text-left">
+          {{ headers?.reasonable || $t('components.learningPlan.evaluationRubrics.headers.reasonable') }} (5)
+        </th>
+        <th class="text-left">
+          {{ headers?.poor || $t('components.learningPlan.evaluationRubrics.headers.poor') }} (2.5)
+        </th>
       </tr>
     </thead>
     <tbody>
       <v-slide-y-transition group mode="out-in">
         <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
           <td>
-            <div class="w-100 h-100 pt-2" :class="editable && 'edit-chip'">
+            <div class="w-100 h-100 pt-2" :class="editable && !readonly && 'edit-chip'">
               <alex-custom-dropdown
                 :items="dropdownItems"
                 :on-item-select="(item) => onCriteriaSelect(item, index)"
@@ -106,10 +147,10 @@ defineExpose({ getContent });
                 content[index].selected === rating && !editable && 'selected-border',
                 !editable && 'cursor-pointer tw-select-none rubric-card',
               ]"
-              @click="content[index].selected = rating as 'excellent' | 'good' | 'reasonable' | 'bad'"
+              @click="onCellSelect(rating as 'excellent' | 'good' | 'reasonable' | 'bad', index)"
             >
               <alex-inputs-radio-button
-                v-if="!editable"
+                v-if="!editable && !readonly"
                 v-model="content[index].selected"
                 :buttons="[{ value: rating }]"
                 hide-details

@@ -1,18 +1,11 @@
 <template>
   <v-app class="tw-relative">
     <app-snackbar />
-    <alex-custom-sidebar
-      v-model="drawer"
-      v-model:clipped="clipped"
-      :blocks="menus"
-      :is-permanent="isPermanent"
-    />
+    <alex-custom-sidebar v-model="drawer" v-model:clipped="clipped" :blocks="menus" :is-permanent="isPermanent" />
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :class="
-        clipped ? 'clipped-sidebar main-header-app' : 'sidebar main-header-app'
-      "
+      :class="clipped ? 'clipped-sidebar main-header-app' : 'sidebar main-header-app'"
       :avatar="user?.avatar"
       :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
@@ -20,13 +13,8 @@
       show-picture
       @toggle:drawer="closeDrawable(!clipped)"
     />
-    <v-main
-      class="bg-gray-blue pt-16 tw-flex tw-flex-col tw-grow"
-      :class="clipped ? 'clipped-sidebar' : 'sidebar'"
-    >
-      <v-container
-        class="tw-flex tw-flex-col tw-grow pa-4 pa-sm-6 max-width-100"
-      >
+    <v-main class="bg-gray-blue pt-16 tw-flex tw-flex-col tw-grow" :class="clipped ? 'clipped-sidebar' : 'sidebar'">
+      <v-container class="tw-flex tw-flex-col tw-grow pa-4 pa-sm-6 max-width-100">
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -210,11 +198,15 @@ const defaultMenus: Menu[] = [
         title: 'Meus Projetos',
         to: '/projects/me',
       },
-      {
-        icon:'alex:FactCheck',
-        title:i18n.t('layouts.default.evaluations'),
-        to:'/evaluations'
-      }
+      ...(user.value?.role.name === 'Professor'
+        ? [
+            {
+              icon: 'alex:FactCheck',
+              title: i18n.t('layouts.default.evaluations'),
+              to: '/evaluations',
+            },
+          ]
+        : []),
       // {
       //   icon: 'mdi-clipboard-multiple-outline',
       //   title: i18n.t('layouts.default.myProjects'),
@@ -301,14 +293,9 @@ const adminMenus = [
 ];
 
 const menus = computed(() => {
-  const newMenus =
-    user.value?.role?.name === 'ADMIN'
-      ? defaultMenus.concat(adminMenus)
-      : defaultMenus;
+  const newMenus = user.value?.role?.name === 'ADMIN' ? defaultMenus.concat(adminMenus) : defaultMenus;
 
-  return config.public.showComponentsPage
-    ? newMenus.concat(componentsMenu)
-    : newMenus;
+  return config.public.showComponentsPage ? newMenus.concat(componentsMenu) : newMenus;
 });
 </script>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Card from './-components/card.vue';
 import Empty from './-components/EmptyState.vue';
+import Card from './-components/card.vue';
 import createCriteria from './-components/daialogs/createCriteria.vue';
 
 const search = ref('');
@@ -54,48 +54,52 @@ const setTableData = (items: readonly Item[]): Criteria[] => {
 </script>
 
 <template>
-  <div class="tw-flex tw-p-6 tw-justify-between">
-    <alex-inputs-text-field
-      v-model="search"
-      name="search"
-      :placeholder="$t('pages.evaluations.search_criteria')"
-      prepend-inner-icon="mdi-magnify"
-      density="comfortable"
-      class="tw-w-[320px]"
-    />
-    <alex-custom-button size="large" @click="showDialog">
-      {{ t('pages.evaluations.new_criteria') }}
-      <createCriteria ref="createCriteriaRef" />
-    </alex-custom-button>
+  <div class="flex-grow-1 d-flex flex-column">
+    <div class="tw-flex tw-p-6 tw-justify-between">
+      <alex-inputs-text-field
+        v-model="search"
+        name="search"
+        :placeholder="$t('pages.evaluations.search_criteria')"
+        prepend-inner-icon="mdi-magnify"
+        density="comfortable"
+        class="tw-w-[320px]"
+      />
+      <alex-custom-button size="large" @click="showDialog">
+        {{ t('pages.evaluations.new_criteria') }}
+        <createCriteria ref="createCriteriaRef" />
+      </alex-custom-button>
+    </div>
+    <div v-if="cards?.length === 0">
+      <Empty :emptyMessage="$t('pages.evaluations.no_criteria')" />
+    </div>
+    <v-data-iterator
+      v-model:search="search"
+      v-model:page="page"
+      :items="cards"
+      :items-per-page="itemsPerPageValue"
+      class="d-flex tw-flex-col tw-flex-grow h-full"
+    >
+      <template #default="{ items }">
+        <div class="d-flex flex-wrap gap-6 w-100 px-6">
+          <Card v-for="(item, index) in setTableData(items)" :key="item.id" :item="item" />
+        </div>
+      </template>
+      <template #footer="{ pageCount, groupedItems }">
+        <div
+          class="d-flex w-full tw-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3 mt-auto"
+        >
+          <p class="show-cardlist text-body-3 text-gray-600">
+            {{ showingData(groupedItems, cards) }}
+          </p>
+          <alex-custom-pagination
+            v-if="pageCount > 1"
+            v-model="page"
+            :length="pageCount"
+            :total-visible="itemsPerPageValue"
+            class="extra-mb"
+          />
+        </div>
+      </template>
+    </v-data-iterator>
   </div>
-  <div v-if="cards?.length === 0">
-    <Empty :emptyMessage="$t('pages.evaluations.no_criteria')" />
-  </div>
-  <v-data-iterator
-    v-model:search="search"
-    v-model:page="page"
-    :items="cards"
-    :items-per-page="itemsPerPageValue"
-    class="d-flex tw-flex-col tw-flex-grow h-full"
-  >
-    <template #default="{ items }">
-      <div class="d-flex flex-wrap gap-6 w-100 px-6">
-        <Card v-for="(item, index) in setTableData(items)" :key="item.id" :item="item" />
-      </div>
-    </template>
-    <template #footer="{ pageCount, groupedItems }">
-      <div class="d-flex w-full th-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3">
-        <p class="show-cardlist text-body-3 text-gray-600">
-          {{ showingData(groupedItems, cards) }}
-        </p>
-
-        <alex-custom-pagination
-          v-model="page"
-          :length="pageCount"
-          :total-visible="itemsPerPageValue"
-          class="extra-mb"
-        />
-      </div>
-    </template>
-  </v-data-iterator>
 </template>

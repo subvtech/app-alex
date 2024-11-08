@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex-grow-1 d-flex flex-column">
     <!-- Header -->
     <div class="pa-6 d-flex tw-flex-col sm:tw-flex-row tw-items-stretch tw-gap-[12px] sm:tw-gap-[16px]">
       <alex-inputs-text-field
@@ -17,6 +17,7 @@
         class="criteria-group-select sm:tw-max-w-[240px] sm:tw-flex-[1_1_150px]"
         :items="[$t(`${i18Dir}.public`), $t(`${i18Dir}.private`)]"
         :placeholder="$t(`${i18Dir}.type`)"
+        name="select"
         density="comfortable"
         clearable
       />
@@ -31,7 +32,7 @@
 
     <!-- Content -->
     <v-data-table
-      class="criteria-groups-table px-6 pb-6"
+      class="criteria-groups-table px-6 pb-6 tw-flex-grow"
       :headers="headers"
       :items="slicedItems"
       :items-per-page="itemsPerPage"
