@@ -20,6 +20,8 @@
   "srchStudent": "Encontrar aluno",
   "expand": "...Ver mais",
   "retract": "...Ver menos",
+  "failLoadProgress": "Falha ao carregar progresso de estudante",
+  "failLoadGrades": "Falha ao carregar notas de estudante",
   "submission": {
     "submission": "Entrega",
     "no_submission": "Sem Entrega",

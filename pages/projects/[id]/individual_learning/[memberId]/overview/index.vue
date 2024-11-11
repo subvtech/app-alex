@@ -41,8 +41,7 @@ const totalizers = ref({
   },
 });
 
-const grades = [];
-
+const grades = ref<any>([]);
 const events = ref<FormattedEvent[]>([]);
 const yourGoals = ref<LearningGoalSimple[]>([]);
 
@@ -241,6 +240,40 @@ const getData = () => {
       };
     });
   });
+
+  // Get grades
+  find('task-members', {
+    filters: {
+      learning_plan_member: member.id,
+      task: {
+        learningplan: +route.params.id,
+      },
+      status: 'done',
+    },
+    populate: {
+      task: true,
+      task_submissions: {
+        populate: {
+          evaluations: {
+            sort: 'id:desc',
+          },
+        },
+        sort: 'id:desc',
+      },
+    },
+  })
+    .then(({ data }) => {
+      grades.value = data
+        .map((taskMember) => ({
+          name: taskMember?.task?.title ?? '',
+          grade: taskMember?.task_submissions?.[0]?.evaluations?.[0]?.grade,
+        }))
+        .filter(({ grade }) => grade !== undefined);
+    })
+    .catch((e) => {
+      console.error(e);
+      setMessage(t('components.courses.tasks.failLoadGrades'), 'error', true);
+    });
 };
 
 onBeforeMount(() => {
