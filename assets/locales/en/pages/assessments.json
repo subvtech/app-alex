@@ -1,5 +1,27 @@
 {
   "newAssessment": "New Assessment",
   "findAssessment": "Find Assessment",
-  "emptyStateText": "It seems that there are no assessments created!"
+  "emptyStateText": "It seems that there are no assessments created!",
+  "name": "Name",
+  "tasks": "Tasks",
+  "lastUpdate": "Last update",
+  "edit": "Edit",
+  "delete": "Delete",
+  "noTasksAssociated": "No tasks associated",
+  "noTitle": "No title",
+  "associatedTasks": "Associated tasks",
+  "addTask": "Add task",
+  "composition": "Composition",
+  "compositionDescription": "The composition of this assessment is determined by the weighted average of the evaluations.",
+  "noTasksAdded": "It seems that no tasks have been added",
+  "individual": "Individual",
+  "group": "Group",
+  "rubric": "Rubric",
+  "criteria": "Criteria",
+  "associateTask": "Associate task",
+  "associateLabel": "Which tasks do you want to associate?",
+  "associatePlaceholder": "Select tasks",
+  "associateEmpty": "No tasks with associated evaluation mode were found",
+  "cancel": "Cancel",
+  "save": "Save"
 }

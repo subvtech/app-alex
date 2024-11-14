@@ -23,10 +23,12 @@ type assessment = {
   id: number;
 };
 
+const i18Dir = 'pages.assessments';
+
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => learningPlanStore.learningPlan?.id);
 const user = useStrapiUser();
-// const { t } = useI18n();
+const { t } = useI18n();
 const i18n = useI18n();
 // const assessments = ref<assessment[]>();
 const page = ref(1);
@@ -34,7 +36,7 @@ const search = ref('');
 const isLoading = ref(false);
 const drawer = ref();
 
-const { getLearningPlanGrades, createGradeMutation, getLearningPlanTasks } = useTaskEvaluation(
+const { getLearningPlanGrades, createGradeMutation, deleteGradeMutation, getLearningPlanTasks } = useTaskEvaluation(
   learningPlanId,
   null,
   user,
@@ -52,11 +54,13 @@ const availableTasks = computed<tasksType[]>(() => {
   }));
 });
 
-const onCreateAsessment = () => {
+const onCreateAsessment = (newAssessment) => {
   // assessments.value[assessments.value.length - 1]
-  drawer.value.openDrawer();
+  drawer.value.openDrawer(newAssessment);
 };
+
 const { mutate: createGradeAssessment, isPending: creatingGradeAssessment } = createGradeMutation(onCreateAsessment);
+const { mutate: deleteGrade } = deleteGradeMutation();
 
 const createAssessment = () => {
   createGradeAssessment({ learningplan: learningPlanId.value });
@@ -88,17 +92,16 @@ const assessments = computed<assessment[]>(() => {
 
 const header = [
   {
-    title: 'Name',
+    title: t(`${i18Dir}.name`),
     key: 'name',
     with: 400,
   },
   {
-    title: 'Tasks',
+    title: t(`${i18Dir}.tasks`),
     key: 'tasks',
-    with: 540,
   },
   {
-    title: 'Last Update',
+    title: t(`${i18Dir}.lastUpdate`),
     key: 'lastUpdate',
   },
   {
@@ -124,15 +127,13 @@ const getRemainingTasks = (tasks: tasksType[]) => {
 // Todo: Delete functionality
 const dropdownItems = (assessments: assessment) => [
   {
-    // text: t('pages.assessments.edit'),
-    text: 'Edit',
+    text: t('pages.assessments.edit'),
     onClick: () => drawer.value.openDrawer(assessments),
   },
   {
-    // text: t('pages.assessments.delete'),
-    text: 'Delete',
+    text: t('pages.assessments.delete'),
     warning: true,
-    onClick: () => console.log('Delete assessment - ', assessments.name),
+    onClick: () => deleteGrade(assessments.id),
   },
 ];
 </script>
@@ -193,12 +194,12 @@ const dropdownItems = (assessments: assessment) => [
               <tr v-for="item in items" :key="item.id" class="text-5 text-no-wrap bg-white">
                 <td class="tw-w-[400px]">
                   <span class="text-gray-800 text-body-3 ellipsis lines-1 tw-break-words">
-                    {{ item.name || 'Sem titulo' }}
+                    {{ item.name || $t(`${i18Dir}.noTitle`) }}
                   </span>
                 </td>
-                <td class="tw-w-[540px] tw-overflow-x-scroll">
+                <td class="tw-overflow-x-auto">
                   <span v-if="!item.tasks?.length" class="text-gray-800 text-body-3 ellipsis lines-1 tw-break-words">
-                    Sem Tarefas Associadas
+                    {{ $t(`${i18Dir}.noTasksAssociated`) }}
                   </span>
                   <template v-for="(task, index) in item.tasks" :key="task">
                     <v-tooltip

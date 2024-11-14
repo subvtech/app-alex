@@ -23,7 +23,7 @@
       :placeholder="'(' + $t('components.learningPlan.drawer.missing.title') + ')'"
     ></alex-inputs-editable-text>
 
-    <h3 class="text-gray-800 text-h3 my-4">Tarefas associadas</h3>
+    <h3 class="text-gray-800 text-h3 my-4">{{ $t(`${i18Dir}.associatedTasks`) }}</h3>
     <div class="mt-4 mb-6 d-flex gap-4 flex-wrap">
       <div v-for="task in selectedTasks" :key="task.id" class="rounded-lg tw-border tw-w-[260px] tw-h-[120px] pa-4">
         <p class="d-flex justify-center">
@@ -38,7 +38,7 @@
             >mdi-format-list-bulleted</v-icon
           >
           <span>
-            <p class="text-gray-800 text-body-4">{{ task.type }}</p>
+            <p class="text-gray-800 text-body-4">{{ $t(`${i18Dir}.${task.type}`) }}</p>
             <p class="text-gray-600 text-body-3">{{ task.methodName }}</p>
           </span>
         </div>
@@ -49,23 +49,23 @@
       >
         <span class="text-body-3 text-black">
           <v-icon class="mr-2">mdi-plus</v-icon>
-          Adicionar Tarefa
+          {{ $t(`${i18Dir}.addTask`) }}
         </span>
       </div>
     </div>
-    <h3 class="text-gray-800 text-h3 mt-6">Composição</h3>
+    <h3 class="text-gray-800 text-h3 mt-6">{{ $t(`${i18Dir}.composition`) }}</h3>
     <p class="text-gray-600 text-body-1 my-4">
-      A composição dessa avaliação é formada pela média ponderada das avaliações.
+      {{ $t(`${i18Dir}.compositionDescription`) }}
     </p>
     <div class="w-100 tw-min-h-[250px] bg-gray-blue rounded-lg d-flex justify-center align-center tw-flex-col gap-4">
       <div v-if="!selectedTasks.length">
         <img src="/svg/emptyComposition.svg" class="mx-auto mb-4" />
-        <p class="text-gray-400 text-body-3">Parece que não foi adicionada nenhuma tarefa</p>
+        <p class="text-gray-400 text-body-3">{{ $t(`${i18Dir}.noTasksAdded`) }}</p>
       </div>
       <div v-else>
         <div class="d-flex flex-wrap pa-6 tw-justify-center">
           <div v-for="(task, index) in selectedTasks" :key="task.id" class="d-flex align-center mb-6">
-            <div class="pa-4 bg-white rounded-lg tw-w-[148px] d-flex justify-center align-center gap-4">
+            <div class="bg-white rounded-lg d-flex justify-center align-center gap-4 pa-4">
               <span class="text-secondary-0 text-body-2"> #{{ task.id }}</span>
               <span class="text-body-3 text-gray-500">X</span>
               <span
@@ -120,6 +120,8 @@ type assessmentType = {
   compositionId: number;
   tasks: taskType[];
 };
+
+const i18Dir = 'pages.assessments';
 
 const props = defineProps<{
   availableTasks: taskType[];

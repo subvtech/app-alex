@@ -1,5 +1,27 @@
 {
   "newAssessment": "Nova Avaliação",
   "findAssessment": "Encontrar Avaliação",
-  "emptyStateText": "Parece que não há avaliações criadas!"
+  "emptyStateText": "Parece que não há avaliações criadas!",
+  "name": "Nome",
+  "tasks": "Tarefas",
+  "lastUpdate": "Atualizado em",
+  "edit": "Editar",
+  "delete": "Deletar",
+  "noTasksAssociated": "Sem tarefas associadas",
+  "noTitle": "Sem título",
+  "associatedTasks": "Tarefas associadas",
+  "addTask": "Adicionar tarefa",
+  "composition": "Composição",
+  "compositionDescription": "A composição dessa avaliação é formada pela média ponderada das avaliações.",
+  "noTasksAdded": "Parece que nenhuma tarefa foi adicionada",
+  "individual": "Individual",
+  "group": "Grupo",
+  "rubric": "Rubrica",
+  "criteria": "Critérios",
+  "associateTask": "Associar tarefa",
+  "associateLabel": "Quais tarefas deseja associar?",
+  "associatePlaceholder": "Selecione as tarefas",
+  "associateEmpty": "Nenhuma tarefa com modo de avaliação associado foi encontrada",
+  "cancel": "Cancelar",
+  "save": "Salvar"
 }

@@ -286,7 +286,7 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
         },
       });
     },
-    createGradeMutation(sucessCallback: any = null) {
+    createGradeMutation(successCallback: any = null) {
       return useMutation({
         mutationFn: ({ learningplan }: any) => {
           return create('grades', { weight: 1, learningplan });
@@ -298,9 +298,22 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
             return oldGrades?.length ? [...oldGrades, result.data] : [result.data];
           });
 
-          if (sucessCallback) {
-            sucessCallback();
+          if (successCallback) {
+            successCallback(result.data);
           }
+        },
+      });
+    },
+    deleteGradeMutation() {
+      return useMutation({
+        mutationFn: (id: number) => {
+          return strapi.delete('grades', id);
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: learningPlanGradesQuery });
+        },
+        onError(e) {
+          console.error(e);
         },
       });
     },

@@ -1,7 +1,10 @@
 <template>
   <alex-custom-dialog
     v-model="openDialog"
+    :title="$t(`${i18Dir}.associateTask`)"
     :loading="isLoading"
+    :main-button-text="$t(`${i18Dir}.save`)"
+    :secondary-button-text="$t(`${i18Dir}.cancel`)"
     @on-main-action="() => associateTasks()"
     @on-secondary-action="openDialog = false"
   >
@@ -9,9 +12,9 @@
       v-model="selectedTasks"
       name="tasks"
       class="ellipsis lines-1"
-      label="Quais tarefas deseja associar?"
-      placeholder="Selecione as tarefas"
-      no-data-text="Nenhuma tarefa com modo de avaliação associado foi encontrada"
+      :label="$t(`${i18Dir}.associateLabel`)"
+      :placeholder="$t(`${i18Dir}.associatePlaceholder`)"
+      :no-data-text="$t(`${i18Dir}.associateEmpty`)"
       :items="props.available"
       item-title="title"
       item-value="id"
@@ -33,11 +36,11 @@
                 />
                 <span v-if="item.raw?.isGroup">
                   <v-icon size="16" icon="mdi-account-multiple" />
-                  Grupo
+                  {{ $t(`${i18Dir}.group`) }}
                 </span>
                 <span v-else>
                   <v-icon size="16" icon="mdi-account-multiple" />
-                  Individual
+                  {{ $t(`${i18Dir}.individual`) }}
                 </span>
               </div>
             </div>
@@ -53,6 +56,9 @@
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
+
+const i18Dir = 'pages.assessments';
+
 const i18n = useI18n();
 const openDialog = defineModel({ default: false });
 const isLoading = ref(false);
@@ -72,4 +78,11 @@ const associateTasks = () => {
   isLoading.value = true;
   emit('onAssociateTasks', selectedTasks.value);
 };
+
+watch(openDialog, (open) => {
+  if (open) {
+    isLoading.value = false;
+    selectedTasks.value = [];
+  }
+});
 </script>
