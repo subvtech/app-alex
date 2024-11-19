@@ -95,6 +95,7 @@
             }
           : undefined
       "
+      @update-status="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value, newStatus, true)"
       @change-finish-at="handleChangeFinishAt"
       @change-submit-after-deadline="handleChangeSendAfterDeadline"
     />

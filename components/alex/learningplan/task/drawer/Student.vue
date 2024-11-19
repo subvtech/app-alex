@@ -122,7 +122,7 @@
                 :task-title="task.title"
                 :task-id="task.id"
                 :learning-plan-id="learningplanStore.learningPlan?.id"
-                :status="getSubmissionStatus(mostRecentSubmission)"
+                :status="submissionStatus || getSubmissionStatus(mostRecentSubmission)"
                 :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
                 :task-member-id="taskMemberId"
@@ -132,6 +132,7 @@
                 :student="student"
                 :group="group"
                 :class="studentClass"
+                @update-task-status="handleChangeStatus"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
@@ -218,6 +219,7 @@
 
 <script setup lang="ts">
 import type { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
+import type { TaskStudent } from '../kanban/index.vue';
 
 export interface Student {
   name: string;
@@ -263,7 +265,11 @@ const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
   'change-submit-after-deadline': [taskId: number, value: boolean];
+  'update-status': [newIndex: number, value: TaskStudent, newStatus: string];
 };
+
+const status = ref<TaskMemberStatus>(props.status);
+const submissionStatus = ref();
 const emit = defineEmits<Emit>();
 const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask);
 const finishAt = toRef(props.finishAt);
@@ -290,7 +296,7 @@ const statusColor = computed(() => {
     in_review: 'orange',
     done: 'green',
   };
-  return mapedColors[props.status] as 'secondary' | 'blue' | 'orange' | 'green';
+  return mapedColors[status.value] as 'secondary' | 'blue' | 'orange' | 'green';
 });
 const config: Record<string, string> = {
   text: t('components.learningPlan.drawer.task.restrictions.text'),
@@ -493,6 +499,21 @@ const changeSendAfterDeadline = async (value: boolean) => {
 const getInChargeMember = (group?: LearningPlanGroupSimple) =>
   group?.group_members.find((member) => member.role === 'in_charge');
 const inChargeMember = computed(() => getInChargeMember(props.group));
+const handleChangeStatus = async (statusValue: TaskMemberStatus) => {
+  emit(
+    'update-status',
+    0,
+    {
+      id: props.taskMemberId,
+      title: props.task.title,
+      status: statusValue,
+      date: new Date(),
+    },
+    statusValue,
+  );
+  status.value = statusValue;
+  submissionStatus.value = statusValue === 'done' ? 'reviewed' : 'in_review';
+};
 watch(finishAt, changeDeadline);
 watch(canSubmitAfterDeadline, changeSendAfterDeadline);
 watch(model, (value) => {
