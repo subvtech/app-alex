@@ -75,6 +75,7 @@ const gradeMapping = {
 };
 
 const onCellSelect = (rating: 'excellent' | 'good' | 'reasonable' | 'bad', index: number) => {
+  if (props.readonly) return;
   content.value[index].selected = rating;
   const criterion = content.value[index].criterion;
   const grade = gradeMapping[rating];
@@ -145,7 +146,7 @@ defineExpose({ getContent });
               class="tw-border tw-border-transparent rounded-lg tw-transition-all h-100"
               :class="[
                 content[index].selected === rating && !editable && 'selected-border',
-                !editable && 'cursor-pointer tw-select-none rubric-card',
+                !editable && !readonly && 'cursor-pointer tw-select-none rubric-card',
               ]"
               @click="onCellSelect(rating as 'excellent' | 'good' | 'reasonable' | 'bad', index)"
             >
@@ -159,7 +160,10 @@ defineExpose({ getContent });
                 v-model="content[index][rating]"
                 tag="p"
                 class="text-body-1 h-100 pa-2"
-                :class="[content[index][rating] ? 'text-gray-800' : 'text-gray-300', !editable && 'cursor-pointer']"
+                :class="[
+                  content[index][rating] ? 'text-gray-800' : 'text-gray-300',
+                  !editable && !readonly && 'cursor-pointer',
+                ]"
                 :cant-edit="editable"
                 :placeholder="$t('components.learningPlan.evaluationRubrics.descriptionPlaceholder')"
               />

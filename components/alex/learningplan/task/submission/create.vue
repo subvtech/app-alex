@@ -33,12 +33,14 @@
     v-model="dialog"
     :persistent="true"
     :retain-focus="false"
+    :no-footer="taskSubmissionEvaluationData.evaluated_at"
     body-classes="bg-white pa-0"
     main-button-text="Avaliar"
     secondary-button-text="Recusar entrega"
     :max-width="1680"
     :fullscreen="fullscreen"
     no-click-animation
+    @on-main-action="finishEvaluation"
   >
     <template #header>
       <alex-custom-dialog-header
@@ -127,10 +129,11 @@
                         {{ evaluation_criteria.criteria.criteria.description }}
                       </p>
                     </div>
-                    <div class="tw-border-t">
-                      <span v-if="taskSubmissionEvaluationData.evaluated_at" class="text-center text-gray-600">{{
-                        evaluation_criteria.grade || 'Nao avaliado'
-                      }}</span>
+                    <div class="tw-border-t pa-2 text-center text-body-2">
+                      <span v-if="taskSubmissionEvaluationData.evaluated_at" class="text-center text-gray-600">
+                        Nota:
+                        {{ evaluation_criteria.grade || 'Nao avaliado' }}</span
+                      >
                       <v-number-input
                         v-else
                         :model-value="evaluation_criteria.grade || 0"
@@ -154,6 +157,7 @@
                 <div v-else class="">
                   <alex-learningplan-evaluation-rubrics
                     class="tw-w-full !tw-min-h-full"
+                    :readonly="taskSubmissionEvaluationData.evaluated_at"
                     :editable="false"
                     :data="rubricRows"
                     :headers="headers"
@@ -194,8 +198,9 @@
           </span>
           <span class="text-gray-600 text-body-3">
             <alex-custom-chip
+              class="!tw-min-w-[48px]"
               text-classes="text-body-3 text-gray-600"
-              :text="evaluation_criteria.grade || 0"
+              :text="evaluation_criteria.grade !== null ? evaluation_criteria.grade.toString().padStart(2, '0') : '00'"
               variant="outlined"
               status="secondary"
             />
@@ -315,15 +320,12 @@ const user = useStrapiUser();
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 
-const { getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation } = useTaskEvaluation(
-  learningPlanId,
-  taskId,
-  user,
-  submissionId,
-);
+const { getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation, setEvaluationDateMutation } =
+  useTaskEvaluation(learningPlanId, taskId, user, submissionId);
 
 const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
 const { mutate: updateEvaluationGrades } = gradeSubmissionEvaluationCriteriasMutation();
+const { mutate: setEvaluationDate } = setEvaluationDateMutation();
 
 const rubricGradeLevels = computed(() => {
   return taskSubmissionEvaluationData.value.evaluation_group.rubric_grade_levels.map((l) => {
@@ -592,6 +594,12 @@ const loadEditorData = () => {
 
 const toggleMaximize = () => {
   fullscreen.value = !fullscreen.value;
+};
+
+const finishEvaluation = () => {
+  if (!taskSubmissionEvaluationData.value) return;
+  setEvaluationDate(taskSubmissionEvaluationData.value.id);
+  dialog.value = false;
 };
 
 watch(dialog, (value) => {
