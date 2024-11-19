@@ -286,8 +286,6 @@ const props = withDefaults(defineProps<submissionProps>(), {
   studentClass: '',
 });
 
-const isReadOnly = ref(props.readOnly);
-
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
   'update-submission': [];
@@ -327,6 +325,10 @@ const { getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation,
 const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
 const { mutate: updateEvaluationGrades } = gradeSubmissionEvaluationCriteriasMutation();
 const { mutate: setEvaluationDate } = setEvaluationDateMutation();
+
+const isReadOnly = computed(() => {
+  return props.readOnly || taskSubmissionEvaluationData.value?.evaluated_at;
+});
 
 const rubricGradeLevels = computed(() => {
   return taskSubmissionEvaluationData.value.evaluation_group.rubric_grade_levels.map((l) => {

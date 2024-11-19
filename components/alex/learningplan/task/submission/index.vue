@@ -48,7 +48,7 @@
     v-model="openConfirmDialog"
     title="Tipo de avaliação não definido!"
     subtitle="Deseja associar um tipo de avaliação para esta tarefa?"
-    submit-button-text="Associar Tipo Avaliacao"
+    submit-button-text="Associar Tipo Avaliação"
     cancel-button-text="
       Cancelar
     "
