@@ -29,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import useNavigationDrawer from '~/composables/useNavigationDrawer';
 import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
 const i18n = useI18n();
 const config = useRuntimeConfig();
 const router = useRouter();
@@ -178,7 +178,6 @@ interface Menu {
     to: string;
   }[];
 }
-
 const defaultMenus: Menu[] = [
   {
     title: i18n.t('layouts.default.userArea'),
@@ -198,7 +197,7 @@ const defaultMenus: Menu[] = [
         title: 'Meus Projetos',
         to: '/projects/me',
       },
-      ...(user.value?.role.name === 'Professor'
+      ...(user.value?.role?.name === 'Professor'
         ? [
             {
               icon: 'alex:FactCheck',
