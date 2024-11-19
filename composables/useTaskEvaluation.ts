@@ -357,5 +357,17 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
         },
       });
     },
+    setEvaluationDateMutation() {
+      return useMutation({
+        mutationFn: (evaluationId) => {
+          return update('task-submission-evaluations', evaluationId, {
+            evaluated_at: new Date().toISOString(),
+          });
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: taskSubmissionEvaluationDataQuery });
+        },
+      });
+    },
   };
 };

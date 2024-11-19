@@ -36,11 +36,12 @@
     :no-footer="taskSubmissionEvaluationData.evaluated_at"
     body-classes="bg-white pa-0"
     main-button-text="Avaliar"
-    secondary-button-text="Recusar entrega"
+    secondary-button-text="Cancelar"
     :max-width="1680"
     :fullscreen="fullscreen"
     no-click-animation
     @on-main-action="finishEvaluation"
+    @on-secondary-action="dialog = false"
   >
     <template #header>
       <alex-custom-dialog-header
@@ -599,6 +600,7 @@ const toggleMaximize = () => {
 const finishEvaluation = () => {
   if (!taskSubmissionEvaluationData.value) return;
   setEvaluationDate(taskSubmissionEvaluationData.value.id);
+  emit('update-task-status', 'done');
   dialog.value = false;
 };
 
