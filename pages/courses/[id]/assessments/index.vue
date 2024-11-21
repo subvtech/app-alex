@@ -42,6 +42,8 @@ const { getLearningPlanGrades, createGradeMutation, deleteGradeMutation, getLear
   user,
 );
 
+console.log('Facilitator:', learningPlanStore.userIsFacilitator);
+
 const { data: learningPlanGrades } = getLearningPlanGrades();
 const { data: tasks } = getLearningPlanTasks();
 
@@ -66,6 +68,16 @@ const createAssessment = () => {
   createGradeAssessment({ learningplan: learningPlanId.value });
 };
 
+// Is facilitaror
+console.log('Facilitator:', learningPlanStore.userIsFacilitator);
+
+watch(
+  () => learningPlanStore.userIsFacilitator,
+  (val) => {
+    console.log('Facilitator:', val);
+  },
+);
+
 const assessments = computed<assessment[]>(() => {
   return learningPlanGrades.value?.map((grade) => {
     return {
@@ -77,13 +89,13 @@ const assessments = computed<assessment[]>(() => {
         const { task } = gct;
         const { evaluation_group } = task;
         return {
-          id: task.id,
-          compositionId: gct.id,
-          title: task.title,
-          type: evaluation_group.type === 'standard' ? 'group' : 'rubric',
-          methodName: evaluation_group.name,
-          isGroup: task.type === 'group',
-          value: gct.weight,
+          id: task?.id,
+          compositionId: gct?.id,
+          title: task?.title,
+          type: evaluation_group?.type === 'standard' ? 'group' : 'rubric',
+          methodName: evaluation_group?.name,
+          isGroup: task?.type === 'group',
+          value: gct?.weight,
         };
       }),
     };
@@ -157,7 +169,6 @@ const dropdownItems = (assessments: assessment) => [
         style="min-width: 160px; max-width: 320px"
         density="comfortable"
       />
-
       <alex-custom-button
         v-if="learningPlanStore.userIsFacilitator"
         prepend-icon="mdi-plus"

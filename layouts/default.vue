@@ -194,7 +194,7 @@ const defaultMenus: Menu[] = [
       },
       {
         icon: 'alex:ProjectConfig',
-        title: 'Meus Projetos',
+        title: i18n.t('layouts.default.myProjects'),
         to: '/projects/me',
       },
       ...(user.value?.role?.name === 'Professor'

@@ -161,13 +161,13 @@ const generalLinks = computed<TabType[]>(() => [
     value: 4,
     to: `/courses/${learningPlanId.value}/projects`,
   },
-  {
-    label: i18n.t('pages.courses.assessments'),
-    value: 5,
-    to: `/courses/${learningPlanId.value}/assessments`,
-  },
   ...(learningPlanStore.userIsFacilitator
     ? [
+        {
+          label: i18n.t('pages.courses.assessments'),
+          value: 5,
+          to: `/courses/${learningPlanId.value}/assessments`,
+        },
         {
           label: '',
           icon: 'mdi-cog-outline',
