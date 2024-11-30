@@ -2,11 +2,11 @@
   <v-row id="login-page" data-testid="login">
     <v-col>
       <v-card class="card card-imagem">
-        <div align="center">
+        <div class="tw-flex tw-justify-center tw-items-center tw-h-full tw-border-yellow-200">
           <img
             :alt="$t('pages.login.alt')"
             src="public/images/imagem_login.png"
-            class="card-imagem-imagem my-5"
+            class="card-imagem-imagem my-5 tw-bg-contain"
           />
         </div>
       </v-card>
@@ -15,23 +15,17 @@
       <v-card class="card card-acesso d-flex justify-center align-center">
         <div class="form d-flex flex-column" style="max-width: 400px">
           <div class="d-flex flex-column">
-            <v-card-title
-              class="text-white text-h3 text-center text-bold mt-16"
-            >
+            <v-card-title class="text-white text-h3 text-center text-bold mt-16 !tw-hidden md:!tw-block">
               {{ $t('pages.login.welcome') }}
             </v-card-title>
             <v-card-subtitle
-              class="text-subtitle-2 text-white text-center"
+              class="text-subtitle-2 text-white text-center !tw-hidden md:!tw-block"
               style="white-space: normal"
             >
               {{ $t('pages.login.access') }}
             </v-card-subtitle>
           </div>
-          <v-form
-            ref="form"
-            class="d-flex flex-column gap-1"
-            @submit.prevent="submit"
-          >
+          <v-form ref="form" class="main-forms d-flex flex-column gap-1" @submit.prevent="submit">
             <alex-inputs-text-field
               :label="$t('pages.login.user')"
               :placeholder="$t('pages.login.userHolder')"
@@ -56,10 +50,7 @@
                 {{ errorMessage }}
               </p>
             </div>
-            <div
-              class="d-flex justify-space-between align-center mb-2"
-              style="max-height: 30px"
-            >
+            <div class="d-flex justify-space-between align-center mb-2" style="max-height: 30px">
               <v-checkbox
                 v-model="checkbox"
                 class="text-white smaller-text"
@@ -69,15 +60,10 @@
                 style="margin-left: -8px"
               >
                 <template #label>
-                  <span class="text-white text-body-2 text-high-emphasis">{{
-                    $t('pages.login.remember')
-                  }}</span>
+                  <span class="text-white text-body-2 text-high-emphasis">{{ $t('pages.login.remember') }}</span>
                 </template>
               </v-checkbox>
-              <nuxt-link
-                to="/forgot"
-                class="blue-label smaller-text text-decoration-none"
-              >
+              <nuxt-link to="/forgot" class="blue-label smaller-text text-decoration-none">
                 {{ $t('pages.login.forgot') }}
               </nuxt-link>
             </div>
@@ -86,35 +72,20 @@
               {{ $t('pages.login.submit') }}
             </alex-custom-button>
           </v-form>
-          <v-card-text
-            class="text-white text-center font-weight-bold text-body-2"
-          >
+          <v-card-text class="create-account text-white text-center font-weight-bold text-body-2">
             {{ $t('pages.login.noAccount') }}
 
             <nuxt-link to="/register" class="blue-label text-decoration-none">
               {{ $t('pages.login.register') }}
             </nuxt-link>
           </v-card-text>
-          <div class="d-flex align-center text-white">
-            <v-divider
-              color="secondary"
-              :thickness="1"
-              class="border-opacity-100"
-            ></v-divider>
+          <div class="sign-divider d-flex align-center text-white">
+            <v-divider color="secondary" :thickness="1" class="border-opacity-100"></v-divider>
             <p class="mx-4">{{ $t('pages.login.divider') }}</p>
-            <v-divider
-              color="secondary"
-              :thickness="1"
-              class="border-opacity-100"
-            ></v-divider>
+            <v-divider color="secondary" :thickness="1" class="border-opacity-100"></v-divider>
           </div>
 
-          <v-btn
-            block
-            class="card-btn metamask d-flex"
-            :loading="logging2"
-            @click="metalogin"
-          >
+          <v-btn block class="card-btn metamask d-flex" :loading="logging2" @click="metalogin">
             <img src="public/images/metamask.png" alt="" />
             <span>{{ $t('pages.login.metamask.btn') }}</span>
           </v-btn>
@@ -135,8 +106,7 @@ definePageMeta({
   middleware: 'control-access',
 });
 
-const redirect =
-  (route.query.redirect as string) || useCookie('redirect').value;
+const redirect = (route.query.redirect as string) || useCookie('redirect').value;
 
 const { login } = useStrapiAuth();
 const router = useRouter();
@@ -149,9 +119,7 @@ const { handleSubmit, errors, values, controlledValues } = useForm({
 });
 
 const isValid = computed(
-  () =>
-    !Object.values(controlledValues.value).includes(undefined) &&
-    !Object.values(errors.value).length,
+  () => !Object.values(controlledValues.value).includes(undefined) && !Object.values(errors.value).length,
 );
 
 const logging = ref(false);
@@ -193,6 +161,9 @@ const submit = handleSubmit(async () => {
 <style scoped lang="scss">
 #login-page {
   overflow-y: auto;
+
+  margin: 0 !important;
+
   .card {
     border-radius: 0 !important;
 
@@ -214,7 +185,7 @@ const submit = handleSubmit(async () => {
       width: calc(100% - 600px);
 
       &-imagem {
-        height: 80vh;
+        max-height: 80vh;
       }
     }
 
@@ -226,6 +197,8 @@ const submit = handleSubmit(async () => {
       width: 629px;
       right: 0;
       overflow: auto;
+
+      // border: solid 2px yellow;
     }
 
     .blue-label {
@@ -302,6 +275,10 @@ const submit = handleSubmit(async () => {
 
 @media (max-height: 700px) {
   #login-page {
+    .main-forms {
+      margin-top: 5rem;
+    }
+
     .card {
       &-acesso {
         &-alex-logo {
@@ -317,6 +294,12 @@ const submit = handleSubmit(async () => {
 
 @media (max-width: 601px) {
   #login-page {
+    .main-forms,
+    .create-account,
+    .sign-divider {
+      padding-inline: 12px;
+    }
+
     .card {
       width: 100%;
 
