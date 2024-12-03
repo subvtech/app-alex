@@ -1,5 +1,5 @@
 <template>
-  <v-container
+  <div
     class="d-flex gap-4 justify-end flex-wrap bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100 alex-dialog-footer"
     data-testid="alex-dialog-footer"
   >
@@ -31,7 +31,7 @@
       :disabled="mainButtonDisabled"
       @click="() => emits('onMainAction')"
     />
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -44,14 +44,7 @@ interface FooterProps {
   noSecondaryButton?: boolean;
   mainButtonLoading?: boolean;
   mainButtonDisabled?: boolean;
-  justify?:
-    | 'start'
-    | 'end'
-    | 'center'
-    | 'space-around'
-    | 'space-between'
-    | 'space-evenly'
-    | 'stretch';
+  justify?: 'start' | 'end' | 'center' | 'space-around' | 'space-between' | 'space-evenly' | 'stretch';
 }
 withDefaults(defineProps<FooterProps>(), {
   mainButtonText: 'Salvar',

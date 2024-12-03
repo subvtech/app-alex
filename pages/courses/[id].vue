@@ -18,8 +18,7 @@
       :links="isJoinRoutePath ? [] : generalLinks"
       :selected-option="selectedOption"
       :copy-object="
-        learningPlanStore.activeInvitationLinkUrl &&
-        learningPlanStore.userIsFacilitator
+        learningPlanStore.activeInvitationLinkUrl && learningPlanStore.userIsFacilitator
           ? {
               label: $t('pages.courses.invite'),
               copyText: learningPlanStore.activeInvitationLinkUrl,
@@ -43,7 +42,7 @@
   </section>
 </template>
 <script setup lang="ts">
-import { TabType } from '~/components/alex/custom/Tabs.vue';
+import type { TabType } from '~/components/alex/custom/Tabs.vue';
 
 definePageMeta({
   middleware: ['auth'],
@@ -63,19 +62,14 @@ const isJoinRoutePath = computed(() => {
 });
 
 const isSettingsRoutePath = computed(() => {
-  return (
-    route.name === 'courses-id-settings' ||
-    route.name === 'courses-id-trails-trailid-settings'
-  );
+  return route.name === 'courses-id-settings' || route.name === 'courses-id-trails-trailid-settings';
 });
 
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const learningPlanId = computed(() => Number.parseInt(route.params?.id.toString()));
 const headerStore = usePageHeaderStore();
 const selectedOption = ref<number | null>(null);
 const fetchData = async () => {
-  await useAsyncData('learningPlanDetails', () =>
-    learningPlanStore.loadLearningPlan(learningPlanId.value),
-  );
+  await useAsyncData('learningPlanDetails', () => learningPlanStore.loadLearningPlan(learningPlanId.value));
 
   headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
@@ -96,11 +90,9 @@ const fetchData = async () => {
   }
 
   if (learningPlanStore.userIsPendingMember && !isJoinRoutePath.value) {
-    const invite = learningPlanStore.learningPlan?.invitation_links.find(
-      (i) => {
-        return i.emails_to_send?.includes(user?.value?.email);
-      },
-    );
+    const invite = learningPlanStore.learningPlan?.invitation_links.find((i) => {
+      return i.emails_to_send?.includes(user?.value?.email);
+    });
 
     if (invite) {
       return navigateTo(`/courses/${learningPlanId.value}/join/${invite.hash}`);
@@ -172,13 +164,24 @@ const generalLinks = computed<TabType[]>(() => [
   ...(learningPlanStore.userIsFacilitator
     ? [
         {
+          label: i18n.t('pages.courses.assessments'),
+          value: 5,
+          to: `/courses/${learningPlanId.value}/assessments`,
+        },
+        {
           label: '',
           icon: 'mdi-cog-outline',
-          value: 5,
+          value: 6,
           to: `/courses/${learningPlanId.value}/settings`,
           classes: 'ml-auto',
         },
       ]
-    : []),
+    : [
+        {
+          label: i18n.t('pages.courses.panel'),
+          value: 6,
+          to: `/courses/${learningPlanId.value}/panel`,
+        },
+      ]),
 ]);
 </script>

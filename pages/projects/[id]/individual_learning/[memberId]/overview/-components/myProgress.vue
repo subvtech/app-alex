@@ -159,7 +159,7 @@ watch(
                   </div>
                   <nuxt-link
                     :to="{
-                      path: currentPath.replace('/overview', '/tasks'),
+                      path: currentPath.replace('/panel', '/tasks'),
                       query: { task: task.id },
                     }"
                     class="text-body-5 text-primary-0"

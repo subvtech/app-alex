@@ -11,16 +11,11 @@
     class="pa-6 pt-2 rounded-s-lg"
   >
     <template #prepend>
-      <alex-custom-button
-        icon="mdi-close"
-        size="small"
-        variant="text"
-        @click="handleCloseModal"
-      />
+      <alex-custom-button icon="mdi-close" size="small" variant="text" @click="handleCloseModal" />
     </template>
 
     <template #default>
-      <div v-if="student" class="user-info text-gray-800">
+      <div v-if="student" class="user-info text-gray-800 mb-4">
         <v-avatar
           :size="80"
           :image="student.avatar || undefined"
@@ -34,32 +29,21 @@
           </template>
         </v-avatar>
         <h2 class="text-h2 ellipsis lines-1">{{ student.name }}</h2>
-        <p class="text-subtitle-2 ellipsis lines-1">
-          {{ studentClass }}
-        </p>
+        <p class="text-subtitle-2 ellipsis lines-1">{{ studentClass }}</p>
       </div>
-      <div v-if="group" class="tw-flex tw-flex-col tw-gap-2 text-gray-800">
+      <div v-if="group" class="tw-flex tw-flex-col tw-gap-2 text-gray-800 mb-6">
         <alex-custom-chip class="tw-w-fit" :text="studentClass" />
         <h2 class="text-h2 ellipsis lines-1">{{ group.title }}</h2>
         <div class="tw-flex tw-items-center tw-gap-2">
           <v-avatar
             :size="40"
-            :image="
-              inChargeMember?.student_member.user.avatar?.url || undefined
-            "
+            :image="inChargeMember?.student_member.user.avatar?.url || undefined"
             class="alex-avatar-group-border alex-avatar-group-margin"
             color="gray-100"
           >
-            <template
-              v-if="!inChargeMember?.student_member.user.avatar?.url"
-              #default
-            >
+            <template v-if="!inChargeMember?.student_member.user.avatar?.url" #default>
               <p class="text-gray-300 text-h4">
-                {{
-                  getInitials(
-                    inChargeMember?.student_member.user.fullname || '',
-                  )
-                }}
+                {{ getInitials(inChargeMember?.student_member.user.fullname || '') }}
               </p>
             </template>
           </v-avatar>
@@ -77,21 +61,18 @@
           <alex-custom-chip
             class="tw-w-fit"
             :status="statusColor"
-            :text="
-              $t(`components.courses.tasks.task.status.${status || 'draft'}`)
-            "
+            :text="$t(`components.courses.tasks.task.status.${status || 'draft'}`)"
           />
         </div>
         <div class="d-flex flex-column gap-2 tw-w-full">
           <p class="text-body-4 text-gray-800 mb-1">
-            <span class="text-tag-orange-light">* </span
-            >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
+            <span class="text-tag-orange-light">* </span>{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
           <alex-learningplan-task-date v-model="finishAt" edit />
         </div>
       </div>
-      <div class="task-submission">
+      <div class="task-submission my-6">
         <template v-if="submission">
           <h4 class="text-h4">
             {{ $t('components.courses.tasks.submission.submission') }}
@@ -101,11 +82,7 @@
             <div class="d-flex gap-2">
               <alex-custom-switch
                 v-model="canSubmitAfterDeadline"
-                :label="
-                  $t(
-                    'components.learningPlan.drawer.task.allowSendAfterSubmission',
-                  )
-                "
+                :label="$t('components.learningPlan.drawer.task.allowSendAfterSubmission')"
                 :disabled="canSubmitAfterDeadlineTask"
               />
             </div>
@@ -131,11 +108,7 @@
             <alex-learningplan-task-description
               v-if="submissionDesc"
               v-model="submissionDesc"
-              :title="
-                $t(
-                  'components.learningPlan.drawer.task.description.submissionLabel',
-                )
-              "
+              :title="$t('components.learningPlan.drawer.task.description.submissionLabel')"
             />
           </div>
           <div class="d-flex flex-column gap-2 tw-w-fit">
@@ -147,25 +120,27 @@
                 v-if="mostRecentSubmission?.submitted_at"
                 type="professor"
                 :task-title="task.title"
-                :status="getSubmissionStatus(mostRecentSubmission)"
+                :task-id="task.id"
+                :learning-plan-id="learningplanStore.learningPlan?.id"
+                :status="submissionStatus || getSubmissionStatus(mostRecentSubmission)"
                 :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
                 :task-member-id="taskMemberId"
                 :content="mostRecentSubmission"
                 :task-status="status"
                 :doc_name="docName"
+                :student="student"
+                :group="group"
+                :class="studentClass"
+                @update-task-status="handleChangeStatus"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
               </p>
             </template>
             <template v-else>
-              <alex-custom-skeleton
-                color="gray-blue"
-                class="tw-w-[96px] tw-h-[19px]" />
-              <alex-custom-skeleton
-                color="gray-blue"
-                class="tw-w-[256px] tw-h-[64px]"
+              <alex-custom-skeleton color="gray-blue" class="tw-w-[96px] tw-h-[19px]" />
+              <alex-custom-skeleton color="gray-blue" class="tw-w-[256px] tw-h-[64px]"
             /></template>
           </div>
         </template>
@@ -243,11 +218,13 @@
 </template>
 
 <script setup lang="ts">
-import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
+import type { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
+import type { TaskStudent } from '../kanban/index.vue';
 
-interface Student {
+export interface Student {
   name: string;
   avatar?: string | null;
+  email?: string;
 }
 interface Submission {
   description: string;
@@ -288,11 +265,13 @@ const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
   'change-submit-after-deadline': [taskId: number, value: boolean];
+  'update-status': [newIndex: number, value: TaskStudent, newStatus: string];
 };
+
+const status = ref<TaskMemberStatus>(props.status);
+const submissionStatus = ref();
 const emit = defineEmits<Emit>();
-const canSubmitAfterDeadline = toRef(
-  props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask,
-);
+const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask);
 const finishAt = toRef(props.finishAt);
 const activePage = ref(props.group ? '0' : '1');
 const initials = computed(() => {
@@ -317,7 +296,7 @@ const statusColor = computed(() => {
     in_review: 'orange',
     done: 'green',
   };
-  return mapedColors[props.status] as 'secondary' | 'blue' | 'orange' | 'green';
+  return mapedColors[status.value] as 'secondary' | 'blue' | 'orange' | 'green';
 });
 const config: Record<string, string> = {
   text: t('components.learningPlan.drawer.task.restrictions.text'),
@@ -369,17 +348,13 @@ const {
   data: submissions,
   execute: executeSubmissions,
   pending,
-} = await useAsyncData(
-  'task-submissions',
-  () => getSubmissions(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskSubmissionSimple[],
-    }),
-    lazy: true,
-  },
-);
+} = await useAsyncData('task-submissions', () => getSubmissions(props.taskMemberId), {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskSubmissionSimple[],
+  }),
+  lazy: true,
+});
 
 const {
   data: events,
@@ -412,10 +387,7 @@ const evaluatedSubmissions = computed(() =>
   ),
 );
 
-const mostRecentSubmission = computed(
-  () =>
-    submissions.value.data.filter((submission) => submission.submitted_at)[0],
-);
+const mostRecentSubmission = computed(() => submissions.value.data.filter((submission) => submission.submitted_at)[0]);
 const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   if (submission?.evaluated_at) {
     return 'reviewed';
@@ -441,9 +413,7 @@ const handleSubmitMessage = async (
 ) => {
   try {
     if ((!text && !audio) || !user.value) return;
-    let learningMember = learningplanStore.activeMembers.find(
-      (member) => member.user.id === user?.value?.id,
-    );
+    let learningMember = learningplanStore.activeMembers.find((member) => member.user.id === user?.value?.id);
     if (learningplanStore.facilitator?.user.id === user.value.id) {
       learningMember = learningplanStore.facilitator;
     }
@@ -491,11 +461,7 @@ const handleSubmitMessage = async (
     });
     messages.value.data = [...messages.value.data, message];
   } catch (error) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.sendMessage'),
-      'error',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.errors.sendMessage'), 'error', true);
   } finally {
     isSendingMessage.value = false;
   }
@@ -512,11 +478,7 @@ const changeDeadline = async (value?: string | null) => {
       emit('change-finish-at', props.taskMemberId, value);
       return;
     }
-    emit(
-      'change-finish-at',
-      props.taskMemberId,
-      (value as Date).toISOString().split('T')[0],
-    );
+    emit('change-finish-at', props.taskMemberId, (value as Date).toISOString().split('T')[0]);
   } catch (error) {
     setMessage(t('pages.tasks.errors.updateDeadlineMember'), 'error', true);
   }
@@ -537,13 +499,27 @@ const changeSendAfterDeadline = async (value: boolean) => {
 const getInChargeMember = (group?: LearningPlanGroupSimple) =>
   group?.group_members.find((member) => member.role === 'in_charge');
 const inChargeMember = computed(() => getInChargeMember(props.group));
+const handleChangeStatus = async (statusValue: TaskMemberStatus) => {
+  emit(
+    'update-status',
+    0,
+    {
+      id: props.taskMemberId,
+      title: props.task.title,
+      status: statusValue,
+      date: new Date(),
+    },
+    statusValue,
+  );
+  status.value = statusValue;
+  submissionStatus.value = statusValue === 'done' ? 'reviewed' : 'in_review';
+};
 watch(finishAt, changeDeadline);
 watch(canSubmitAfterDeadline, changeSendAfterDeadline);
 watch(model, (value) => {
   if (value) {
     finishAt.value = props.finishAt;
-    canSubmitAfterDeadline.value =
-      props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
+    canSubmitAfterDeadline.value = props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
     setSubmissionDescription();
     executeSubmissions();
     executeEvents();
