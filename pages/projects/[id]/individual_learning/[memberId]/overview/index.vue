@@ -248,7 +248,6 @@ const getData = () => {
         tasks,
       };
     });
-<<<<<<< HEAD
 
     // Update goals totalizer
     const newTotalizers = totalizers.value;
@@ -270,9 +269,7 @@ const getData = () => {
     };
 
     totalizers.value = newTotalizers;
-=======
     progressPercentage.value = getPercentage(completed, total);
->>>>>>> e4c168a831c02af1fbec2e38639970e07ccc4ffb
   });
 
   // Get grades
