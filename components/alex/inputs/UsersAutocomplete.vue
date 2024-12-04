@@ -69,22 +69,13 @@ interface AutoCompleteUsersProps {
   submitButtonLoading?: boolean;
 }
 const props = defineProps<AutoCompleteUsersProps>();
-const emit = defineEmits([
-  'update:modelValue',
-  'refresh:invite',
-  'remove:invite',
-  'click:button',
-]);
+const emit = defineEmits(['update:modelValue', 'refresh:invite', 'remove:invite', 'click:button']);
 const { find } = useStrapi();
 const { emailRegex } = useFormRules();
 const user = useStrapiUser();
-const { value: selectedUser, resetField } = useField<User | null>(
-  () => props.name,
-  undefined,
-  {
-    initialValue: null,
-  },
-);
+const { value: selectedUser, resetField } = useField<User | null>(() => props.name, undefined, {
+  initialValue: null,
+});
 const search = ref('');
 const items = ref<User[]>([]);
 const selectedUsers = defineModel<User[]>({ required: true });
@@ -94,9 +85,7 @@ const cleanInput = () => {
 };
 
 const removeSelf = (email?: string) => {
-  selectedUsers.value = selectedUsers.value.filter(
-    (item) => item.email !== email,
-  );
+  selectedUsers.value = selectedUsers.value.filter((item) => item.email !== email);
   emit('remove:invite');
 };
 
@@ -106,23 +95,18 @@ const filteredItems = computed(() => {
 });
 
 const updateModelValue = () => {
-  const wasNotSelectedUser = !selectedUsers.value.find(
-    (v) => v.email === selectedUser.value?.email,
-  );
+  const wasNotSelectedUser = !selectedUsers.value.find((v) => v.email === selectedUser.value?.email);
   if (selectedUser.value && wasNotSelectedUser) {
     selectedUsers.value.push(selectedUser.value);
   }
   cleanInput();
 };
 
-useOnStopTyping(search, async () => {
+const setItems = async () => {
   const registeredFields = (await find('users', {
     fields: ['email', 'fullname'],
     filters: {
-      $or: [
-        { email: { $containsi: search.value } },
-        { fullname: { $containsi: search.value } },
-      ],
+      $or: [{ email: { $containsi: search.value } }, { fullname: { $containsi: search.value } }],
       id: { $notIn: props.ignoreUserIds || [] },
     },
     populate: ['avatar'],
@@ -130,17 +114,14 @@ useOnStopTyping(search, async () => {
   if (registeredFields.length) {
     items.value = registeredFields.filter(
       (itemRequest) =>
-        !selectedUsers.value.find((item) => item.id === itemRequest?.id) &&
-        itemRequest.email !== user.value?.email,
+        !selectedUsers.value.find((item) => item.id === itemRequest?.id) && itemRequest.email !== user.value?.email,
     );
   }
-});
+};
 
-const filterByFullnameAndEmail = (
-  _value: string,
-  query: string,
-  item?: any,
-) => {
+useOnStopTyping(search, () => setItems);
+
+const filterByFullnameAndEmail = (_value: string, query: string, item?: any) => {
   const fullname = item.raw.fullname?.toLowerCase() || '';
   const email = item.raw.email?.toLowerCase();
   const searchText = query.toLowerCase();
@@ -148,16 +129,16 @@ const filterByFullnameAndEmail = (
   return fullname.includes(searchText) > -1 || email.includes(searchText) > -1;
 };
 
+onMounted(() => {
+  setItems();
+});
+
 watch(
   search,
   () => {
     const isValidEmail = emailRegex.test(search.value);
     const local = items.value.filter((item) => item?.local);
-    if (
-      search.value.length &&
-      isValidEmail &&
-      !(props.ignoreEmails || []).includes(search.value)
-    ) {
+    if (search.value.length && isValidEmail && !(props.ignoreEmails || []).includes(search.value)) {
       if (!local.length) {
         items.value = [{ email: search.value, local: true }, ...items.value];
       }

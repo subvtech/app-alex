@@ -1,26 +1,14 @@
 <template>
-  <div
-    v-if="isProfessor || learningPlanStore.loading"
-    class="bg-white rounded wrapper"
-  >
+  <div v-if="isProfessor || learningPlanStore.loading" class="bg-white rounded wrapper">
     <Transition name="fade" mode="out-in">
       <div
         v-if="learningPlanStore.loading"
         class="w-100 d-flex justify-space-between align-center height-18 header px-6"
       >
-        <alex-custom-skeleton
-          color="gray-300"
-          class="w-100 max-w-80 mr-6 min-w-60 height-11"
-        />
-        <alex-custom-skeleton
-          color="gray-300"
-          class="w-100 max-w-11 height-11"
-        />
+        <alex-custom-skeleton color="gray-300" class="w-100 max-w-80 mr-6 min-w-60 height-11" />
+        <alex-custom-skeleton color="gray-300" class="w-100 max-w-11 height-11" />
       </div>
-      <div
-        v-else
-        class="w-100 d-flex justify-space-between align-center height-18 header px-6"
-      >
+      <div v-else class="w-100 d-flex justify-space-between align-center height-18 header px-6">
         <alex-inputs-text-field
           v-model="search"
           :placeholder="t('pages.task.searchPlaceholder')"
@@ -59,11 +47,7 @@
             />
           </TransitionGroup>
 
-          <alex-learningplan-task-container
-            ref="tasksContainer"
-            :search="search"
-            :filter="filter"
-          />
+          <alex-learningplan-task-container ref="tasksContainer" :search="search" :filter="filter" />
         </div>
       </Transition>
     </div>
@@ -130,9 +114,7 @@ watch(
       isProfessor.value = learningPlanStore.userIsFacilitator || false;
 
       // Kanban
-      classes.value =
-        learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
-        [];
+      classes.value = learningPlanStore.learningPlan?.classes?.map((group) => group.name) || [];
       headerStore.title = t('components.courses.settings.breadcrumbTitle');
       headerStore.items = [
         {
