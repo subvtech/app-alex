@@ -41,12 +41,12 @@ const totalizers = ref({
   },
 });
 
-const grades = [];
-
+const grades = ref<any>([]);
 const events = ref<FormattedEvent[]>([]);
 const yourGoals = ref<LearningGoalSimple[]>([]);
 
 const progress = ref([]);
+const progressPercentage = ref<number>(0);
 
 const memberId = computed<number>(() => {
   const member = learningPlanStore.learningPlan?.members.find(({ user }) => user.id === +route.params.memberId);
@@ -116,36 +116,36 @@ const getData = () => {
       };
 
       // Calculate learning goals
-      const completedGoals: LearningPlanGoalSimple[] = [];
+      // const completedGoals: LearningPlanGoalSimple[] = [];
 
-      const allGoals = data.reduce((acc: LearningPlanGoalSimple[], taskMember: TaskMember) => {
-        const newGoals: LearningPlanGoalSimple[] = [];
+      // const allGoals = data.reduce((acc: LearningPlanGoalSimple[], taskMember: TaskMember) => {
+      //   const newGoals: LearningPlanGoalSimple[] = [];
 
-        taskMember.task?.learning_goals?.forEach((goal) => {
-          if (acc.every(({ id }) => id !== goal.id)) {
-            newGoals.push(goal);
-          }
+      //   taskMember.task?.learning_goals?.forEach((goal) => {
+      //     if (acc.every(({ id }) => id !== goal.id)) {
+      //       newGoals.push(goal);
+      //     }
 
-          if (taskMember?.status === 'done') {
-            completedGoals.push(goal);
-          }
-        });
+      //     if (taskMember?.status === 'done') {
+      //       completedGoals.push(goal);
+      //     }
+      //   });
 
-        return [...acc, ...newGoals];
-      }, []);
+      //   return [...acc, ...newGoals];
+      // }, []);
 
-      const totalGoals = allGoals.length;
-      const filteredCompletedGoals = completedGoals.reduce(
-        (acc: LearningPlanGoalSimple[], goal: LearningPlanGoalSimple) =>
-          acc.every(({ id }) => id !== goal.id) ? [...acc, goal] : acc,
-        [],
-      ).length;
+      // const totalGoals = allGoals.length;
+      // const filteredCompletedGoals = completedGoals.reduce(
+      //   (acc: LearningPlanGoalSimple[], goal: LearningPlanGoalSimple) =>
+      //     acc.every(({ id }) => id !== goal.id) ? [...acc, goal] : acc,
+      //   [],
+      // ).length;
 
-      newTotalizers.objectives = {
-        ...newTotalizers.objectives,
-        value: !totalGoals ? '0' : totalGoals.toString().padStart(2, '0'),
-        percentage: getPercentage(filteredCompletedGoals, totalGoals),
-      };
+      // newTotalizers.objectives = {
+      //   ...newTotalizers.objectives,
+      //   value: !totalGoals ? '0' : totalGoals.toString().padStart(2, '0'),
+      //   percentage: getPercentage(filteredCompletedGoals, totalGoals),
+      // };
 
       // Calculate contributions
       const completedContributions: TrailContribuition[] = [];
@@ -190,16 +190,17 @@ const getData = () => {
     filters: {
       learning_plan_member: member.id,
     },
-    populate: {
-      task: true,
-    },
+    populate: ['task', 'learning_plan_member.user'],
+    sort: 'id:desc',
   }).then(({ data }) => {
-    events.value = (data as TaskEvent[]).map(({ id, event, createdAt, task }) => ({
-      id,
-      event,
-      title: task?.title ?? '',
-      date: createdAt,
-    }));
+    events.value = (data as TaskEvent[])
+      .map(({ id, event, createdAt, task, learning_plan_member }) => ({
+        id,
+        event,
+        title: task?.title ?? learning_plan_member?.user?.fullname ?? '',
+        date: createdAt,
+      }))
+      .sort((a, b) => b.id - a.id);
   });
 
   // Get progress
@@ -222,10 +223,17 @@ const getData = () => {
       },
     },
   }).then(({ data }) => {
+    let total = 0;
+    let completed = 0;
+
     yourGoals.value = data as LearningPlanGoalSimple[];
     progress.value = (data as LearningPlanGoalSimple[]).map((goal) => {
       const taskMemberStatus = goal?.tasks?.map((task) => task?.task_members?.[0]?.status) ?? [];
       const completedTasks = taskMemberStatus?.filter((status) => status === 'done');
+
+      total += taskMemberStatus.length;
+      completed += completedTasks.length;
+
       const tasks =
         goal?.tasks?.map((task) => ({
           id: task.id,
@@ -240,7 +248,63 @@ const getData = () => {
         tasks,
       };
     });
+
+    // Update goals totalizer
+    const newTotalizers = totalizers.value;
+
+    const allPercentages = (data as LearningPlanGoalSimple[]).map((goal: LearningPlanGoalSimple) => {
+      const allTasks = goal?.tasks?.length;
+      const completed = goal.tasks.filter((task) => task?.task_members?.[0]?.status === 'done').length;
+
+      return getPercentage(completed, allTasks);
+    });
+
+    const percentagesSum = allPercentages.reduce((total, curr) => total + curr, 0);
+    const filteredCompletedGoals = percentagesSum / allPercentages.length;
+
+    newTotalizers.objectives = {
+      ...newTotalizers.objectives,
+      value: !data.length ? '0' : data.length.toString().padStart(2, '0'),
+      percentage: filteredCompletedGoals,
+    };
+
+    totalizers.value = newTotalizers;
+    progressPercentage.value = getPercentage(completed, total);
   });
+
+  // Get grades
+  find('task-members', {
+    filters: {
+      learning_plan_member: member.id,
+      task: {
+        learningplan: +route.params.id,
+      },
+      status: 'done',
+    },
+    populate: {
+      task: true,
+      task_submissions: {
+        populate: {
+          evaluations: {
+            sort: 'id:desc',
+          },
+        },
+        sort: 'id:desc',
+      },
+    },
+  })
+    .then(({ data }) => {
+      grades.value = data
+        .map((taskMember) => ({
+          name: taskMember?.task?.title ?? '',
+          grade: taskMember?.task_submissions?.[0]?.evaluations?.[0]?.grade,
+        }))
+        .filter(({ grade }) => grade !== undefined);
+    })
+    .catch((e) => {
+      console.error(e);
+      setMessage(t('components.courses.tasks.failLoadGrades'), 'error', true);
+    });
 };
 
 onBeforeMount(() => {
@@ -264,7 +328,7 @@ watch(
     </div>
     <v-row class="mb-6">
       <v-col cols="12" lg="8">
-        <Progress :data="progress" />
+        <Progress :data="progress" :percentage="progressPercentage" />
       </v-col>
       <v-col cols="12" lg="4">
         <Performance :data="grades" />

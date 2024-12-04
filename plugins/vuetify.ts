@@ -8,6 +8,9 @@ import { createVuetify } from 'vuetify';
 import { mdi } from 'vuetify/iconsets/mdi';
 import { alexIcons } from 'assets/icons';
 import DateFnsAdapter from '@date-io/date-fns';
+import { VNumberInput } from 'vuetify/labs/VNumberInput'
+
+
 
 export const vuetify = createVuetify({
   locale: {
@@ -21,7 +24,10 @@ export const vuetify = createVuetify({
       en: enUS,
     },
   },
-  components,
+  components: {
+    ...components,
+    VNumberInput,
+  },
   directives,
   defaults,
   display: {

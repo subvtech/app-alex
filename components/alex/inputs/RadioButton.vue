@@ -1,11 +1,6 @@
 <template>
   <v-radio-group color="accent" class="alex-radio-button">
-    <div
-      v-for="button in buttons"
-      :key="button.value"
-      class="d-flex flex-column"
-      role="button-radio"
-    >
+    <div v-for="button in buttons" :key="button.value" class="d-flex flex-column" role="button-radio">
       <v-radio
         class="text-body-1 radio"
         :class="button.disabled ? 'text-gray-400' : 'text-gray-800 '"
@@ -17,10 +12,7 @@
         density="default"
       >
       </v-radio>
-      <p
-        :class="button.disabled ? 'text-gray-400' : 'text-gray-600 '"
-        class="ml-11 text-body-3"
-      >
+      <p :class="button.disabled ? 'text-gray-400' : 'text-gray-600 '" class="ml-11 text-body-3">
         {{ button.hint }}
       </p>
     </div>
