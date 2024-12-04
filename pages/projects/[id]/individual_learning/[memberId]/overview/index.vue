@@ -41,8 +41,7 @@ const totalizers = ref({
   },
 });
 
-const grades = [];
-
+const grades = ref<any>([]);
 const events = ref<FormattedEvent[]>([]);
 const yourGoals = ref<LearningGoalSimple[]>([]);
 
@@ -117,36 +116,36 @@ const getData = () => {
       };
 
       // Calculate learning goals
-      const completedGoals: LearningPlanGoalSimple[] = [];
+      // const completedGoals: LearningPlanGoalSimple[] = [];
 
-      const allGoals = data.reduce((acc: LearningPlanGoalSimple[], taskMember: TaskMember) => {
-        const newGoals: LearningPlanGoalSimple[] = [];
+      // const allGoals = data.reduce((acc: LearningPlanGoalSimple[], taskMember: TaskMember) => {
+      //   const newGoals: LearningPlanGoalSimple[] = [];
 
-        taskMember.task?.learning_goals?.forEach((goal) => {
-          if (acc.every(({ id }) => id !== goal.id)) {
-            newGoals.push(goal);
-          }
+      //   taskMember.task?.learning_goals?.forEach((goal) => {
+      //     if (acc.every(({ id }) => id !== goal.id)) {
+      //       newGoals.push(goal);
+      //     }
 
-          if (taskMember?.status === 'done') {
-            completedGoals.push(goal);
-          }
-        });
+      //     if (taskMember?.status === 'done') {
+      //       completedGoals.push(goal);
+      //     }
+      //   });
 
-        return [...acc, ...newGoals];
-      }, []);
+      //   return [...acc, ...newGoals];
+      // }, []);
 
-      const totalGoals = allGoals.length;
-      const filteredCompletedGoals = completedGoals.reduce(
-        (acc: LearningPlanGoalSimple[], goal: LearningPlanGoalSimple) =>
-          acc.every(({ id }) => id !== goal.id) ? [...acc, goal] : acc,
-        [],
-      ).length;
+      // const totalGoals = allGoals.length;
+      // const filteredCompletedGoals = completedGoals.reduce(
+      //   (acc: LearningPlanGoalSimple[], goal: LearningPlanGoalSimple) =>
+      //     acc.every(({ id }) => id !== goal.id) ? [...acc, goal] : acc,
+      //   [],
+      // ).length;
 
-      newTotalizers.objectives = {
-        ...newTotalizers.objectives,
-        value: !totalGoals ? '0' : totalGoals.toString().padStart(2, '0'),
-        percentage: getPercentage(filteredCompletedGoals, totalGoals),
-      };
+      // newTotalizers.objectives = {
+      //   ...newTotalizers.objectives,
+      //   value: !totalGoals ? '0' : totalGoals.toString().padStart(2, '0'),
+      //   percentage: getPercentage(filteredCompletedGoals, totalGoals),
+      // };
 
       // Calculate contributions
       const completedContributions: TrailContribuition[] = [];
@@ -249,8 +248,63 @@ const getData = () => {
         tasks,
       };
     });
+
+    // Update goals totalizer
+    const newTotalizers = totalizers.value;
+
+    const allPercentages = (data as LearningPlanGoalSimple[]).map((goal: LearningPlanGoalSimple) => {
+      const allTasks = goal?.tasks?.length;
+      const completed = goal.tasks.filter((task) => task?.task_members?.[0]?.status === 'done').length;
+
+      return getPercentage(completed, allTasks);
+    });
+
+    const percentagesSum = allPercentages.reduce((total, curr) => total + curr, 0);
+    const filteredCompletedGoals = percentagesSum / allPercentages.length;
+
+    newTotalizers.objectives = {
+      ...newTotalizers.objectives,
+      value: !data.length ? '0' : data.length.toString().padStart(2, '0'),
+      percentage: filteredCompletedGoals,
+    };
+
+    totalizers.value = newTotalizers;
     progressPercentage.value = getPercentage(completed, total);
   });
+
+  // Get grades
+  find('task-members', {
+    filters: {
+      learning_plan_member: member.id,
+      task: {
+        learningplan: +route.params.id,
+      },
+      status: 'done',
+    },
+    populate: {
+      task: true,
+      task_submissions: {
+        populate: {
+          evaluations: {
+            sort: 'id:desc',
+          },
+        },
+        sort: 'id:desc',
+      },
+    },
+  })
+    .then(({ data }) => {
+      grades.value = data
+        .map((taskMember) => ({
+          name: taskMember?.task?.title ?? '',
+          grade: taskMember?.task_submissions?.[0]?.evaluations?.[0]?.grade,
+        }))
+        .filter(({ grade }) => grade !== undefined);
+    })
+    .catch((e) => {
+      console.error(e);
+      setMessage(t('components.courses.tasks.failLoadGrades'), 'error', true);
+    });
 };
 
 onBeforeMount(() => {

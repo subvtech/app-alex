@@ -90,9 +90,9 @@
           :key="`student-member${member.raw.id}`"
           :member="{
             name:
-              member.raw.learning_plan_member?.user.fullname ||
+              member.raw.learning_plan_member?.user?.fullname ||
               member.raw.learning_plan_group?.title ||
-              member.raw.user.fullname,
+              member.raw.user?.fullname,
             class:
               member.raw.learning_plan_member?.learning_class?.name ||
               member.raw.learning_plan_group?.learning_class.name,
@@ -156,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface MembersProps {
   listGroupMembers?: boolean;

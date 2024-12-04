@@ -28,22 +28,16 @@
       />
     </template>
     <template v-if="prependIcon" #prepend>
-      <v-icon
-        class="mr-1"
-        :size="['x-small', 'small'].includes(size) ? 'medium' : '20'"
-        >{{ prependIcon }}</v-icon
-      ></template
+      <v-icon class="mr-1" :size="['x-small', 'small'].includes(size) ? 'medium' : '20'">{{
+        prependIcon
+      }}</v-icon></template
     >
 
     <div v-if="icon" style="display: inline-flex" data-testid="icon">
-      <v-icon
-        class="mx-0"
-        :size="['x-small', 'small'].includes(size) ? 'medium' : '20'"
-        >{{ icon }}</v-icon
-      >
+      <v-icon class="mx-0" :size="['x-small', 'small'].includes(size) ? 'medium' : '20'">{{ icon }}</v-icon>
     </div>
     <div v-else class="w-100 overflow-hidden">
-      <span>{{ text }}</span>
+      <span :class="textClasses">{{ text }}</span>
     </div></v-chip
   >
 </template>
@@ -62,6 +56,7 @@ interface Props {
   status?: 'primary' | 'secondary' | 'orange' | 'green' | 'red' | 'blue';
   color?: string;
   variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain';
+  textClasses?: string;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -76,6 +71,7 @@ withDefaults(defineProps<Props>(), {
   status: undefined,
   color: '',
   variant: undefined,
+  textClasses: '',
 });
 </script>
 

@@ -40,27 +40,24 @@ export const useStrapiUtils = () => {
     return { ...result, data: formatResult<T>(result.data) };
   }
 
-  async function find<T>(
-    contentType: string,
-    params?: Strapi4RequestParams,
-  ): Promise<{ meta: any; data: T[] }> {
+  async function find<T>(contentType: string, params?: Strapi4RequestParams): Promise<{ meta: any; data: T[] }> {
     const result = await strapi.find<T>(contentType, params);
-    const formattedResult = result.data
-      ? result.data.map(formatResult<T>)
-      : (result as unknown as T[]);
+    const formattedResult = result.data ? result.data.map(formatResult<T>) : (result as unknown as T[]);
 
     return {
       meta: result.meta,
       data: formattedResult,
     };
   }
-  async function create<T>(
-    contentType: string,
-    data: Partial<T>,
-  ): Promise<{ meta: any; data: T }> {
+  async function create<T>(contentType: string, data: Partial<T>): Promise<{ meta: any; data: T }> {
     const result = await strapi.create<T>(contentType, data);
     return { meta: result.meta, data: formatResult<T>(result.data) };
   }
 
-  return { findOne, find, formatResult, create };
+  async function update<T>(contentType: string, id: number, data: Partial<T>): Promise<{ meta: any; data: T }> {
+    const result = await strapi.update<T>(contentType, id, data);
+    return { meta: result.meta, data: formatResult<T>(result.data) };
+  }
+
+  return { findOne, find, formatResult, create, update };
 };
