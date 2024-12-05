@@ -11,7 +11,7 @@ const route = useRoute();
 
 const hasError = ref(false);
 const loading = ref(true);
-const members = ref<UserSimple[]>([]);
+const members = ref<UserSimple[] | undefined>(undefined);
 const search = ref('');
 
 const cardClass = computed(() => {
@@ -25,7 +25,7 @@ const cardClass = computed(() => {
 });
 
 const filteredMembers = computed(() => {
-  return members.value.filter((member) => {
+  return (members?.value ?? []).filter((member) => {
     return contains(member.email, search.value) || contains(member.fullname, search.value);
   });
 });
@@ -79,7 +79,7 @@ onMounted(fetchMembers);
 <template>
   <div class="tw-bg-white tw-flex tw-flex-col tw-rounded-lg tw-p-6 tw-min-h-[500px] !tw-text-slate-500">
     <div class="tw-flex tw-flex-1 tw-flex-col tw-mb-6 tw-w-full tw-gap-6">
-      <template v-if="members.length">
+      <template v-if="members?.length">
         <alex-inputs-text-field
           v-show="members.length"
           v-model="search"
@@ -155,7 +155,7 @@ onMounted(fetchMembers);
         </div>
       </template>
       <template v-else>
-        <div v-if="true">
+        <div v-if="members === undefined">
           <Skeleton class="tw-w-[320px] tw-h-[44px] tw-mb-6 tw-rounded-xl" />
           <div class="tw-flex tw-flex-wrap">
             <Skeleton v-for="index in 8" :key="index" :class="[cardClass, 'tw-h-[230px] tw-w-[300px] tw-rounded-xl']" />
