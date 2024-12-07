@@ -47,25 +47,27 @@ const fetchMembers = async () => {
       populate: ['members.user.avatar', 'members.task_members.task.learning_goals'],
     });
 
-    members.value = res.data.members.map((member) => {
+    const teste = res.data.members.map((member) => {
       let goals = 0;
       let completedGoals = 0;
 
       member.task_members.forEach((taskMember) => {
-        goals += taskMember.task.learning_goals.length;
+        goals += taskMember?.task?.learning_goals?.length;
 
-        if (taskMember.status === 'done') {
-          completedGoals += taskMember.task.learning_goals.length;
+        if (taskMember?.status === 'done') {
+          completedGoals += taskMember?.task.learning_goals?.length;
         }
       });
 
-      const percentage = !goals && !completedGoals ? 100 : getPercentage(completedGoals, goals);
+      const percentage = !goals && !completedGoals ? 0 : getPercentage(completedGoals, goals);
 
       return {
         ...member.user,
         percentage,
       };
     });
+    // console.log(teste);
+    members.value = teste;
   } catch (_) {
     hasError.value = true;
   } finally {
