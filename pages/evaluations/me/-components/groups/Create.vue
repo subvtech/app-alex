@@ -39,7 +39,7 @@
       "
     />
     <!-- Criteria chips -->
-    <div class="d-flex tw-flex-wrap ga-2">
+    <div class="d-flex tw-flex-wrap ga-2 tw-min-h-[32px]">
       <alex-custom-chip
         v-for="criterion in criteria"
         :key="criterion"
