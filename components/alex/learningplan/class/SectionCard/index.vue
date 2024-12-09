@@ -1,24 +1,10 @@
 <template>
-  <alex-custom-card
-    title=""
-    class="participantes-card mb-6"
-    align-content="align-center"
-  >
+  <alex-custom-card title="" class="participantes-card mb-6" align-content="align-center">
     <template #content>
       <v-row v-if="loading" class="w-100 gap-4">
-        <div
-          class="d-flex w-full align-center justify-space-between flex-wrap gap-6 w-100 px-1"
-        >
-          <alex-custom-skeleton
-            color="gray-100"
-            class="width-76 height-12 absolute"
-            rounded="rounded"
-          />
-          <alex-custom-skeleton
-            color="gray-100"
-            class="width-40 height-11 absolute"
-            rounded="rounded"
-          />
+        <div class="d-flex w-full align-center justify-space-between flex-wrap gap-6 w-100 px-1">
+          <alex-custom-skeleton color="gray-100" class="width-76 height-12 absolute" rounded="rounded" />
+          <alex-custom-skeleton color="gray-100" class="width-40 height-11 absolute" rounded="rounded" />
         </div>
         <div class="d-flex align-start flex-wrap gap-6 w-100 px-1">
           <alex-learningplan-skeleton-class-member-card
@@ -46,15 +32,13 @@
           <template #custom-dialog>
             <slot name="custom-dialog" />
           </template>
+
+          <template #dialog-content><slot name="dialog-content"></slot></template>
         </alex-learningplan-class-section-card-header>
 
         <v-row v-if="!items.length" dense align="center" justify="center">
           <div class="d-flex flex-column align-center ga-6">
-            <v-img
-              :src="emptyStateImage"
-              :height="imageHeight"
-              :width="imageWidth"
-            />
+            <v-img :src="emptyStateImage" :height="imageHeight" :width="imageWidth" />
             <h3 class="text-h3 text-gray-400">
               {{ emptyStateMessage }}
             </h3>
@@ -91,12 +75,7 @@
                 <p class="text-body-3 text-gray-600">
                   {{ pagination.showingData(groupedItems) }}
                 </p>
-                <alex-custom-pagination
-                  v-if="pageCount > 1"
-                  v-model="page"
-                  :length="pageCount"
-                  :total-visible="5"
-                />
+                <alex-custom-pagination v-if="pageCount > 1" v-model="page" :length="pageCount" :total-visible="5" />
               </div>
             </template>
           </v-data-iterator>
@@ -164,13 +143,7 @@ const searchModel = computed({
 
 const cardItems = computed(() => props.items);
 
-const pagination = usePagination(
-  searchModel,
-  page,
-  cardItems,
-  t(props.emptyStateObjectName),
-  props.entity,
-);
+const pagination = usePagination(searchModel, page, cardItems, t(props.emptyStateObjectName), props.entity);
 </script>
 
 <style lang="scss" scoped>

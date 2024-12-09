@@ -28,20 +28,17 @@
         <template v-if="!isMobile">{{ actionText }}</template>
         <template v-else><v-icon :icon="actionIcon" /></template>
         <slot v-if="useCustomDialog" name="custom-dialog"></slot>
-        <alex-custom-dialog
-          v-else
-          v-model="dialogModelValue"
-          :title="dialogTitle"
-          activator="parent"
-        >
+        <alex-custom-dialog v-else v-model="dialogModelValue" :title="dialogTitle" activator="parent">
           <slot name="dialog-content"></slot>
           <template #footer>
             <alex-custom-dialog-footer
               no-secondary-button
               :main-button-text="dialogActionText"
+              :secondary-button-text="$t('components.card.cancel')"
               :main-button-loading="dialogActionLoading"
               :main-button-disabled="dialogActionDisabled"
               @on-main-action="emit('action')"
+              @on-secondary-action="dialogModelValue = false"
             />
           </template>
         </alex-custom-dialog> </alex-custom-button
