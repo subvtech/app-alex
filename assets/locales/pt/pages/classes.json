@@ -55,6 +55,7 @@
   "emptyGroupsMessage": "Parece que ainda não há grupos criados!",
   "findGroup": "Encontrar grupo",
   "createGroup": "Criar grupo",
+  "updateGroup": "Editar grupo",
   "whatGroupName": "Qual o nome do Grupo?",
   "textGroupName": "Digite o nome do grupo",
   "whoAreGroupResponsible": "Quem será responsável pelo grupo?",
