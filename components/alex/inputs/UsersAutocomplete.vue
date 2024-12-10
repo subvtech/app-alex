@@ -136,6 +136,8 @@ onMounted(() => {
 watch(
   search,
   () => {
+    setItems();
+
     const isValidEmail = emailRegex.test(search.value);
     const local = items.value.filter((item) => item?.local);
     if (search.value.length && isValidEmail && !(props.ignoreEmails || []).includes(search.value)) {
