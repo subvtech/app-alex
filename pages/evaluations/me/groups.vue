@@ -127,7 +127,7 @@ const { setMessage } = useMessageStore();
 const user = useStrapiUser();
 const { getUserEvaluationGroupsByType, deleteUserEvaluationGroupMutation } = useTaskEvaluation(0, 0, user);
 
-const { data: items, refetch: refresh } = getUserEvaluationGroupsByType('standard');
+const { data: items, refetch: refresh } = getUserEvaluationGroupsByType({ value: 'standard' });
 const { mutateAsync: deleteUserEvaluationGroup } = deleteUserEvaluationGroupMutation();
 
 const i18Dir = 'pages.evaluations.groupsSec';
@@ -167,12 +167,12 @@ const filteredItems = computed(() => {
     }) ?? [];
 
   // Filter by name or criteria
-  filtered = filtered.filter(({ name, criteria }) => {
-    if (name.toLowerCase().includes(search.value.toLocaleLowerCase())) {
+  filtered = filtered.filter((group) => {
+    if (group.name.toLowerCase().includes(search.value.toLocaleLowerCase())) {
       return true;
     }
 
-    if (criteria.some((value) => value.toLowerCase().includes(search.value.toLowerCase()))) {
+    if (group.evaluation_criterias.some(({ name }) => name.toLowerCase().includes(search.value.toLowerCase()))) {
       return true;
     }
 
@@ -189,12 +189,12 @@ const filteredItems = computed(() => {
 
 const slicedItems = computed(() => {
   return filteredItems.value.slice(
-    (activePage.value - 1) * itemsPerPage,
-    Math.min(activePage.value * itemsPerPage, totalItems.value),
+    Math.max((activePage.value - 1) * itemsPerPage, 0),
+    Math.min((activePage.value + 1) * itemsPerPage, totalItems.value),
   );
 });
 
-const totalItems = computed<number>(() => filteredItems.value.length);
+const totalItems = computed<number>(() => items?.value?.length ?? 0);
 
 const editGroup = (group) => {
   createModal.value = true;
@@ -232,8 +232,8 @@ const paginationLength = computed<number>(() => {
 });
 
 const paginationText = computed<string>(() => {
-  const from = (activePage.value - 1) * itemsPerPage + 1;
-  const to = Math.min(activePage.value * itemsPerPage, totalItems.value);
+  const from = Math.max((activePage.value - 1) * itemsPerPage + 1, Number(!!slicedItems.value.length));
+  const to = Math.min((activePage.value + 1) * itemsPerPage, slicedItems.value.length);
   const total = totalItems.value;
 
   return t(`${i18Dir}.pagination`, {
@@ -244,8 +244,12 @@ const paginationText = computed<string>(() => {
 });
 
 // Events
+onMounted(() => {
+  refresh();
+});
+
 watch(totalItems, (val) => {
-  if (activePage.value > Math.floor(val / itemsPerPage) || 1) {
+  if (activePage.value > (Math.floor(val / itemsPerPage) || 1)) {
     activePage.value = Math.floor(val / itemsPerPage) || 1;
   }
 });
