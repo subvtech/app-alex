@@ -48,6 +48,8 @@ const defaultCriteria = {
   public: false,
 };
 
+const i18Dir = 'pages.evaluations.criteriaSec';
+
 const criteria = ref<Criteria>({ ...defaultCriteria });
 const isLoading = ref(false);
 const showDialog = ref(false);
@@ -58,6 +60,7 @@ const { handleSubmit } = useForm({
   // validationSchema: evaluationsCriteriaRules,
 });
 const { setMessage } = useMessageStore();
+const { t } = useI18n();
 
 const { mutateAsync: createUserEvaluation } = createUserEvaluationMutation();
 const { mutateAsync: updateUserEvaluation } = updateUserEvaluationMutation();
@@ -78,11 +81,11 @@ const onSubmit = handleSubmit(async () => {
   try {
     // Checa se tem algum input faltando
     if (!criteria.value.name) {
-      setMessage('Por favor, informe o nome do critério', 'warning', true);
+      setMessage(t(`${i18Dir}.missingName`), 'warning', true);
       // eslint-disable-next-line no-throw-literal
       throw 'Missing input (Name)';
     } else if (!criteria.value.description) {
-      setMessage('Por favor, informe a descrição do critério', 'warning', true);
+      setMessage(t(`${i18Dir}.missingDescription`), 'warning', true);
       // eslint-disable-next-line no-throw-literal
       throw 'Missing input (Description)';
     }
@@ -90,10 +93,10 @@ const onSubmit = handleSubmit(async () => {
     //
     if (criteria.value.id) {
       await updateUserEvaluation({ ...criteria.value });
-      setMessage('Critério atualizado com sucesso', 'success', true);
+      setMessage(t(`${i18Dir}.updateSuccess`), 'success', true);
     } else {
       await createUserEvaluation({ ...criteria.value });
-      setMessage('Critério criado com sucesso', 'success', true);
+      setMessage(t(`${i18Dir}.createSuccess`), 'success', true);
     }
 
     showDialog.value = false;

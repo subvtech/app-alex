@@ -15,12 +15,18 @@
   "criteriaAssociated": "Critério não pode ser deletado porque já pertence a rubrica",
   "criteriaDeleteSuccess": "Critério deletado com sucesso",
   "criteriaDeleteFail": "Falha ao deletar critério",
+  "criteriaSec": {
+    "missingName": "Por favor, informe um nome para o critério",
+    "missingDescription": "Por favor, informe uma descrição para o critério",
+    "updateSuccess": "Critério atualizado com sucesso",
+    "createSuccess": "Critério criado com sucesso"
+  },
   "rubrics": {
     "name": "Nome",
     "criteria": "Critérios",
     "search": "Encontrar rubricas",
     "new": "Nova rubrica",
-    "pagination": "Mostrando do %{from} ao %{to} de um total de %{total} cursos",
+    "pagination": "Mostrando do %{from} ao %{to} de um total de %{total} rubricas",
     "createTitle": "Criar nova rubrica",
     "create": "Criar",
     "cancel": "Cancelar",
@@ -53,7 +59,7 @@
     "loadFail": "Falha ao carregar grupos",
     "search": "Encontrar grupo",
     "type": "Selecionar tipo",
-    "new": "Novo critério",
+    "new": "Novo grupo",
     "failLoadCriteria": "Falha ao carregar critérios",
     "missName": "Digite um nome para o grupo",
     "missCriteria": "Selecione ao menos um critério",

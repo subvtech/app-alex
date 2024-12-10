@@ -114,7 +114,7 @@ const user = useStrapiUser();
 const { setMessage } = useMessageStore();
 const { getUserEvaluationGroupsByType, deleteUserEvaluationGroupMutation } = useTaskEvaluation(0, 0, user);
 
-const { data: items, refetch: refresh } = getUserEvaluationGroupsByType('rubric');
+const { data: items, refetch: refresh } = getUserEvaluationGroupsByType({ value: 'rubric' });
 const { mutateAsync: deleteUserEvaluationGroup } = deleteUserEvaluationGroupMutation();
 
 const headers = [
@@ -132,12 +132,12 @@ const editContent = ref<null | any>(null);
 
 const filteredItems = computed(() => {
   const filtered =
-    items.value?.filter(({ name, criteria }) => {
-      if (name.toLowerCase().includes(search.value.toLocaleLowerCase())) {
+    items.value?.filter((rubric) => {
+      if (rubric.name.toLowerCase().includes(search.value.toLocaleLowerCase())) {
         return true;
       }
 
-      if (criteria.some((value) => value.toLowerCase().includes(search.value.toLowerCase()))) {
+      if (rubric.evaluation_criterias.some(({ name }) => name.toLowerCase().includes(search.value.toLowerCase()))) {
         return true;
       }
 
@@ -167,7 +167,7 @@ const paginationLength = computed<number>(() => {
 
 const paginationText = computed<string>(() => {
   const from = (activePage.value - 1) * itemsPerPage + 1;
-  const to = Math.min(activePage.value * itemsPerPage, totalItems.value);
+  const to = Math.min(activePage.value * itemsPerPage, filteredItems.value.length);
   const total = totalItems.value;
 
   return t(`${i18Dir}.pagination`, {

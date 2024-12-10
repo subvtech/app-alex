@@ -9,7 +9,6 @@ const { t } = useI18n();
 const user = useStrapiUser();
 const createCriteriaRef = ref(createCriteria);
 const { getUserEvaluations } = useTaskEvaluation(0, 0, user);
-const { setMessage } = useMessageStore();
 
 const { data: cards } = getUserEvaluations();
 
@@ -40,7 +39,7 @@ const showingData = (groupedItems: any, items: Array<any>) => {
     from,
     to,
     total,
-    entity: t('pages.evaluations.criteria'),
+    entity: t('pages.evaluations.criteria').toLowerCase(),
   });
   if (to === 0) {
     return t('pages.classes.noData');
@@ -70,7 +69,7 @@ const setTableData = (items: readonly Item[]): Criteria[] => {
       </alex-custom-button>
     </div>
     <div v-if="cards?.length === 0">
-      <Empty :emptyMessage="$t('pages.evaluations.no_criteria')" />
+      <Empty :empty-message="$t('pages.evaluations.no_criteria')" />
     </div>
     <v-data-iterator
       v-model:search="search"
