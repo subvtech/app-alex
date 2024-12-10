@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 
 const { find, findOne, create, update } = useStrapiUtils();
+
 const strapi = useStrapi();
 
 export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: null | Ref<any> = null) => {
@@ -331,6 +332,16 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
       return useMutation({
         mutationFn: ({ taskCompositionId, weight }: any) => {
           return update('grade-composition-tasks', taskCompositionId, { weight });
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: learningPlanGradesQuery });
+        },
+      });
+    },
+    deleteTaskComposition() {
+      return useMutation({
+        mutationFn: ({ taskCompositionId }: any) => {
+          return strapi.delete('grade-composition-tasks', taskCompositionId);
         },
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: learningPlanGradesQuery });
