@@ -304,7 +304,7 @@ import { orderEvents } from '~/utils';
 import type { RestrictionValue } from '../Restrictions.vue';
 const queryClient = useQueryClient();
 const { t } = useI18n();
-const isFirstTimeOpened = ref(true);
+
 const openGradeCompositionDialog = ref(false);
 const openEvaluationGroupDialog = ref(false);
 const { find, findOne, create, update } = useStrapiUtils();
