@@ -11,7 +11,7 @@ const route = useRoute();
 
 const hasError = ref(false);
 const loading = ref(true);
-const members = ref<UserSimple[]>([]);
+const members = ref<UserSimple[] | undefined>(undefined);
 const search = ref('');
 
 const cardClass = computed(() => {
@@ -25,7 +25,7 @@ const cardClass = computed(() => {
 });
 
 const filteredMembers = computed(() => {
-  return members.value.filter((member) => {
+  return (members?.value ?? []).filter((member) => {
     return contains(member.email, search.value) || contains(member.fullname, search.value);
   });
 });
@@ -34,15 +34,40 @@ const emptyMessage = computed(() => {
   return hasError.value ? t('errors.default') : t('pages.projects.individual_learning.empty_members');
 });
 
+const getPercentage = (amount: number, total: number): number => {
+  const result = amount > 0 ? Math.floor((amount / total) * 100) : 0;
+  return !Number.isNaN(result) ? result : 100;
+};
+
 const fetchMembers = async () => {
   loading.value = true;
 
   try {
     const res = await findOne<LearningPlanSimple>('learningplans', Number(route.params.id), {
-      populate: ['members.user.avatar'],
+      populate: ['members.user.avatar', 'members.task_members.task.learning_goals'],
     });
 
-    members.value = res.data.members.map((r) => ({ ...r.user }));
+    const teste = res.data.members.map((member) => {
+      let goals = 0;
+      let completedGoals = 0;
+
+      member.task_members.forEach((taskMember) => {
+        goals += taskMember?.task?.learning_goals?.length;
+
+        if (taskMember?.status === 'done') {
+          completedGoals += taskMember?.task.learning_goals?.length;
+        }
+      });
+
+      const percentage = !goals && !completedGoals ? 0 : getPercentage(completedGoals, goals);
+
+      return {
+        ...member.user,
+        percentage,
+      };
+    });
+    // console.log(teste);
+    members.value = teste;
   } catch (_) {
     hasError.value = true;
   } finally {
@@ -56,7 +81,7 @@ onMounted(fetchMembers);
 <template>
   <div class="tw-bg-white tw-flex tw-flex-col tw-rounded-lg tw-p-6 tw-min-h-[500px] !tw-text-slate-500">
     <div class="tw-flex tw-flex-1 tw-flex-col tw-mb-6 tw-w-full tw-gap-6">
-      <template v-if="members.length">
+      <template v-if="members?.length">
         <alex-inputs-text-field
           v-show="members.length"
           v-model="search"
@@ -101,14 +126,11 @@ onMounted(fetchMembers);
                           variant="text"
                         />
                       </div>
-                      <div class="tw-flex tw-flex-col tw-overflow-hidden">
-                        <span
-                          class="text-gray-800 text-h5 tw-text-ellipsis tw-overflow-hidden tw-whitespace-nowrap"
-                          :title="member.fullname"
-                        >
+                      <div class="tw-flex tw-flex-col tw-overflow-hidden w-100">
+                        <span class="text-gray-800 text-h5 tw-truncate" :title="member.fullname">
                           {{ member.fullname }}
                         </span>
-                        <span class="text-gray-600 text-body-3" :title="member.email">
+                        <span class="text-gray-600 text-body-3 tw-truncate" :title="member.email">
                           {{ member.email }}
                         </span>
                       </div>
@@ -119,12 +141,12 @@ onMounted(fetchMembers);
                         color="accent"
                         class="tw-mb-2"
                         :height="8"
-                        model-value="50"
+                        :model-value="member.percentage"
                         bg-color="gray-600"
                       />
                       <div class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45">
                         <span>{{ $t('pages.projects.individual_learning.my_goals') }}</span>
-                        <span>50%</span>
+                        <span>{{ member.percentage }}%</span>
                       </div>
                     </div>
                   </CardContent>
@@ -135,7 +157,7 @@ onMounted(fetchMembers);
         </div>
       </template>
       <template v-else>
-        <div v-if="true">
+        <div v-if="members === undefined">
           <Skeleton class="tw-w-[320px] tw-h-[44px] tw-mb-6 tw-rounded-xl" />
           <div class="tw-flex tw-flex-wrap">
             <Skeleton v-for="index in 8" :key="index" :class="[cardClass, 'tw-h-[230px] tw-w-[300px] tw-rounded-xl']" />

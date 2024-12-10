@@ -104,11 +104,14 @@
           v-for="member in items"
           :key="`student-member${member.raw.id}`"
           :member="{
-            name: member.raw.learning_plan_member?.user.fullname || member.raw.learning_plan_group?.title,
+            name:
+              member.raw.learning_plan_member?.user?.fullname ||
+              member.raw.learning_plan_group?.title ||
+              member.raw.user?.fullname,
             class:
               member.raw.learning_plan_member?.learning_class?.name ||
               member.raw.learning_plan_group?.learning_class?.name,
-            avatarUrl: member.raw.learning_plan_member?.user?.avatar?.url,
+            avatarUrl: member.raw.learning_plan_member?.user?.avatar?.url || member.raw.user?.avatar?.url,
             group: !!member.raw.learning_plan_group,
             participants: member.raw.learning_plan_group
               ? getMembersOfGroup(member.raw.learning_plan_group)
@@ -133,6 +136,21 @@
               : undefined
           "
         />
+      </template>
+      <template v-else>
+        <template v-for="member in items" :key="`student-member${member.raw.id}`">
+          <alex-learningplan-task-members-card
+            v-for="groupMember in member.raw.learning_plan_group.group_members"
+            :key="`group-member${groupMember.id}`"
+            :member="{
+              name: groupMember.student_member.user.fullname,
+              class: member.raw.learning_plan_group?.learning_class.name,
+              avatarUrl: groupMember.student_member.user?.avatar?.url,
+              responsable: groupMember.role === 'in_charge',
+            }"
+            :edit="false"
+            @to-profile="navigateTo(`/users/${groupMember.student_member.user.username}`)"
+        /></template>
       </template>
     </template>
     <template #no-data>
@@ -165,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface MembersProps {
   listGroupMembers?: boolean;

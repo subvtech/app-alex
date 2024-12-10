@@ -80,6 +80,7 @@
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
+    :learning-plan-id="learningPlanStore.learningPlan?.id"
     :title="taskDetails?.title"
     :status="taskDetails?.status"
     :blocks="taskDetails?.blocks"
@@ -114,9 +115,9 @@
 </template>
 
 <script setup lang="ts">
-import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
+import type { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
-import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
+import type { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 
 export interface TaskItem {
   id: number;
@@ -166,6 +167,9 @@ const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 const teacherDrawer = ref(false);
 const slideTransition = (i: number) => (tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up');
+
+const route = useRoute();
+const router = useRouter();
 
 const groupsArray = ['draft', 'published', 'finished', 'archived'];
 const groups = {};
@@ -499,6 +503,19 @@ const openDrawer = (id: number) => {
   editTaskId.value = id;
   teacherDrawer.value = true;
 };
+
+onMounted(() => {
+  if (route.query?.taskId) {
+    openDrawer(Number.parseInt(route.query.taskId.toString()));
+  }
+});
+
+watch(teacherDrawer, (open) => {
+  if (open || !route.query?.taskId) {
+    return;
+  }
+  setTimeout(() => router.replace({ path: route.path, query: { ...route.query, taskId: undefined } }), 500);
+});
 
 const handleChangeValues = (values: Partial<TaskSimple>) => {
   const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);

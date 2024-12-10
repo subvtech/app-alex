@@ -101,6 +101,7 @@ import { useField } from 'vee-validate';
 
 export interface CreateTrailDialogComponentType {
   learningStructure: number;
+  userId?: number;
 }
 
 const { createTrailsRules } = useFormRules();
@@ -113,12 +114,14 @@ const imageRef = ref();
 const image = ref(null);
 const dialog = ref(false);
 
+const user = useStrapiUser();
+const learningPlanStore = useLearningPlanStore();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 
 const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
-const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), {});
+const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), { userId: undefined });
 const {
   value: descriptionValue,
   errorMessage: descriptionErrorMsg,
@@ -172,20 +175,52 @@ const createTrail = async () => {
         body: formData,
       });
     }
+
+    let createdLearningStructure = null;
+
+    if (!props.learningStructure) {
+      const member = learningPlanStore.learningPlan?.members.find(
+        (member) => member.user.id === (props.userId || user.value?.id),
+      );
+
+      const newStructure = await create('learning-plan-structures', {
+        title: member?.user.fullname ?? 'Learning Structure',
+        type: 'standard',
+        learningplan: learningPlanStore.learningPlan?.id ?? 0,
+        author_member: member?.id ?? 0,
+      });
+
+      createdLearningStructure = {
+        id: newStructure.data.id,
+        ...newStructure.data.attributes,
+        author_member: toRaw(member),
+      };
+    }
+
     const data = {
       title: titleValue.value,
       description: descriptionValue.value,
       cover_image: imageData,
-      learning_structure: props.learningStructure || null,
+      learning_structure: (props.learningStructure || createdLearningStructure?.id) ?? 0,
     };
 
-    console.log('Data:', data);
     const trailData = await create('trails', data);
+
+    if (createdLearningStructure) {
+      const newTrail = {
+        id: trailData.data.id,
+        ...trailData.data.attributes,
+        structures: [],
+      };
+
+      createdLearningStructure.trails = [newTrail];
+    }
+
     resetTitleField();
     resetDescriptionField();
 
     setMessage(t('pages.trails.success'), 'success', true);
-    emit('courseCreated', trailData.data.id);
+    emit('courseCreated', trailData.data.id, createdLearningStructure);
   } catch (error) {
     setMessage(t('pages.trails.error'), 'error', true);
   } finally {

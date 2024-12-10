@@ -93,9 +93,11 @@
           ? {
               name: studentDetails.learning_plan_member?.user.fullname || '',
               avatar: studentDetails.learning_plan_member?.user?.avatar?.url,
+              email: studentDetails.learning_plan_member?.user.email,
             }
           : undefined
       "
+      @update-status="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value, newStatus, true)"
       @change-finish-at="handleChangeFinishAt"
       @change-submit-after-deadline="handleChangeSendAfterDeadline"
     />
@@ -133,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { InsertCardProps, Task } from '@/components/alex/learningplan/task/kanban/index.vue';
+import type { InsertCardProps, Task } from '@/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
@@ -147,8 +149,8 @@ const { t } = useI18n();
 const { id, taskId: taskIdValue } = route.params;
 const { setMessage } = useMessageStore();
 const strapi = useStrapi();
-const taskId = computed(() => parseInt(taskIdValue.toString()));
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const taskId = computed(() => Number.parseInt(taskIdValue.toString()));
+const learningPlanId = computed(() => Number.parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref<Task[]>([]);
 const studentDetailsId = ref<number>(-1);

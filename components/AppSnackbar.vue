@@ -127,12 +127,8 @@ const onClose = () => {
   width: 0%;
 }
 .snackbar {
-  display: inline-flex;
   min-width: 300px;
   padding: 16px !important;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  align-items: flex-start;
   border-radius: 8px;
 
   box-shadow:

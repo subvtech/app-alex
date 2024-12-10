@@ -8,7 +8,12 @@ export const useOnStopTyping = <T = string>(
   const isTyping = ref(false);
   const callFirst = ref(first);
   const empty = ref(whenEmpty);
-  watchEffect((onInvalidate) => {
+  const timeout = ref();
+
+  watch(search, () => {
+    if (timeout.value) {
+      clearInterval(timeout.value);
+    }
     if (!search.value && empty.value) {
       return;
     }
@@ -19,14 +24,10 @@ export const useOnStopTyping = <T = string>(
 
     isTyping.value = true;
 
-    const timeout = setTimeout(async () => {
+    timeout.value = setTimeout(async () => {
       isTyping.value = false;
       await callback(search.value);
     }, ms);
-
-    onInvalidate(() => {
-      clearInterval(timeout);
-    });
   });
   return {
     isTyping,

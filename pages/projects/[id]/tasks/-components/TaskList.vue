@@ -1009,7 +1009,9 @@ const updateTaskContract = (newAddress: string | null) => {
       :contract-address="editTask?.contract_address"
       @update-value="
         (field) => {
-          handleUpdateTask(editTask?.id ?? 0, field);
+          if (editTask) {
+            handleUpdateTask(editTask?.id ?? 0, field);
+          }
         }
       "
       @update:contract="updateTaskContract"

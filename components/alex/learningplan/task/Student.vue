@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { TaskStudent, InsertCardProps } from './kanban/index.vue';
+import type { InsertCardProps, TaskStudent } from './kanban/index.vue';
 
 interface StudentProps {
   studentId: number;
@@ -187,7 +187,7 @@ const { data: tasks, execute } = await useAsyncData(
     },
   },
 );
-const handleUpdateStatus = async (newIndex: number, item: TaskStudent, newStatus: string, emitEvt: boolean = false) => {
+const handleUpdateStatus = async (newIndex: number, item: TaskStudent, newStatus: string, emitEvt = false) => {
   if (!kanban.value) {
     return;
   }

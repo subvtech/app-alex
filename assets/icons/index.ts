@@ -1,6 +1,9 @@
 import { h } from 'vue';
 import type { IconProps, IconSet } from 'vuetify';
+import ArticleFilled from './ArticleFilled.vue';
+import CollectionBookmark from './CollectionBookmark.vue';
 import DragIndicator from './DragIndicator.vue';
+import FactCheck from './FactCheck.vue';
 import HistoryEdu from './HistoryEdu.vue';
 import Kanban from './Kanban.vue';
 import ManageHistory from './ManageHistory.vue';
@@ -18,6 +21,9 @@ const alexAliases = {
   Sprint,
   ManageHistory,
   HistoryEdu,
+  FactCheck,
+  ArticleFilled,
+  CollectionBookmark,
 };
 
 const alexIcons: IconSet = {

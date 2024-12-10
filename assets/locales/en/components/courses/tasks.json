@@ -20,6 +20,8 @@
   "srchStudent": "Search student",
   "expand": "...See more",
   "retract": "...See less",
+  "failLoadProgress": "Failed to load student progress",
+  "failLoadGrades": "Failed to load student grades",
   "submission": {
     "submission": "Submission",
     "no_submission": "No Submission",

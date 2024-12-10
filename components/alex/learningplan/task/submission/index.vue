@@ -15,9 +15,7 @@
       <h5 class="text-body-4" :class="colorsAndSizes.title">
         {{ text.title }}
       </h5>
-      <p :class="[colorsAndSizes.subtitle, colorsAndSizes.subtitleSize]">
-        {{ text.subtitle }}
-      </p>
+      <p :class="[colorsAndSizes.subtitle, colorsAndSizes.subtitleSize]">{{ text.subtitle }}</p>
     </div>
     <slot name="appendIcon" />
     <v-icon
@@ -33,26 +31,51 @@
     :deadline="taskDeadline"
     :restrictions="restrictions"
     :task-member-id="taskMemberId"
+    :learning-plan-id="learningPlanId"
+    :task-id="taskId"
     :last-submission="content"
     :task-status="taskStatus"
     :read-only="readOnly"
     :doc-name="shouldBeCollaborative"
+    :member-type="type"
+    :group="group"
+    :student="student"
+    :studentClass="class"
     @update-task-status="(status) => $emit('update-task-status', status)"
     @update-submission="() => $emit('update-submission')"
+  />
+  <alex-custom-confirm-dialog
+    v-model="openConfirmDialog"
+    title="Tipo de avaliação não definido!"
+    subtitle="Deseja associar um tipo de avaliação para esta tarefa?"
+    submit-button-text="Associar Tipo Avaliação"
+    cancel-button-text="
+      Cancelar
+    "
+    :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+    @submit="setTaskEvaluationGroup"
+    @cancel="openConfirmDialog = false"
   />
 </template>
 
 <script setup lang="ts">
+import type { Student } from '../drawer/Student.vue';
+
 interface Submission {
   mark?: number | null;
   maxMark?: number | null;
   taskTitle?: string;
+  taskId?: number;
+  learningPlanId?: number;
   taskDeadline?: string;
   restrictions?: string[];
   content?: TaskSubmissionSimple;
   taskMemberId: number;
   taskStatus: TaskMemberStatus;
   docName?: string;
+  group?: LearningPlanGroupSimple;
+  student?: Student;
+  class?: string;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';
@@ -62,24 +85,47 @@ interface ProfessorSubimission {
   status: 'in_review' | 'reviewed' | 'denied';
   type: 'professor';
 }
-type SubimissionProps = Submission &
-  (StudentSubimission | ProfessorSubimission);
+type SubimissionProps = Submission & (StudentSubimission | ProfessorSubimission);
 
 const props = withDefaults(defineProps<SubimissionProps>(), {
   clickable: false,
   mark: 0,
   maxMark: 0,
   taskTitle: undefined,
+  taskId: 0,
+  learningPlanId: 0,
   taskDeadline: undefined,
   restrictions: undefined,
   content: undefined,
   docName: undefined,
+  group: undefined,
+  student: undefined,
+  class: undefined,
 });
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
   'update-submission': [];
 };
 defineEmits<Emits>();
+const user = useStrapiUser();
+const taskId = toRef(props, 'taskId');
+const learningPlanId = toRef(props, 'learningPlanId');
+const submission = toRef(props, 'content');
+const submissionId = computed(() => submission.value?.id);
+
+const openConfirmDialog = ref(false);
+
+const { getTaskEvaluatonData, getTaskSubmissionEvaluation, createSubmissionEvaluationMutation } = useTaskEvaluation(
+  learningPlanId,
+  taskId,
+  user,
+  submissionId,
+);
+
+const { data: taskEvaluationData } = getTaskEvaluatonData();
+const { data: taskSubmissionData } = getTaskSubmissionEvaluation();
+const { mutateAsync: createTaskSubmissionEvaluation } = createSubmissionEvaluationMutation();
+
 const { t } = useI18n();
 const slots = useSlots();
 const hasPrepend = computed(() => !!slots.prependIcon);
@@ -96,10 +142,7 @@ const formattedMark = computed(() => {
 });
 
 const shouldBeCollaborative = computed(() => {
-  if (
-    ['to_do', 'in_progress'].includes(props.taskStatus) &&
-    props.type === 'student'
-  ) {
+  if (['to_do', 'in_progress'].includes(props.taskStatus) && props.type === 'student') {
     return props.docName;
   }
   return '';
@@ -107,18 +150,12 @@ const shouldBeCollaborative = computed(() => {
 
 const defaultChip = computed(
   () =>
-    ['not_started', 'started'].includes(props.status) ||
-    (props.status === 'in_review' && props.type === 'professor'),
+    ['not_started', 'started'].includes(props.status) || (props.status === 'in_review' && props.type === 'professor'),
 );
 
-const readOnly = computed(
-  () =>
-    ['in_review', 'done'].includes(props.status) || props.type === 'professor',
-);
+const readOnly = computed(() => ['in_review', 'done'].includes(props.status) || props.type === 'professor');
 
-const remake = computed(
-  () => props.status === 'denied' && props.type === 'student',
-);
+const remake = computed(() => props.status === 'denied' && props.type === 'student');
 const colorsAndSizes = computed(() => {
   let subtitle = 'text-gray-500';
   let subtitleSize = 'text-body-5';
@@ -196,13 +233,24 @@ const text = computed(() => {
       subtitle: formattedMark.value,
     };
   }
+
   return {
     title: t('components.courses.tasks.submission.done'),
     subtitle: t('components.courses.tasks.submission.click_to_review'),
   };
 });
 
-const openDialog = () => {
+const setTaskEvaluationGroup = async () => {
+  await navigateTo({ path: `/courses/${learningPlanId.value}/tasks`, query: { taskId: taskId.value } });
+};
+
+const openDialog = async () => {
+  if (props.status === 'in_review' && !taskEvaluationData.value.evaluation_group) {
+    openConfirmDialog.value = true;
+    return;
+  } else if (!taskSubmissionData.value && props.status === 'in_review')
+    await createTaskSubmissionEvaluation({ groupId: taskEvaluationData.value?.evaluation_group?.id });
+
   dialog.value.openDialog();
 };
 </script>
