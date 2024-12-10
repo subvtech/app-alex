@@ -129,7 +129,8 @@ const props = defineProps<{
 }>();
 
 const assessmentAvailableTasks = computed(() => {
-  const tasksIds = selectedTasks.value.map((t) => t.id);
+  let tasksIds = selectedTasks.value.map((t) => t.id);
+  tasksIds = tasksIds.concat(props.assessments.flatMap((a) => a.tasks.map((t) => t.id)));
   return (props.availableTasks || []).filter((t) => !tasksIds.includes(t.id));
 });
 
