@@ -7,42 +7,25 @@
     data-testid="horizontal-bar"
     style="min-width: max-content"
   >
-    <div
-      class="d-flex w-100 align-center"
-      :class="reverse ? 'flex-row-reverse' : ''"
-      :role="reverse ? 'reversed' : ''"
-    >
-      <v-app-bar-nav-icon
-        class="text-gray-900"
-        @click.stop="emit('toggle:drawer')"
-      />
-
+    <div class="d-flex w-100 align-center" :class="reverse ? 'flex-row-reverse' : ''" :role="reverse ? 'reversed' : ''">
+      <v-app-bar-nav-icon class="text-gray-900" @click.stop="emit('toggle:drawer')" />
       <v-spacer />
 
-      <div :class="[reverse ? 'ml-4' : 'mr-4']">
+      <div v-if="!isGuest" :class="[reverse ? 'ml-4' : 'mr-4']">
         <v-btn icon color="#6E7A87" @click="emit('chat')">
           <img
-            :src="
-              isChatActive ? '/svg/chat-read-active.svg' : '/svg/chat-read.svg'
-            "
+            :src="isChatActive ? '/svg/chat-read-active.svg' : '/svg/chat-read.svg'"
             width="24"
             height="24"
             role="chat-active"
           />
         </v-btn>
         <v-btn icon color="grey" @click="emit('alert')">
-          <img
-            v-if="isBellActive"
-            src="public/svg/bell.svg"
-            width="24"
-            height="24"
-            role="bell-active"
-          />
+          <img v-if="isBellActive" src="public/svg/bell.svg" width="24" height="24" role="bell-active" />
           <v-icon v-else color="#6E7A87">mdi-bell-outline</v-icon>
         </v-btn>
       </div>
-
-      <v-menu offset-y nudge-bottom="10">
+      <v-menu v-if="!isGuest" offset-y nudge-bottom="10">
         <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
             <div
@@ -65,9 +48,7 @@
                 {{ computedPlaceholder }}
               </span>
 
-              <v-icon color="#6E7A87" style="cursor: pointer">
-                mdi-chevron-down
-              </v-icon>
+              <v-icon color="#6E7A87" style="cursor: pointer"> mdi-chevron-down </v-icon>
             </div>
             <div
               v-else-if="showPicture"
@@ -85,9 +66,7 @@
                 {{ computedPlaceholder }}
               </span>
 
-              <v-icon color="#6E7A87" style="cursor: pointer">
-                mdi-chevron-down
-              </v-icon>
+              <v-icon color="#6E7A87" style="cursor: pointer"> mdi-chevron-down </v-icon>
             </div>
           </v-hover>
         </template>
@@ -95,13 +74,7 @@
           <v-list-item
             v-for="(item, index) in menuItems"
             :key="`profile-menu-item-${index}`"
-            @click="
-              item.to
-                ? router.push({ path: item.to })
-                : item.action
-                ? item.action()
-                : () => {}
-            "
+            @click="item.to ? router.push({ path: item.to }) : item.action ? item.action() : () => {}"
           >
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
@@ -138,6 +111,7 @@ export interface HorizontalBarComponentType {
   isChatActive?: boolean;
   reverse?: boolean;
   showPicture?: boolean;
+  isGuest?: boolean;
   pictureSize?: number;
   trackCurrentUser?: boolean;
 }
@@ -155,6 +129,7 @@ const props = withDefaults(defineProps<HorizontalBarComponentType>(), {
   isBellActive: false,
   isChatActive: false,
   reverse: false,
+  isGuest: false,
   showPicture: false,
   pictureSize: 40,
   trackCurrentUser: false,

@@ -144,6 +144,7 @@ const props = defineProps<{
   activeFilter: boolean;
   group: string;
   dragging: boolean;
+  isGuest?: boolean;
   over: {
     id: number;
     index?: number;
@@ -224,6 +225,10 @@ const confirmDelete = () => {
 const dropDownItems = (task: TaskItem) => {
   const deliveredTotal = task.delivered ? task.delivered.underReview + task.delivered.completed : 0;
   const items = [getDropDownAction('details', task.id), getDropDownAction('kanban', task.id)];
+
+  if (props.isGuest) {
+    return items;
+  }
 
   if (props.individualJourney) {
     items.push(getDropDownAction('delete', task.id));
