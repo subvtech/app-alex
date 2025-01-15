@@ -171,10 +171,11 @@ import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 const learningPlanStore = useLearningPlanStore();
 // const headerStore = usePageHeaderStore();
 const strapi = useStrapi();
+const user = useStrapiUser();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 
-const isGuest = ref<boolean>(true);
+const isGuest = ref<boolean>(!user?.value);
 
 // Dialog
 const delDocDialog = ref<boolean>(false);
@@ -255,11 +256,6 @@ const mentionUsers = computed<MentionUserPropsArray>(() => {
   if (learningPlanStore.loading || !learningPlanStore.learningPlan?.members) {
     return [];
   }
-
-  isGuest.value =
-    !learningPlanStore.userIsFacilitator &&
-    !learningPlanStore.userIsActiveMember &&
-    !learningPlanStore.userIsPendingMember;
 
   const users: (UserSimple | undefined)[] = learningPlanStore.learningPlan.members.map((member) => member.user);
 
@@ -589,6 +585,13 @@ onMounted(() => {
 watch(
   () => learningPlanStore.loading,
   () => getFolders(),
+);
+
+watch(
+  () => user.value,
+  () => {
+    isGuest.value = !user?.value;
+  },
 );
 
 watch(selectedDoc, async (doc) => {
