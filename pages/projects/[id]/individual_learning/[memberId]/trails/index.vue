@@ -13,6 +13,7 @@ const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
 
+const isGuest = ref<boolean>(true);
 const search = ref('');
 const showAddTrailDialog = ref(false);
 
@@ -117,6 +118,11 @@ onBeforeMount(async () => {
     await learningPlanStore.loadLearningPlan(+route.params.id);
   }
 
+  isGuest.value =
+    !learningPlanStore.userIsFacilitator &&
+    !learningPlanStore.userIsActiveMember &&
+    !learningPlanStore.userIsPendingMember;
+
   // My trails
   find('trails', {
     populate: ['structures.blocks', 'cover_image'],
@@ -169,7 +175,7 @@ onBeforeMount(async () => {
         density="comfortable"
         hide-details
       />
-      <alex-custom-button prepend-icon="mdi-plus" size="large" @click="showAddTrailDialog = true">
+      <alex-custom-button v-if="!isGuest" prepend-icon="mdi-plus" size="large" @click="showAddTrailDialog = true">
         {{ $t('pages.trails.newTrail') }}
       </alex-custom-button>
     </div>
@@ -192,7 +198,7 @@ onBeforeMount(async () => {
           :image="{ url: item?.cover_image?.url }"
           :blocks="item?.blocks ?? []"
           class="flex-stretch tw-flex-[0_0_316px]"
-          can-edit
+          :can-edit="!isGuest"
           hide-copy
           @toggle-visibility="toggleVisibility(item.id, item.hidden)"
           @configurations="navigate(item.id, 'settings')"

@@ -41,6 +41,8 @@ const totalizers = ref({
   },
 });
 
+const isGuest = ref<boolean>(true);
+
 const grades = ref<any>([]);
 const events = ref<FormattedEvent[]>([]);
 const yourGoals = ref<LearningGoalSimple[]>([]);
@@ -307,12 +309,17 @@ const getData = () => {
     });
 };
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   if (!learningPlanStore.loading && learningPlanStore.learningPlan) {
-    learningPlanStore.loadLearningPlan(+route.params.id);
+    await learningPlanStore.loadLearningPlan(+route.params.id);
   } else if (learningPlanStore.learningPlan) {
     getData();
   }
+
+  isGuest.value =
+    !learningPlanStore.userIsFacilitator &&
+    !learningPlanStore.userIsActiveMember &&
+    !learningPlanStore.userIsPendingMember;
 });
 
 watch(
@@ -347,7 +354,7 @@ watch(
           :user-id="memberId"
           :data="formattedYourGoals"
           :tooltip="$t('components.courses.goals.tooltip')"
-          can-edit
+          :can-edit="!isGuest"
           no-icon
           @update="() => getData()"
         />
