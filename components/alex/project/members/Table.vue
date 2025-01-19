@@ -4,9 +4,7 @@
       v-model:search-model="searchModel"
       action-icon="mdi-account"
       :action-text="$t('components.learningPlan.projects.invite.label')"
-      :search-placeholder="
-        $t('components.learningPlan.projects.searchPlaceholder')
-      "
+      :search-placeholder="$t('components.learningPlan.projects.searchPlaceholder')"
       :hide-action="!canEdit"
       use-mobile-breakpoint
       use-custom-dialog
@@ -16,9 +14,7 @@
         ><alex-project-members-invite-dialog
           v-model:dialog-model="dialogModelValue"
           :dialog-title="$t('components.learningPlan.projects.invite.title')"
-          :dialog-action-text="
-            $t('components.learningPlan.projects.invite.label')
-          "
+          :dialog-action-text="$t('components.learningPlan.projects.invite.label')"
           :learning-plan-id="learningPlanId"
           :invite-link-hash="inviteLinkHash"
           :invitation-duration="invitationDuration"
@@ -78,30 +74,20 @@
               <td>
                 <alex-custom-chip
                   :text="capitalize(item.role)"
-                  :status="
-                    item.role === MemberRoles.STUDENT ? 'secondary' : 'primary'
-                  "
+                  :status="item.role === MemberRoles.STUDENT ? 'secondary' : 'primary'"
                 />
               </td>
               <td>
                 <alex-custom-chip
                   :text="capitalize(item.status)"
-                  :status="
-                    item.status === MemberStatus.JOINED ? 'green' : 'secondary'
-                  "
+                  :status="item.status === MemberStatus.JOINED ? 'green' : 'secondary'"
                 />
               </td>
 
               <td>
-                <alex-custom-dropdown
-                  :items="dropdownItems(item.user.username, item.id, item.role)"
-                >
+                <alex-custom-dropdown :items="dropdownItems(item.user.username, item.id, item.role)">
                   <template #activator="{ props: activeProps }">
-                    <alex-custom-button
-                      v-bind="activeProps"
-                      icon="mdi-dots-vertical"
-                      variant="text"
-                    />
+                    <alex-custom-button v-bind="activeProps" icon="mdi-dots-vertical" variant="text" />
                   </template>
                 </alex-custom-dropdown>
               </td>
@@ -165,9 +151,7 @@ const { setMessage } = useMessageStore();
 const page = ref(1);
 
 const headers = computed(() => {
-  const indexCol = props.showPositions
-    ? [{ title: 'Index', key: 'index' }]
-    : [];
+  const indexCol = props.showPositions ? [{ title: 'Index', key: 'index' }] : [];
 
   return [
     ...indexCol,
@@ -186,7 +170,8 @@ const dropdownItems = (username, id, role: MemberRoles) => {
       onClick: () => navigateTo(`/users/${username}`),
     },
   ];
-  if (props.canEdit && role !== MemberRoles.FACILITATOR)
+
+  if (props.canEdit && role !== MemberRoles.FACILITATOR && role !== MemberRoles.LEADER)
     temp.push({
       text: t('components.learningPlan.projects.delete'),
       icon: 'mdi-trash-can-outline',
@@ -194,11 +179,7 @@ const dropdownItems = (username, id, role: MemberRoles) => {
       onClick: async () => {
         await _delete('learning-plan-members', id);
         dataRef.value = dataRef.value.filter((item) => item.id !== id);
-        setMessage(
-          t('components.learningPlan.projects.invite.deleted'),
-          'green',
-          true,
-        );
+        setMessage(t('components.learningPlan.projects.invite.deleted'), 'green', true);
       },
     });
 
@@ -231,17 +212,13 @@ const updateMembers = async () => {
   // dataRef.value = data.value.concat(newMembers.data);
 };
 
-const setTableData = (items): readonly LearningPlanMemberSimple[] =>
-  items.map((item) => item.raw);
+const setTableData = (items): readonly LearningPlanMemberSimple[] => items.map((item) => item.raw);
 
 const showingData = (groupedItems) => {
   const itemsPerPage = searchModel.value === '' ? 12 : groupedItems.length;
 
   const from = (page.value - 1) * itemsPerPage + 1;
-  const to =
-    page.value * itemsPerPage > props.data.length
-      ? props.data.length
-      : page.value * itemsPerPage;
+  const to = page.value * itemsPerPage > props.data.length ? props.data.length : page.value * itemsPerPage;
   const total = props.data.length;
   const message = t('components.learningPlan.projects.showingData', {
     from,

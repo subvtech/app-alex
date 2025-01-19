@@ -28,6 +28,8 @@ const props = defineProps<{
   search: string;
 }>();
 
+defineEmits(['kanban']);
+
 const i18dir = 'pages.projects.tasks.actions';
 
 const { t } = useI18n();
@@ -840,7 +842,17 @@ const updateSprints = () => {
                 {{ formattedDate(sprint.start_at) }} - {{ formattedDate(sprint.end_at) }}
               </span>
               <alex-custom-chip size="small" status="secondary" :text="`${sprint.tasks.length}`" />
-              <div v-if="!isGuest" class="ml-auto d-flex ga-2">
+              <div v-if="!isGuest" class="ml-auto d-flex ga-1 tw-items-center">
+                <alex-custom-tooltip :text="$t('pages.projects.tasks.see_kanban')">
+                  <template #content>
+                    <alex-custom-button
+                      class="tw-scale-[0.85]"
+                      icon="alex:Kanban"
+                      variant="text"
+                      @click="() => $emit('kanban', sprint)"
+                    />
+                  </template>
+                </alex-custom-tooltip>
                 <alex-custom-dropdown icon="mdi-dots-vertical" variant="text" :items="editSprint(sprint, i)" />
               </div>
             </v-expansion-panel-title>

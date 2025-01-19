@@ -9,9 +9,12 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+const route = useRoute();
 const search = ref('');
 const filterDrawer = ref(false);
+const disableInvite = ref<boolean>(true);
 const learningPlanStore = useLearningPlanStore();
+const user = useStrapiUser();
 
 const filters: FilterItemProps[] = [
   {
@@ -85,10 +88,27 @@ const updateSearch = (value: string) => {
   });
 };
 
+onMounted(() => {
+  learningPlanStore.loadLearningPlan(+route.params.id);
+});
+
 watch(
-  () => learningPlanStore.learningPlan,
-  () => (activeMembers.value = learningPlanStore.learningPlan?.members || []),
+  () => learningPlanStore.loading,
+  () => {
+    activeMembers.value = learningPlanStore.learningPlan?.members || [];
+
+    if (learningPlanStore.loading) {
+      return;
+    }
+
+    const member = learningPlanStore.learningPlan?.members?.find((member) => member?.user?.id === user.value?.id);
+
+    if (['student_leader', 'facilitator'].includes(member?.role ?? '')) {
+      disableInvite.value = false;
+    }
+  },
 );
+// :disable-invite="!learningPlanStore.learningPlan?.invite_enabled"
 </script>
 
 <template>
@@ -102,9 +122,9 @@ watch(
         :active-invite-id="learningPlanStore.learningPlan?.id"
         :invite-link-hash="learningPlanStore.invitationLink?.hash"
         :invite-link-expires-at="expiresAtDate"
-        :disable-invite="!learningPlanStore.learningPlan?.invite_enabled"
+        :disable-invite="disableInvite"
         :title="$t('components.learningPlan.drawer.filter')"
-        :can-edit="learningPlanStore.userIsFacilitator"
+        :can-edit="disableInvite"
         :active-filters="selectedFilters"
         @toggle:drawer="handleToggleDrawer"
         @remove:filter="removeFilter"

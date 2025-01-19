@@ -138,7 +138,20 @@ watch(sprints, (value) => {
           />
         </TransitionGroup>
         <Kanban v-if="mode === Mode.Kanban" key="kanban" :sprint="selectedSprint" :is-guest="isGuest" />
-        <TaskList v-else key="taskList" ref="taskList" :search="search" :filter="filter" :is-guest="isGuest" />
+        <TaskList
+          v-else
+          key="taskList"
+          ref="taskList"
+          :search="search"
+          :filter="filter"
+          :is-guest="isGuest"
+          @kanban="
+            (sprint) => {
+              selectedSprint = sprint;
+              toggleMode();
+            }
+          "
+        />
       </template>
     </div>
     <TaskFilterDrawer ref="filterDrawer" v-model="openFilterDrawer" @filter="handleFilter" />
