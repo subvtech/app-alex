@@ -119,8 +119,6 @@ const setItems = async () => {
   }
 };
 
-useOnStopTyping(search, () => setItems);
-
 const filterByFullnameAndEmail = (_value: string, query: string, item?: any) => {
   const fullname = item.raw.fullname?.toLowerCase() || '';
   const email = item.raw.email?.toLowerCase();

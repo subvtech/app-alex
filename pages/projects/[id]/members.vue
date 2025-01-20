@@ -124,7 +124,7 @@ watch(
         :invite-link-expires-at="expiresAtDate"
         :disable-invite="disableInvite"
         :title="$t('components.learningPlan.drawer.filter')"
-        :can-edit="disableInvite"
+        :can-edit="!disableInvite"
         :active-filters="selectedFilters"
         @toggle:drawer="handleToggleDrawer"
         @remove:filter="removeFilter"
