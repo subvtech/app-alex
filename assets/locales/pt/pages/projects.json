@@ -16,6 +16,13 @@
     "tasks": "Tarefas",
     "trails": "Trilhas"
   },
+  "confirm": {
+    "reject": "Negar",
+    "title": "Você quer participar deste projeto?",
+    "rejectFail": "Falha ao negar convite do projeto",
+    "joinSuccess": "Você entrou no projeto",
+    "joinFail": "Falha ao entrar no projeto"
+  },
   "errors": {
     "403": "Acesso negado",
     "404": "Página não encontrada",
