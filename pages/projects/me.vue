@@ -93,7 +93,7 @@ watch(confirmProjectDialog, (open) => {
       v-model="confirmProjectDialog"
       variant="primary"
       persistent
-      :title="$t('components.learningPlan.join.active.title')"
+      :title="$t('components.learningPlan.join.active.titleProject')"
       image-class="mb-6"
       :image="{
         src: '/svg/Invite.svg',
@@ -108,7 +108,7 @@ watch(confirmProjectDialog, (open) => {
       @cancel="() => handleInvitation(false)"
     >
       <template #subtitle>
-        {{ $t('components.learningPlan.join.active.description') }}
+        {{ $t('components.learningPlan.join.active.descriptionProject') }}
         <strong>{{ pendingInvitations[0]?.learningplan?.title ?? '' }}</strong>
       </template>
     </alex-custom-confirm-dialog>

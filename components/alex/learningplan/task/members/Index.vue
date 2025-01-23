@@ -101,10 +101,25 @@
             participants: member.raw.learning_plan_group
               ? getMembersOfGroup(member.raw.learning_plan_group)
               : undefined,
+            responsable: ['student_leader', 'in_charge'].includes(member.raw.role),
           }"
           :edit="edit"
           :clickable="kind !== 'project'"
           :no-class="kind === 'project'"
+          toggle-responsible
+          @responsible="
+            (responsible: boolean) => {
+              const memberId = member.raw.id;
+
+              projectStudents = projectStudents.map((member) => {
+                if (member.id === memberId) {
+                  member.role = (responsible ? 'in_charge' : 'student') as MemberRoles;
+                }
+
+                return member;
+              });
+            }
+          "
           @remove-click="removeMember(member.raw)"
           @edit-click="() => handleEditClick(member.raw.learning_plan_group, items)"
           @to-profile="
@@ -156,6 +171,7 @@
 </template>
 
 <script setup lang="ts">
+import { MemberRoles } from '#imports';
 import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface MembersProps {

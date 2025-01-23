@@ -1,9 +1,5 @@
 <template>
-  <alex-custom-card
-    class="mt-6"
-    :title="$t('components.projects.title')"
-    full-width
-  >
+  <alex-custom-card class="mt-6" :title="$t('components.projects.title')" full-width>
     <template #content>
       <div class="d-flex mb-6">
         <div class="d-flex flex-wrap align-center py-2 px-3 search">
@@ -17,24 +13,13 @@
       </div>
 
       <div class="d-flex flex-wrap items">
-        <div
-          v-for="(item, index) in data"
-          :key="index"
-          class="d-flex flex-column align-start item"
-        >
-          <img
-            class="w-100"
-            src="https://picsum.photos/900/900"
-            :alt="item.title"
-          />
+        <div v-for="(item, index) in data" :key="index" class="d-flex flex-column align-start item">
+          <img class="w-100" src="https://picsum.photos/900/900" :alt="item.title" />
           <div class="d-flex w-100 h-100 flex-column pa-4">
             <div class="tags d-flex flex-row flex-wrap justify-center">
-              <span
-                v-for="(tag, index2) in item.tags"
-                :key="index2"
-                class="d-flex justify-center align-center px-4"
-                >{{ tag }}</span
-              >
+              <span v-for="(tag, index2) in item.tags" :key="index2" class="d-flex justify-center align-center px-4">{{
+                tag
+              }}</span>
             </div>
             <div class="d-flex flex-column w-100 pt-4 text-block">
               <span>{{ item.title }}</span>
@@ -45,9 +30,7 @@
             <div class="footer d-flex pt-6">
               <div class="block d-flex align-center">
                 <div class="icon d-flex justify-center align-center pa-2">
-                  <v-icon size="x-small" color="#ABB2B9"
-                    >mdi-account-multiple-outline</v-icon
-                  >
+                  <v-icon size="x-small" color="#ABB2B9">mdi-account-multiple-outline</v-icon>
                 </div>
                 <div class="d-flex flex-column">
                   <span>{{ $t('components.projects.facilitator') }}</span>
@@ -57,9 +40,7 @@
 
               <div class="block d-flex align-center">
                 <div class="icon d-flex justify-center align-center pa-2">
-                  <v-icon size="x-small" color="#ABB2B9"
-                    >mdi-chart-timeline-variant</v-icon
-                  >
+                  <v-icon size="x-small" color="#ABB2B9">mdi-chart-timeline-variant</v-icon>
                 </div>
 
                 <div class="d-flex flex-column">
