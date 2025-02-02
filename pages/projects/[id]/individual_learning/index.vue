@@ -55,7 +55,7 @@ const fetchMembers = async () => {
         goals += taskMember?.task?.learning_goals?.length;
 
         if (taskMember?.status === 'done') {
-          completedGoals += taskMember?.task.learning_goals?.length;
+          completedGoals += taskMember?.task?.learning_goals?.length;
         }
       });
 
