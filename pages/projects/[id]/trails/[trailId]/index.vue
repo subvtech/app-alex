@@ -141,7 +141,13 @@
               </div>
             </div>
             <div v-if="!canEdit" class="w-100 pt-12 d-flex justify-center align-center contributions-container">
-              <alex-custom-button class="ma-auto" prepend-icon="mdi-plus" size="large" @click="goToContributions()">
+              <alex-custom-button
+                v-if="!isGuest"
+                class="ma-auto"
+                prepend-icon="mdi-plus"
+                size="large"
+                @click="goToContributions()"
+              >
                 {{ t('pages.trailId.overview.contribute') }}
               </alex-custom-button>
             </div>
@@ -275,6 +281,13 @@ const highlightedContributionsSimple = computed(() => {
 });
 
 onMounted(async () => {
+  learningPlanStore.loadLearningPlan(+route.params.id).then(() => {
+    isGuest.value =
+      !learningPlanStore.userIsFacilitator &&
+      !learningPlanStore.userIsActiveMember &&
+      !learningPlanStore.userIsPendingMember;
+  });
+
   isLoading.value = true;
   while (trailStore.loading) {
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -292,6 +305,7 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
+const isGuest = ref<boolean>(true);
 const sections = ref([
   {
     title: t('pages.trailId.overview.sectionTitle'),

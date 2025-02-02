@@ -24,8 +24,11 @@ interface DropdownItem {
 
 const props = defineProps<{
   filter?: filterType;
+  isGuest?: boolean;
   search: string;
 }>();
+
+defineEmits(['kanban']);
 
 const i18dir = 'pages.projects.tasks.actions';
 
@@ -675,7 +678,7 @@ const updateSprints = () => {
                 {{ taskSections[backlogIndex - 1] }}
               </span>
               <alex-custom-chip size="small" status="secondary" :text="`${filteredTasks.length}`" />
-              <div class="ml-auto">
+              <div v-if="!isGuest" class="ml-auto">
                 <alex-custom-dropdown icon="mdi-plus" variant="text" :items="addToSprint()" />
               </div>
             </v-expansion-panel-title>
@@ -701,6 +704,7 @@ const updateSprints = () => {
                     :is-project="true"
                     :editing-task="editingTask"
                     :over="setOver"
+                    :edit="!isGuest"
                     :search="search"
                     :sprints="sprintGroups"
                     :tasks="backlogTasks"
@@ -762,7 +766,7 @@ const updateSprints = () => {
               <div v-if="backlogIndex === 1" class="mb-4">
                 <Transition mode="out-in" name="add-task">
                   <alex-custom-button
-                    v-if="!showInputs[0]"
+                    v-if="!showInputs[0] && !isGuest"
                     class="w-100 create-task-btn"
                     prepend-icon="mdi-plus"
                     size="large"
@@ -772,7 +776,7 @@ const updateSprints = () => {
                   >
                     {{ $t('pages.projects.tasks.add') }}
                   </alex-custom-button>
-                  <div v-else class="d-flex ga-2">
+                  <div v-else-if="!isGuest" class="d-flex ga-2">
                     <alex-inputs-text-field
                       v-model="tasksTitles[0]"
                       autofocus
@@ -808,6 +812,7 @@ const updateSprints = () => {
       <div class="tw-flex tw-w-full tw-justify-between align-center">
         <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
         <alex-custom-button
+          v-if="!isGuest"
           prepend-icon="alex:Sprint"
           size="large"
           @click="
@@ -837,7 +842,17 @@ const updateSprints = () => {
                 {{ formattedDate(sprint.start_at) }} - {{ formattedDate(sprint.end_at) }}
               </span>
               <alex-custom-chip size="small" status="secondary" :text="`${sprint.tasks.length}`" />
-              <div class="ml-auto d-flex ga-2">
+              <div v-if="!isGuest" class="ml-auto d-flex ga-1 tw-items-center">
+                <alex-custom-tooltip :text="$t('pages.projects.tasks.see_kanban')">
+                  <template #content>
+                    <alex-custom-button
+                      class="tw-scale-[0.85]"
+                      icon="alex:Kanban"
+                      variant="text"
+                      @click="() => $emit('kanban', sprint)"
+                    />
+                  </template>
+                </alex-custom-tooltip>
                 <alex-custom-dropdown icon="mdi-dots-vertical" variant="text" :items="editSprint(sprint, i)" />
               </div>
             </v-expansion-panel-title>
@@ -861,6 +876,7 @@ const updateSprints = () => {
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"
                     :is-project="true"
+                    :edit="!isGuest"
                     :editing-task="editingTask"
                     :over="setOver"
                     :search="search"
@@ -917,7 +933,7 @@ const updateSprints = () => {
               <div v-if="backlogIndex === 1" class="mb-4">
                 <Transition mode="out-in" name="add-task">
                   <alex-custom-button
-                    v-if="!showInputs[i + 1]"
+                    v-if="!showInputs[i + 1] && !isGuest"
                     class="w-100 create-task-btn"
                     prepend-icon="mdi-plus"
                     size="large"
@@ -927,7 +943,7 @@ const updateSprints = () => {
                   >
                     {{ $t('pages.projects.tasks.add') }}
                   </alex-custom-button>
-                  <div v-else class="d-flex ga-2">
+                  <div v-else-if="!isGuest" class="d-flex ga-2">
                     <alex-inputs-text-field
                       v-model="tasksTitles[i + 1]"
                       autofocus
@@ -999,6 +1015,7 @@ const updateSprints = () => {
       v-model="teacherDrawer"
       :task="editTask"
       :sprints="sprintsValue.sprints"
+      :can-edit="!isGuest"
       @update-value="
         (field) => {
           if (editTask) {

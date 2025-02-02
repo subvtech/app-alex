@@ -11,19 +11,13 @@
       </p>
       <h2 class="text-h2 text-gray-800">{{ showValuesGroup?.title }}</h2>
     </div>
-    <template
-      v-for="(section, indexSection) in sectionsShowGroup"
-      :key="`group-section-${indexSection}`"
-    >
+    <template v-for="(section, indexSection) in sectionsShowGroup" :key="`group-section-${indexSection}`">
       <h5 class="text-h5 text-gray-800">{{ section.title }}</h5>
       <alex-custom-list-item-user
-        v-for="(member, i) in filterMembersByRole(
-          section.filter,
-          showValuesGroup?.members,
-        )"
+        v-for="(member, i) in filterMembersByRole(section.filter, showValuesGroup?.members)"
         :key="`group-member-${i}`"
         :user="{
-          email: member?.student_member?.email || 'a',
+          email: member?.student_member?.user?.email || '',
           name: member?.student_member?.user?.fullname || '',
           image: member?.student_member?.user.avatar?.url || '',
         }"
@@ -37,12 +31,7 @@
             @click="click"
           /> </template
       ></alex-custom-list-item-user>
-      <v-divider
-        v-if="indexSection == 0"
-        color="secondary"
-        :thickness="1"
-        class="border-opacity-100"
-      />
+      <v-divider v-if="indexSection == 0" color="secondary" :thickness="1" class="border-opacity-100" />
     </template>
   </alex-custom-dialog>
 </template>
@@ -81,9 +70,7 @@ function filterMembersByRole(
   role: keyof typeof learningPlanGroupMemberRolesSimple,
   members?: LearningPlanGroupMemberSimple[],
 ) {
-  return members?.filter(
-    (member) => member.role === learningPlanGroupMemberRolesSimple[role],
-  );
+  return members?.filter((member) => member.role === learningPlanGroupMemberRolesSimple[role]);
 }
 </script>
 

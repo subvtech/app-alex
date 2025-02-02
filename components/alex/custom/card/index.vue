@@ -19,6 +19,7 @@
       :tooltip="tooltip"
       :disable-save="disableSave"
       :tooltip-extra-class="tooltipExtraClass"
+      :is-guest="isGuest"
       @click:cancel="emit('click:cancel')"
       @click:save="emit('click:save')"
       @toggle:is-editing="emit('toggle:isEditing')"
@@ -52,6 +53,7 @@ export interface CardComponentType extends CardHeaderProps {
   noHeader?: boolean;
   outline?: boolean;
   showFooterDivider?: boolean;
+  isGuest?: boolean;
 }
 
 withDefaults(defineProps<CardComponentType>(), {
@@ -74,6 +76,7 @@ withDefaults(defineProps<CardComponentType>(), {
   smallButtons: false,
   tooltip: undefined,
   tooltipExtraClass: undefined,
+  isGuest: false,
 });
 
 const emit = defineEmits(['toggle:isEditing', 'click:save', 'click:cancel']);

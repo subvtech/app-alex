@@ -16,6 +16,13 @@
     "tasks": "Tasks",
     "trails": "Trails"
   },
+  "confirm": {
+    "reject": "Reject",
+    "title": "Do you want to join this project?",
+    "rejectFail": "Failed to deny project invitation",
+    "joinSuccess": "You have joined the project",
+    "joinFail": "Failed to enter project"
+  },
   "errors": {
     "403": "Access denied",
     "404": "Page not found",

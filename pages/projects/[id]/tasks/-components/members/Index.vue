@@ -114,7 +114,7 @@ const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inChar
   >
     <!-- Header -->
     <template #header>
-      <div class="header d-flex tw-align-center py-4 px-2">
+      <div v-if="edit" class="header d-flex tw-align-center py-4 px-2">
         <alex-inputs-text-field
           v-model="search"
           name="member"
@@ -152,6 +152,7 @@ const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inChar
         }"
         :raw="member"
         no-checkbox
+        :edit="edit"
         @toggle-responsible-click="(value, inCharge) => handleUpdateMember(value?.raw, inCharge)"
         @remove-click="(value) => handleRemoveMember(value.raw)"
       />
