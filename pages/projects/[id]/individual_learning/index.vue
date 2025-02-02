@@ -52,10 +52,10 @@ const fetchMembers = async () => {
       let completedGoals = 0;
 
       member.task_members.forEach((taskMember) => {
-        goals += taskMember?.task?.learning_goals?.length;
+        goals += taskMember?.task?.learning_goals?.length ?? 0;
 
         if (taskMember?.status === 'done') {
-          completedGoals += taskMember?.task?.learning_goals?.length;
+          completedGoals += taskMember?.task?.learning_goals?.length ?? 0;
         }
       });
 
