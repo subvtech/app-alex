@@ -17,7 +17,7 @@
 
     <div class="tw-flex-1">
       <!-- Tags -->
-      <alex-learningplan-task-tags v-model="tags" class="mt-2 mb-4" :task-id="task?.id" edit />
+      <alex-learningplan-task-tags v-model="tags" class="mt-2 mb-4" :task-id="task?.id" :edit="canEdit" />
 
       <!-- Informações -->
       <alex-inputs-editable-text
@@ -26,6 +26,7 @@
         class="mt-4 text-h2 ellipsis lines-2"
         :placeholder="'(' + $t('components.learningPlan.drawer.missing.title') + ')'"
         cant-edit
+        :disabled="!canEdit"
         @keydown.enter.prevent="(e) => e.target.blur()"
       ></alex-inputs-editable-text>
 
@@ -37,10 +38,10 @@
             :placeholder="selectedSprint ? 'Selecionar status' : 'Não iniciado'"
             :items="statusOptions"
             item-title="title"
-            :edit="selectedSprint"
+            :edit="selectedSprint && canEdit"
           />
         </v-col>
-        <v-col v-if="task?.organization === 'standard'" cols="6">
+        <v-col v-if="task?.organization === 'standard' && !individualLearning" cols="6">
           <p class="text-body-4 text-gray-800 mb-1">Sprint</p>
           <Options
             v-model="selectedSprint"
@@ -48,7 +49,7 @@
             :items="sprintOptions"
             item-title="title"
             empty-value="Backlog"
-            edit
+            :edit="canEdit"
           />
         </v-col>
 
@@ -57,7 +58,7 @@
             <span class="text-tag-orange-light">* </span>{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
-          <alex-learningplan-task-date ref="startDateComp" v-model="startDate" edit />
+          <alex-learningplan-task-date ref="startDateComp" v-model="startDate" :edit="canEdit" />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -68,30 +69,35 @@
             ref="endDateComp"
             v-model="endDate"
             :can-set-value="checkEndDate(startDate, endDate)"
-            edit
+            :edit="canEdit"
           />
         </v-col>
 
-        <v-col cols="12">
+        <v-col v-if="!individualLearning" cols="12">
           <p class="text-body-4 text-gray-800 mb-1">Épico ou história</p>
           <Options
             v-model="selectedParent"
             placeholder="Escolha um épico ou história"
             :items="groupOptions ?? []"
             item-title="title"
-            edit
+            :edit="canEdit"
           />
         </v-col>
       </v-row>
 
-      <alex-learningplan-task-description v-model="description" class="my-4" :mention-users="mentionUsers" edit />
+      <alex-learningplan-task-description
+        v-model="description"
+        class="my-4"
+        :mention-users="mentionUsers"
+        :edit="canEdit"
+      />
 
       <!-- Entregas-->
-      <p class="text-h3 mt-6">
+      <p v-if="canEdit || submissionRequired" class="text-h3 mt-6">
         {{ $t('components.learningPlan.drawer.task.submission.label') }}
       </p>
       <v-row class="mx-0 mt-3 mb-4">
-        <v-col class="pa-0 d-flex align-center" cols="6">
+        <v-col v-if="canEdit" class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
             v-model="submissionRequired"
             :label="$t('components.learningPlan.drawer.task.submission.reqSubmission')"
@@ -99,14 +105,14 @@
           />
         </v-col>
         <template v-if="submissionRequired"
-          ><v-col class="pa-0 d-flex align-center" cols="6">
+          ><v-col v-if="canEdit" class="pa-0 d-flex align-center" cols="6">
             <alex-custom-switch
               v-model="canSubmitAfterDeadline"
               :label="$t('components.learningPlan.drawer.task.submission.aftrDeadline')"
             />
           </v-col>
           <v-col class="mt-4 pa-0" cols="12">
-            <alex-learningplan-task-restrictions v-model="restrictionsValue" edit /> </v-col
+            <alex-learningplan-task-restrictions v-model="restrictionsValue" :edit="canEdit" /> </v-col
         ></template>
       </v-row>
 
@@ -115,7 +121,7 @@
         v-model="submissionDescription"
         class="mb-6"
         name="submissionDescription"
-        edit
+        :edit="canEdit"
         :mention-users="mentionUsers"
         :title="$t('components.learningPlan.drawer.task.submission.description.label')"
       />
@@ -129,7 +135,7 @@
           :blocks="blocks"
           teacher
           project
-          edit
+          :edit="canEdit"
         />
 
         <!-- Ver blocks -->
@@ -146,6 +152,7 @@
             :task-id="task?.id"
             :start-at="startDate"
             :finish-at="endDate"
+            :edit="canEdit"
             @change-members="$emit('update-value')"
           />
         </v-window-item>
@@ -168,9 +175,16 @@ import Members from './members/Index.vue';
 interface DrawerProjectProps {
   task?: SprintTask;
   sprints?: SprintSimple[];
+  canEdit?: boolean;
+  individualLearning?: boolean;
 }
 
-const props = withDefaults(defineProps<DrawerProjectProps>(), { task: undefined, sprints: () => [] });
+const props = withDefaults(defineProps<DrawerProjectProps>(), {
+  task: undefined,
+  sprints: () => [],
+  canEdit: true,
+  individualLearning: false,
+});
 const open = defineModel<boolean>({ required: true });
 const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 'moved']);
 const { t } = useI18n();

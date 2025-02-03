@@ -10,6 +10,7 @@ interface Props {
   title: string;
   disabledInterations?: boolean;
   loading?: boolean;
+  isGuest?: boolean;
 }
 
 type Events = {
@@ -25,6 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
   quantity: 0,
   disabledInterations: false,
   loading: false,
+  isGuest: false,
 });
 
 const emit = defineEmits<Events>();
@@ -101,18 +103,19 @@ const handleInput = () => {
         v-model="titleValue"
         type="text"
         class="tw-w-full text-h5 tw-text-gray-800 tw-border-none tw-outline-none tw-min-h-[30px]"
+        :disabled="isGuest"
         @focus="toggleEdit"
         @keydown.enter="handleKeyEnter"
         @blur="handleTitleChange"
       />
       <div v-if="!isEditing && !disabledInterations" key="options" class="tw-flex tw-gap-1">
         <span
-          v-if="!isHovering && !showOptions"
+          v-if="isGuest || (!isHovering && !showOptions)"
           class="tw-flex tw-items-center tw-justify-center tw-pt-[1px] tw-bg-gray-100 tw-rounded-lg tw-min-h-6 tw-min-w-6"
           >{{ quantity }}</span
         >
         <alex-custom-button
-          :class="{ '!tw-hidden': !isHovering && !showOptions }"
+          :class="{ '!tw-hidden': isGuest || (!isHovering && !showOptions) }"
           icon="mdi-plus"
           variant="text"
           size="small"
@@ -121,12 +124,12 @@ const handleInput = () => {
         <alex-custom-dropdown
           v-model="showOptions"
           :close-on-content-click="false"
-          :class="{ '!tw-hidden': !isHovering && !showOptions }"
+          :class="{ '!tw-hidden': isGuest || (!isHovering && !showOptions) }"
           :items="items"
         >
           <template #activator="{ props: propsActivator }">
             <alex-custom-button
-              :class="{ '!tw-hidden': !isHovering && !showOptions }"
+              :class="{ '!tw-hidden': isGuest || (!isHovering && !showOptions) }"
               icon="mdi-dots-vertical"
               variant="text"
               size="small"

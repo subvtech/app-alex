@@ -6,10 +6,7 @@
       :class="hasDocSelected ? 'bg-gray-blue' : 'bg-white'"
       hide-actions
     >
-      <v-icon
-        :icon="open ? 'mdi-folder-open' : 'mdi-folder'"
-        :color="hasDocSelected ? 'secondary-0' : 'gray-600'"
-      />
+      <v-icon :icon="open ? 'mdi-folder-open' : 'mdi-folder'" :color="hasDocSelected ? 'secondary-0' : 'gray-600'" />
 
       <input
         ref="titleInput"
@@ -22,13 +19,14 @@
         @keydown.space.prevent="titleRef += ' '"
       />
       <alex-custom-button
+        v-if="!isGuest"
         variant="text"
         size="small"
         icon="mdi-plus"
         color="gray-400"
         @click.stop="emit('add-doc')"
       />
-      <alex-custom-dropdown :items="options" class="!tw-z-[10000]"
+      <alex-custom-dropdown v-if="!isGuest" :items="options" class="!tw-z-[10000]"
         ><template #activator="activate">
           <alex-custom-button
             v-bind="activate.props"
@@ -51,11 +49,7 @@
       />
     </v-expansion-panel-text>
   </v-expansion-panel>
-  <alex-custom-skeleton
-    v-else
-    class="tw-h-[52px] tw-w-full mb-2"
-    rounded="lg"
-  />
+  <alex-custom-skeleton v-else class="tw-h-[52px] tw-w-full mb-2" rounded="lg" />
 
   <alex-custom-confirm-dialog
     v-model="deleteDialog"
@@ -64,13 +58,9 @@
     :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
     :title="$t('components.project.document.dialog.del.folder.title')"
     :subtitle="$t('components.project.document.dialog.del.folder.subtitle')"
-    :input-label-confirmation="
-      $t('components.project.document.dialog.del.type')
-    "
+    :input-label-confirmation="$t('components.project.document.dialog.del.type')"
     :input-word-confirmation="$t('components.project.document.dialog.del.word')"
-    :input-placeholder-confirmation="
-      $t('components.project.document.dialog.del.placeholder')
-    "
+    :input-placeholder-confirmation="$t('components.project.document.dialog.del.placeholder')"
     :no-input-confirmation="false"
     :submit-button-text="$t('components.project.document.edit.delete')"
     :cancel-button-text="$t('components.project.document.edit.cancel')"
@@ -87,6 +77,7 @@ interface FolderProps {
   title: string;
   documents: Document[];
   selectedId: number;
+  isGuest: boolean;
   open: boolean;
   loading: boolean;
   focus?: boolean;
@@ -112,9 +103,7 @@ const options = ref<AlexDropdownItem[]>([
 ]);
 
 const hasDocSelected = computed(() => {
-  const docIds = props.documents
-    .map(({ id }) => id)
-    .filter((doc) => doc !== undefined);
+  const docIds = props.documents.map(({ id }) => id).filter((doc) => doc !== undefined);
 
   return docIds.includes(props.selectedId);
 });

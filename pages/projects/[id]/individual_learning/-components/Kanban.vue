@@ -55,7 +55,7 @@
         :group="column.group"
         :accept="column.accept"
         :add="column.add"
-        :disabled="!canDrag || column.disable"
+        :disabled="!edit || !canDrag || column.disable"
         @insert-card="handleInsertCard"
         @create-task="(title) => emit('create-task', title, column)"
       >
@@ -88,7 +88,7 @@
         </template>
         <template #add
           ><div
-            v-if="column.group === 'to_do'"
+            v-if="column.group === 'to_do' && edit"
             :class="`${!isAddingTask && 'pa-4 tw-border-dashed'} d-flex align-center justify-center ga-2 tw-border
       tw-rounded-[8px] tw-cursor-pointer tw-transition
     hover:tw-bg-gray-50`"
@@ -197,6 +197,7 @@ interface KanbanProps {
   classes?: string[];
   noHeader?: boolean;
   filter?: string;
+  edit?: boolean;
 }
 
 const { t } = useI18n();

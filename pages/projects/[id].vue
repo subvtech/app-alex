@@ -79,16 +79,28 @@ const fetchData = async () => {
     return navigateTo(`/projects/${projectId}`);
   }
 
-  if (
+  const isGuest =
     !learningPlanStore.userIsFacilitator &&
     !learningPlanStore.userIsActiveMember &&
-    !learningPlanStore.userIsPendingMember &&
-    !isJoinRoute.value
-  ) {
-    return navigateTo('/projects/me');
-  }
+    !learningPlanStore.userIsPendingMember;
+  // if (
+  //   !learningPlanStore.userIsFacilitator &&
+  //   !learningPlanStore.userIsActiveMember &&
+  //   !learningPlanStore.userIsPendingMember &&
+  //   !isJoinRoute.value
+  // ) {
+  //   console.log(
+  //     'Sem learning plan 2',
+  //     !learningPlanStore.userIsFacilitator,
+  //     !learningPlanStore.userIsActiveMember,
+  //     !learningPlanStore.userIsPendingMember,
+  //     !isJoinRoute.value,
+  //   );
+  //   return;
+  //   // return navigateTo('/projects/me');
+  // }
 
-  if (learningPlanStore.userIsPendingMember && !isJoinRoute.value) {
+  if (!isGuest && learningPlanStore.userIsPendingMember && !isJoinRoute.value) {
     const invite = learningPlanStore.learningPlan?.invitation_links.find(
       (v) => v.emails_to_send?.includes(user?.value?.email),
     );
@@ -191,7 +203,7 @@ onBeforeUnmount(() => {
       :settings="{ label: '', icon: 'mdi-cog-outline', value: 5, to: `/projects/${projectId}/settings` }"
       :show-settings="learningPlanStore.userIsFacilitator"
       :start-date="learningPlanStore.startDateFormated"
-      :user-id="user.id"
+      :user-id="user?.id"
       @select:option="changeRoute"
     />
     <NuxtPage @update="fetchData" />
