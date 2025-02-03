@@ -30,10 +30,12 @@ export interface Column<U extends { id: number }> {
   status_type: ValueOf<typeof KanbanStatusType>;
   color?: Colors;
   disable?: boolean;
+  isGuest?: boolean;
 }
 type Item = Droppable<KanbanColumnTask>;
 type KanbanProps = {
   sprint?: SprintSimple;
+  isGuest?: boolean;
 };
 const { t } = useI18n();
 const props = defineProps<KanbanProps>();
@@ -321,6 +323,7 @@ defineExpose({ canDrag, setCanDrag });
             :group="column.group"
             :title="column.title"
             :is-creating-task="isCreatingTask && isCreatingTaskColumnId === column.id"
+            :is-guest="isGuest"
             @delete="handleConfirmDeleteColumn(column.group)"
             @insert-card="handleInsertCard"
             @sort-end="handleSortEnd"
@@ -344,6 +347,7 @@ defineExpose({ canDrag, setCanDrag });
         </SlickItem>
 
         <KanbanAddColumn
+          v-if="!isGuest"
           ref="addColumnRef"
           :is-loading="isCreatingColumn"
           :kanban="kanban"
@@ -371,6 +375,7 @@ defineExpose({ canDrag, setCanDrag });
         v-model="teacherDrawer"
         :task="editTask"
         :sprints="sprints.sprints"
+        :can-edit="!isGuest"
         @update-value="refetchKanban"
       />
     </template>

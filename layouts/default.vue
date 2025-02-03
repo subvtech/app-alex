@@ -8,6 +8,7 @@
       :class="clipped ? 'clipped-sidebar main-header-app' : 'sidebar main-header-app'"
       :avatar="user?.avatar"
       :placeholder="user?.fullname"
+      :is-guest="!user"
       :menu-items="profileMenuItems"
       :track-current-user="userStore.isCurrentUser"
       show-picture

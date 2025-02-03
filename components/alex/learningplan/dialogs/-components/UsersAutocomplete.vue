@@ -83,6 +83,7 @@ const cleanInput = () => {
   search.value = '';
   resetField();
 };
+const learningPlanStore = useLearningPlanStore();
 
 const removeSelf = (email?: string) => {
   selectedUsers.value = selectedUsers.value.filter((item) => item.email !== email);
@@ -118,6 +119,8 @@ const setItems = async () => {
     );
   }
 };
+
+// useOnStopTyping(search, () => setItems);
 
 const filterByFullnameAndEmail = (_value: string, query: string, item?: any) => {
   const fullname = item.raw.fullname?.toLowerCase() || '';

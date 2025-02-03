@@ -3,24 +3,16 @@
     v-model="model"
     :title="$t('components.projects.create.members.title')"
     :main-button-text="$t('components.projects.create.members.mainAction')"
-    :secondary-button-text="
-      $t('components.projects.create.members.secondaryAction')
-    "
+    :secondary-button-text="$t('components.projects.create.members.secondaryAction')"
     @on-main-action="onInvite"
     @on-secondary-action="onCancel"
   >
-    <alex-custom-tabs
-      v-if="learningplanIds.length"
-      v-model="activePage"
-      :tabs="tabs"
-    />
+    <alex-custom-tabs v-if="learningplanIds.length" v-model="activePage" :tabs="tabs" />
     <alex-inputs-text-field
       v-if="activePage === '1'"
       v-model="searchStudents"
       name="search"
-      :placeholder="
-        $t('components.projects.create.members.searchPlaceholder.students')
-      "
+      :placeholder="$t('components.projects.create.members.searchPlaceholder.students')"
       class="tw-w-full my-6"
       density="comfortable"
       prepend-inner-icon="mdi-magnify"
@@ -31,9 +23,7 @@
       v-if="activePage === '2'"
       v-model="searchGroups"
       name="search"
-      :placeholder="
-        $t('components.projects.create.members.searchPlaceholder.groups')
-      "
+      :placeholder="$t('components.projects.create.members.searchPlaceholder.groups')"
       class="tw-w-full my-6"
       density="comfortable"
       prepend-inner-icon="mdi-magnify"
@@ -44,44 +34,20 @@
       <v-window-item value="1">
         <v-expansion-panels multiple>
           <v-expansion-panels class="task-student-card" multiple>
-            <p
-              v-if="!hasStudentsToAdd"
-              class="text-body-1 text-gray-400 text-center"
-            >
-              {{ $t('components.projects.create.emptyMessage.students') }}
+            <p v-if="!hasStudentsToAdd" class="text-body-1 text-gray-400 text-center">
+              {{ $t('components.projects.create.members.emptyMessage.students') }}
             </p>
-            <template
-              v-for="classValue in filteredClasses"
-              :key="classValue.id"
-            >
+            <template v-for="classValue in filteredClasses" :key="classValue.id">
               <v-expansion-panel v-if="classValue.members?.length">
-                <v-expansion-panel-title
-                  class="justify-start align-center ga-3"
-                >
+                <v-expansion-panel-title class="justify-start align-center ga-3">
                   <alex-inputs-checkbox
-                    :model-value="
-                      !!getSelectedUsersStatus(
-                        classValue.id,
-                        filteredClasses,
-                        selectedUsers,
-                      )
-                    "
-                    :indeterminate="
-                      getSelectedUsersStatus(
-                        classValue.id,
-                        filteredClasses,
-                        selectedUsers,
-                      ) === -1
-                    "
+                    :model-value="!!getSelectedUsersStatus(classValue.id, filteredClasses, selectedUsers)"
+                    :indeterminate="getSelectedUsersStatus(classValue.id, filteredClasses, selectedUsers) === -1"
                     class="checkbox"
                     @click.stop="
                       selectClass(
                         classValue.members,
-                        getSelectedUsersStatus(
-                          classValue.id,
-                          filteredClasses,
-                          selectedUsers,
-                        ),
+                        getSelectedUsersStatus(classValue.id, filteredClasses, selectedUsers),
                       )
                     "
                   />
@@ -100,17 +66,10 @@
                       :user="{
                         name: member.user.fullname,
                         email: member.user.email,
-                        image:
-                          member.user?.avatar?.formats?.small?.url ||
-                          member.user?.avatar?.url,
+                        image: member.user?.avatar?.formats?.small?.url || member.user?.avatar?.url,
                       }"
                       no-chip
-                      :is-selected-value="
-                        !!selectedUsers.find(
-                          (projectUser) =>
-                            projectUser.user.id === member.user.id,
-                        )
-                      "
+                      :is-selected-value="!!selectedUsers.find((projectUser) => projectUser.user.id === member.user.id)"
                       @click.stop="selectUser(member)"
                     />
                   </v-slide-y-transition>
@@ -123,17 +82,12 @@
       <v-window-item value="2">
         <v-expansion-panels multiple>
           <v-expansion-panels class="task-student-card" multiple>
-            <p
-              v-if="!hasGroupsToAdd"
-              class="text-body-1 text-gray-400 text-center"
-            >
-              {{ $t('components.projects.create.emptyMessage.students') }}
+            <p v-if="!hasGroupsToAdd" class="text-body-1 text-gray-400 text-center">
+              {{ $t('components.projects.create.members.emptyMessage.students') }}
             </p>
             <template v-for="classValue in filteredGroups" :key="classValue.id">
               <v-expansion-panel v-if="classValue.groups?.length">
-                <v-expansion-panel-title
-                  class="justify-start align-center ga-3"
-                >
+                <v-expansion-panel-title class="justify-start align-center ga-3">
                   <span class="text-body-2 text-gray-900">
                     {{ classValue.name }}
                   </span>
@@ -151,9 +105,7 @@
                       @add-members="addStudentsFromGroups"
                     />
                     <p v-if="!classValue.groups?.length" class="text-gray-500">
-                      {{
-                        $t('components.projects.create.emptyMessage.students')
-                      }}
+                      {{ $t('components.projects.create.members.emptyMessage.students') }}
                     </p>
                   </div>
                 </v-expansion-panel-text>
@@ -166,14 +118,10 @@
         <alex-inputs-users-autocomplete
           v-model="autoCompleteUsers"
           :label="$t('components.projects.create.members.generalSearch.label')"
-          :placeholder="
-            $t('components.projects.create.members.generalSearch.placeholder')
-          "
+          :placeholder="$t('components.projects.create.members.generalSearch.placeholder')"
           :ignore-user-ids="selectedUsers.map((user) => user.user.id)"
           :ignore-emails="selectedUsers.map((user) => user.user.email)"
-          :no-data-text="
-            $t('components.projects.create.members.generalSearch.noResults')
-          "
+          :no-data-text="$t('components.projects.create.members.generalSearch.noResults')"
           name="selectUsers"
         />
       </v-window-item>
@@ -213,9 +161,7 @@ const emit = defineEmits(['invite']);
 
 const autoCompleteUsers = ref<User[]>([]);
 
-const selectedUsers = ref<LearningPlanMemberSimple[]>([
-  ...props.selectedStudents,
-]);
+const selectedUsers = ref<LearningPlanMemberSimple[]>([...props.selectedStudents]);
 
 const { data: classesData } = await useAsyncData(
   'classes',
@@ -263,19 +209,12 @@ const filteredClasses = computed(() => {
 });
 
 const hasStudentsToAdd = computed(
-  () =>
-    filteredClasses.value.filter(
-      (studentClass) => !!studentClass.members?.length,
-    ).length > 0,
+  () => filteredClasses.value.filter((studentClass) => !!studentClass.members?.length).length > 0,
 );
 
 const selectUser = (user: LearningPlanMemberSimple) => {
-  selectedUsers.value.find(
-    (selectedUser) => selectedUser.user.id === user.user.id,
-  )
-    ? (selectedUsers.value = selectedUsers.value.filter(
-        (selectedUser) => selectedUser.id !== user.id,
-      ))
+  selectedUsers.value.find((selectedUser) => selectedUser.user.id === user.user.id)
+    ? (selectedUsers.value = selectedUsers.value.filter((selectedUser) => selectedUser.id !== user.id))
     : (selectedUsers.value = [...selectedUsers.value, user]);
 };
 
@@ -285,9 +224,7 @@ const selectClass = (members: LearningPlanMemberSimple[], status: number) => {
       selectedUsers.value = [...selectedUsers.value, member];
     });
   } else {
-    selectedUsers.value = selectedUsers.value.filter(
-      (user) => !members.find((member) => member.id === user.id),
-    );
+    selectedUsers.value = selectedUsers.value.filter((user) => !members.find((member) => member.id === user.id));
   }
 };
 
@@ -296,9 +233,7 @@ const getSelectedUsersStatus = (
   filteredClasses: classItem[],
   selectedUsers: LearningPlanMemberSimple[],
 ) => {
-  const classValue = filteredClasses.find(
-    (classValue) => classValue.id === classId,
-  );
+  const classValue = filteredClasses.find((classValue) => classValue.id === classId);
   if (!classValue) return 0;
   const selectedUsersInClass = selectedUsers.filter((user) =>
     classValue.members.find((member) => member.user.id === user.user.id),
@@ -320,9 +255,7 @@ const filteredGroups = computed(() => {
 });
 
 const hasGroupsToAdd = computed(
-  () =>
-    filteredGroups.value.filter((studentClass) => !!studentClass.groups?.length)
-      .length > 0,
+  () => filteredGroups.value.filter((studentClass) => !!studentClass.groups?.length).length > 0,
 );
 
 const addStudentsFromGroups = (group: LearningPlanGroupSimple) => {
@@ -335,9 +268,7 @@ const addStudentsFromGroups = (group: LearningPlanGroupSimple) => {
 
 const isGroupAdded = (group: LearningPlanGroupSimple) => {
   return group.group_members.every((member) =>
-    selectedUsers.value.find(
-      (selectedUser) => selectedUser.user.id === member.student_member.user.id,
-    ),
+    selectedUsers.value.find((selectedUser) => selectedUser.user.id === member.student_member.user.id),
   );
 };
 

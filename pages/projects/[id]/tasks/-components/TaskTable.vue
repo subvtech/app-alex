@@ -85,6 +85,7 @@ const props = withDefaults(
     dragging?: boolean;
     group: string;
     isProject?: boolean;
+    edit?: boolean;
     over?: { id: number; index?: number; list?: string; position?: 'top' | 'bottom' };
     search: string;
     sprints: string[];
@@ -99,6 +100,7 @@ const props = withDefaults(
     over: undefined,
     editingTask: null,
     draggedTask: null,
+    edit: true,
   },
 );
 
@@ -235,7 +237,9 @@ const dropDownItems = (task: SprintTask): AlexDropdownItem[] => {
         (action): action is AlexDropdownItem => action !== undefined,
       );
     default:
-      return [actions.details, actions.delete].filter((action): action is AlexDropdownItem => action !== undefined);
+      return [actions.details, props.edit ? actions.delete : undefined].filter(
+        (action): action is AlexDropdownItem => action !== undefined,
+      );
   }
 };
 
@@ -424,12 +428,13 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none draggable-row"
+                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none"
                     :class="[
+                      edit ? 'draggable-row' : '',
                       dragging && dragFrom == item.id ? 'dragging' : '',
                       item.parent_task ? 'border-bottom' : '',
                     ]"
-                    :draggable="true"
+                    :draggable="edit"
                     @dragstart="(e) => setDragStart(item.id, e)"
                     @dragend="
                       (e) => {
