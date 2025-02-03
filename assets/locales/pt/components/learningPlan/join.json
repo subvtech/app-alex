@@ -2,7 +2,9 @@
   "invite": "Convite",
   "active": {
     "title": "Deseja participar desse curso?",
+    "titleProject": "Deseja participar desse projeto?",
     "description": "Voce foi convidado para participar do curso de",
+    "descriptionProject": "Voce foi convidado para participar do projeto",
     "at": "na turma",
     "action": "Participar"
   },

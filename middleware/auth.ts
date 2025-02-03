@@ -1,4 +1,7 @@
 export default defineNuxtRouteMiddleware((to, _from) => {
+  if (_from.path.includes('/projects/')) {
+    return;
+  }
   const user = useStrapiUser();
   if (!user.value) {
     if (to.fullPath === '/login' || to.fullPath === '/') {

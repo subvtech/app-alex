@@ -20,7 +20,9 @@ enum Mode {
 
 const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
+const strapiUser = useStrapiUser();
 
+const isGuest = ref<boolean>(!strapiUser.value);
 const mode = ref<Mode>(Mode.List);
 const search = ref('');
 const route = useRoute();
@@ -41,6 +43,13 @@ const handleFilter = (value: FilterType) => {
 const toggleMode = () => {
   mode.value = mode.value === Mode.Kanban ? Mode.List : Mode.Kanban;
 };
+
+watch(
+  () => strapiUser.value,
+  () => {
+    isGuest.value = !strapiUser.value;
+  },
+);
 
 watch(
   () => [learningPlanStore.loading],
@@ -128,8 +137,21 @@ watch(sprints, (value) => {
             @click="filterDrawer.removeFilter(chip)"
           />
         </TransitionGroup>
-        <Kanban v-if="mode === Mode.Kanban" key="kanban" :sprint="selectedSprint" />
-        <TaskList v-else key="taskList" ref="taskList" :search="search" :filter="filter" />
+        <Kanban v-if="mode === Mode.Kanban" key="kanban" :sprint="selectedSprint" :is-guest="isGuest" />
+        <TaskList
+          v-else
+          key="taskList"
+          ref="taskList"
+          :search="search"
+          :filter="filter"
+          :is-guest="isGuest"
+          @kanban="
+            (sprint) => {
+              selectedSprint = sprint;
+              toggleMode();
+            }
+          "
+        />
       </template>
     </div>
     <TaskFilterDrawer ref="filterDrawer" v-model="openFilterDrawer" @filter="handleFilter" />
