@@ -171,9 +171,7 @@
                       class="rounded mr-4 !tw-max-w-[48px] !tw-max-h-[36px]"
                       cover
                     />
-                    <p class="text-gray-900 text-body-4 text-overflow">
-                      {{ item.learningPlan.title }}
-                    </p>
+                    <p class="text-gray-900 text-body-4 text-overflow">{{ item.learningPlan.title }}</p>
                   </div>
                 </td>
                 <td class="text-overflow max-width-[596px]">
@@ -564,7 +562,7 @@ watch(
   },
 );
 
-defineExpose({ query });
+defineExpose({ query, refetch: () => query.refetch() });
 </script>
 
 <style scoped lang="scss">

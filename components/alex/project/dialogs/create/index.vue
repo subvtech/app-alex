@@ -190,6 +190,8 @@
 </template>
 
 <script setup lang="ts">
+import { MemberRoles } from '#imports';
+
 type FieldSimpleOptionalId = Omit<FieldSimple, 'id'> & { id?: number };
 type ProductSimpleOptionalId = Omit<ProductSimple, 'id'> & { id?: number };
 
@@ -414,16 +416,24 @@ const createProject = async () => {
     const usersData = students.value.map((student) => ({
       id: student.user?.id ?? student.id,
       email: student.user?.email ?? student.email,
-      role: 'student',
+      role: student?.role ?? 'student',
     }));
+
+    if (!usersData.find(({ role }) => ['in_charge', 'student_leader'].includes(role))) {
+      return setMessage('Escolha pelo menos um líder para o projeto', 'warning', true);
+    }
 
     const users = usersData.filter((user) => user.id);
     const newUsersEmails = usersData.filter((user) => !user.id).map((user) => user.email);
+    const leaders = students.value
+      .filter(({ role }) => ['in_charge', 'student_leader'].includes(role))
+      .map((member) => member.user.id);
 
     users.push({
       id: user.value.id,
       email: user.value.email,
-      role: 'student_leader',
+      role: 'facilitator' as MemberRoles,
+      // role: 'student_leader',
     });
 
     loading.value = true;
@@ -442,6 +452,7 @@ const createProject = async () => {
         course: associatedCourses.value.map((course) => course.id),
         new_users: newUsersEmails,
         users,
+        leaders,
       },
     });
     emit('submit');

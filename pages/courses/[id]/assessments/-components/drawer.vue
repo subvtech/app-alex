@@ -26,9 +26,10 @@
     <h3 class="text-gray-800 text-h3 my-4">{{ $t(`${i18Dir}.associatedTasks`) }}</h3>
     <div class="mt-4 mb-6 d-flex gap-4 flex-wrap">
       <div v-for="task in selectedTasks" :key="task.id" class="rounded-lg tw-border tw-w-[260px] tw-h-[120px] pa-4">
-        <p class="d-flex justify-center">
+        <p class="d-flex justify-center align-center">
           <span class="text-body-4 text-gray-800 tw-w-[198px] ellipsis lines-2">{{ task.title }}</span>
           <span class="text-body-2 text-secondary-0">#{{ task.id }}</span>
+          <alex-custom-dropdown variant="text" :items="dropdownItems(task)" />
         </p>
         <div class="mt-4 d-flex align-center">
           <v-icon
@@ -121,6 +122,8 @@ type assessmentType = {
   tasks: taskType[];
 };
 
+const { t } = useI18n();
+
 const i18Dir = 'pages.assessments';
 
 const props = defineProps<{
@@ -129,7 +132,8 @@ const props = defineProps<{
 }>();
 
 const assessmentAvailableTasks = computed(() => {
-  const tasksIds = selectedTasks.value.map((t) => t.id);
+  let tasksIds = selectedTasks.value.map((t) => t.id);
+  tasksIds = tasksIds.concat((props.assessments || []).flatMap((a) => a.tasks.map((t) => t.id)));
   return (props.availableTasks || []).filter((t) => !tasksIds.includes(t.id));
 });
 
@@ -143,11 +147,25 @@ const dialog = ref(false);
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => learningPlanStore.learningPlan?.id);
 
-const { addTaskToGradeCompositionMutation, updateGradeTitleMutation, updateTaskCompositionWeight } = useTaskEvaluation(
-  learningPlanId,
-  null,
-  null,
-);
+const {
+  addTaskToGradeCompositionMutation,
+  updateGradeTitleMutation,
+  updateTaskCompositionWeight,
+  deleteTaskComposition,
+} = useTaskEvaluation(learningPlanId, null, null);
+
+const dropdownItems = (task: taskType) => [
+  {
+    text: t('pages.assessments.delete'),
+    warning: true,
+    onClick: () => deleteGradeCompositionTask(task.compositionId),
+  },
+];
+
+const { mutateAsync: deleteTaskCompositionMutation } = deleteTaskComposition();
+const deleteGradeCompositionTask = async (taskCompositionId) => {
+  await deleteTaskCompositionMutation({ taskCompositionId });
+};
 
 const openDrawer = (assessment?: assessmentType) => {
   model.value = true;

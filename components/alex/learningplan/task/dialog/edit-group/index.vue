@@ -1,20 +1,14 @@
 <template>
   <alex-custom-dialog
     v-model="model"
-    :main-button-text="
-      $t('components.learningPlan.drawer.task.dialog.title.add')
-    "
+    :main-button-text="$t('components.learningPlan.drawer.task.dialog.title.add')"
     :main-button-disabled="hasMembersInOtherGroups"
     @on-main-action="updateGroup"
     @on-secondary-action="model = false"
   >
     <template #header>
       <header class="d-flex align-start ga-4 px-6 pt-6 bg-white rounded-t-lg">
-        <alex-custom-button
-          icon="mdi-chevron-left"
-          variant="text"
-          @click="model = false"
-        />
+        <alex-custom-button icon="mdi-chevron-left" variant="text" @click="model = false" />
         <div class="flex-fill text-center">
           <p class="text-subtitle-2 text-gray-600">
             {{ $t('components.learningPlan.drawer.task.dialog.title.members') }}
@@ -33,9 +27,7 @@
       class="tw-w-full mb-6"
       name="group"
       prepend-inner-icon="mdi-magnify"
-      :placeholder="
-        $t('components.learningPlan.drawer.task.dialog.searchMembers')
-      "
+      :placeholder="$t('components.learningPlan.drawer.task.dialog.searchMembers')"
       density="comfortable"
     />
 
@@ -103,34 +95,23 @@ const { setMessage } = useMessageStore();
 const { t } = useI18n();
 
 const otherGroupIds = computed<number[]>(() => {
-  return props.allGroups.flatMap((group) =>
-    group.group_members.map((groupMember) => groupMember.student_member.id),
-  );
+  return props.allGroups.flatMap((group) => group.group_members.map((groupMember) => groupMember.student_member.id));
 });
 const hasMembersInOtherGroups = computed(
-  () =>
-    !!members.value.filter((member) =>
-      otherGroupIds.value.includes(member.student_member.id),
-    ).length,
+  () => !!members.value.filter((member) => otherGroupIds.value.includes(member.student_member.id)).length,
 );
 const filteredMembers = computed<LearningPlanGroupMemberSimple[]>(() =>
   members.value.filter((member) =>
-    member.student_member.user.fullname
-      .toLocaleLowerCase()
-      .includes(search.value.toLowerCase()),
+    member.student_member.user.fullname.toLocaleLowerCase().includes(search.value.toLowerCase()),
   ),
 );
 
 const responsible = computed<LearningPlanGroupMemberSimple | undefined>(() => {
-  const responsible = props.group?.group_members.find(
-    ({ role }) => role === 'in_charge',
-  );
+  const responsible = props.group?.group_members.find(({ role }) => role === 'in_charge');
 
   const name = responsible?.student_member?.user.fullname;
 
-  return name?.toLowerCase().includes(search.value.toLowerCase())
-    ? responsible
-    : undefined;
+  return name?.toLowerCase().includes(search.value.toLowerCase()) ? responsible : undefined;
 });
 
 function onAnotherGroup(member: LearningPlanGroupMemberSimple): boolean {
@@ -143,20 +124,12 @@ function removeMember(member: LearningPlanGroupMemberSimple) {
 
 async function updateGroup() {
   if (responsible.value === undefined) {
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.missResponsible'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.dialog.message.missResponsible'), 'warning', true);
     return;
   }
 
   if (!members.value.length) {
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.oneMember'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.dialog.message.oneMember'), 'warning', true);
     return;
   }
 
@@ -175,8 +148,7 @@ async function updateGroup() {
     });
     await strapi.create('task-members', {
       status: 'to_do',
-      can_submit_after_deadline:
-        props.canSubmitAfter !== undefined ? props.canSubmitAfter : true,
+      can_submit_after_deadline: props.canSubmitAfter !== undefined ? props.canSubmitAfter : true,
       started_at: props.startAt || null,
       finished_at: props.finishAt || null,
       task: props.taskId,
@@ -184,17 +156,9 @@ async function updateGroup() {
     });
 
     emit('add-group');
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.added'),
-      'success',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.dialog.message.added'), 'success', true);
   } catch (e) {
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.createError'),
-      'error',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.dialog.message.createError'), 'error', true);
   } finally {
     model.value = false;
   }
@@ -205,8 +169,6 @@ watch(model, () => {
     return;
   }
 
-  members.value =
-    props.group?.group_members.filter((member) => member.role === 'standard') ||
-    [];
+  members.value = props.group?.group_members.filter((member) => member.role === 'standard') || [];
 });
 </script>

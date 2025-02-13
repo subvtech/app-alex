@@ -35,7 +35,7 @@
         <v-expansion-panels multiple>
           <v-expansion-panels class="task-student-card" multiple>
             <p v-if="!hasStudentsToAdd" class="text-body-1 text-gray-400 text-center">
-              {{ $t('components.projects.create.emptyMessage.students') }}
+              {{ $t('components.projects.create.members.emptyMessage.students') }}
             </p>
             <template v-for="classValue in filteredClasses" :key="classValue.id">
               <v-expansion-panel v-if="classValue.members?.length">
@@ -83,7 +83,7 @@
         <v-expansion-panels multiple>
           <v-expansion-panels class="task-student-card" multiple>
             <p v-if="!hasGroupsToAdd" class="text-body-1 text-gray-400 text-center">
-              {{ $t('components.projects.create.emptyMessage.students') }}
+              {{ $t('components.projects.create.members.emptyMessage.students') }}
             </p>
             <template v-for="classValue in filteredGroups" :key="classValue.id">
               <v-expansion-panel v-if="classValue.groups?.length">
@@ -105,7 +105,7 @@
                       @add-members="addStudentsFromGroups"
                     />
                     <p v-if="!classValue.groups?.length" class="text-gray-500">
-                      {{ $t('components.projects.create.emptyMessage.students') }}
+                      {{ $t('components.projects.create.members.emptyMessage.students') }}
                     </p>
                   </div>
                 </v-expansion-panel-text>

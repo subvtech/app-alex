@@ -50,6 +50,7 @@
       type="professor"
       :classes="taskMemberClasses"
       :filter="filter"
+      :edit="!isGuest"
       no-header
       @create-task="(title, column) => handleCreateTask(title, column)"
       @card-click="(_, taskMember) => openDrawer(taskMember)"
@@ -101,6 +102,7 @@
                 :over="{ id: 0, index: 0, position: 'top' }"
                 :drag-from="0"
                 :dragging="false"
+                :is-guest="isGuest"
                 individual-journey
                 @delete-task="handleDeleteTask"
                 @edit-task="openDrawer"
@@ -108,6 +110,7 @@
               />
 
               <div
+                v-if="!isGuest"
                 :class="`${!isAddingTask && 'pa-4 tw-border-dashed'} d-flex align-center justify-center ga-2 tw-border
                   tw-rounded-[8px] tw-cursor-pointer tw-transition
                 hover:tw-bg-gray-50 mb-4`"
@@ -151,6 +154,7 @@
     </div>
 
     <alex-learningplan-task-drawer-teacher
+      v-if="!isGuest"
       v-model="teacherDrawer"
       :task-id="taskDetails?.id"
       :title="taskDetails?.title"
@@ -171,8 +175,8 @@
       :start-date="taskDetails?.start_at"
       :end-date="taskDetails?.finish_at"
       :restrictions="taskDetails?.allowed_editor_plugins"
-      individual-journey
       editable
+      individual-journey
       @change-goals="handleChangeGoals"
       @change-values="handleChangeValues"
       @change-description="handleChangeDescription"
@@ -183,6 +187,7 @@
       @change-can-alter-from-review="handleChangeAlterFromReview"
       @change-kanban-status="(group) => handleUpdateDrawerStatus(group)"
     />
+    <DrawerTaskDetails v-else v-model="teacherDrawer" :task="taskDetails" :can-edit="!isGuest" individual-learning />
 
     <alex-learningplan-task-drawer-filter
       ref="filterDrawer"
@@ -217,6 +222,7 @@
 
 <script setup lang="ts">
 import { type TaskStudent } from '@/components/alex/learningplan/task/kanban/index.vue';
+import DrawerTaskDetails from '../../tasks/-components/DrawerTaskDetails.vue';
 import Kanban from '../-components/Kanban.vue';
 
 // Const
@@ -230,9 +236,11 @@ const strapi = useStrapi();
 const { find } = useStrapiUtils();
 const route = useRoute();
 const router = useRouter();
+const user = useStrapiUser();
 const { t } = useI18n();
 
 // Ref
+const isGuest = ref<boolean>(!user.value);
 const loading = ref<boolean>(true);
 const kanban = ref<{
   setCanDrag: (val: boolean) => void;
@@ -811,6 +819,13 @@ watch(
     if (!show) {
       headerStore.showHeader = true;
     }
+  },
+);
+
+watch(
+  () => user.value,
+  () => {
+    isGuest.value = !user.value;
   },
 );
 

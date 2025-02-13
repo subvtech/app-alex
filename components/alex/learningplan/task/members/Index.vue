@@ -2,7 +2,7 @@
   <v-data-iterator
     :search="search"
     :page="page"
-    :items="membersRef"
+    :items="kind === 'project' ? projectStudents : members.data"
     :items-per-page="itemsPerPage"
     class="members"
     :filter-keys="[
@@ -13,7 +13,6 @@
       'user.fullname',
       'user.email',
     ]"
-    :loading="isLoading"
   >
     <!-- Header -->
     <template v-if="!listGroupMembers" #header>
@@ -24,44 +23,44 @@
           class="w-100 tw-mr-4"
           :placeholder="$t('components.learningPlan.members.search')"
           prepend-inner-icon="mdi-magnify"
-          :density="isProject ? 'comfortable' : 'compact'"
+          :density="kind === 'project' ? 'comfortable' : 'compact'"
           clearable
         />
 
         <alex-learningplan-task-dialog-add-member
-          v-if="!isGroup && isTypeDefined && isTask"
+          v-if="type === 'individual' && kind === 'task'"
           v-model="addMemberDialog"
-          :learningplan-id="props.learningplanIds[0]"
-          :members="membersRef"
+          :learningplan-id="props.learningplanId"
+          :members="members.data"
           @add-click="addMember"
         />
         <alex-learningplan-task-dialog-add-group
-          v-else-if="isGroup && isTask"
+          v-else-if="type === 'group' && kind === 'task'"
           v-model="addGroupDialog"
-          :learningplan-id="props.learningplanIds[0]"
+          :learningplan-id="props.learningplanId"
           :task-id="props.taskId"
           :start-at="startAt"
           :finish-at="finishAt"
           :can-submit-after="props.sendAfterDeadline"
-          :task-members="membersRef"
+          :task-members="members.data"
           @add-group="handleAddGroup"
         />
         <alex-learningplan-task-dialog-add-project-members
-          v-if="isProject"
+          v-if="kind === 'project'"
           v-model="addProjectMembersDialog"
           :learningplan-ids="props.learningplanIds"
-          :selected-students="membersRef"
-          @invite="(members) => (membersRef = members)"
+          :selected-students="projectStudents"
+          @invite="(members) => (projectStudents = members)"
         />
 
-        <alex-custom-dropdown :items="typeOptions" :disabled="isTypeDefined || isProject">
+        <alex-custom-dropdown :items="typeOptions" :disabled="!!type || kind === 'project'">
           <template #activator="{ props: propsDropdown }">
             <alex-custom-button
               v-bind="propsDropdown"
               class="tw-ml-auto"
               variant="secondary"
               prepend-icon="mdi-plus"
-              :size="isProject ? 'large' : 'default'"
+              :size="kind === 'project' ? 'large' : 'default'"
               @click="handleAddMemberOrClass"
               >{{ $t('components.learningPlan.members.add.label') }}</alex-custom-button
             >
@@ -69,15 +68,15 @@
         </alex-custom-dropdown>
       </div>
       <alex-learningplan-task-dialog-create-group
-        v-if="isTask"
+        v-if="kind === 'task'"
         v-model="groupDialog"
-        :learning-plan-id="props.learningplanIds[0]"
+        :learning-plan-id="props.learningplanId"
         :task-id="props.taskId"
         :start-at="props.startAt"
         :finish-at="props.finishAt"
         :can-submit-after="props.sendAfterDeadline"
         :classes="classes.data"
-        :task-members="membersRef"
+        :task-members="members.data"
         :group="groupInfo"
         @add-group="handleAddGroup"
         @update-group="handleAddGroup"
@@ -85,21 +84,7 @@
     </template>
     <!-- Cards -->
     <template #default="{ items }">
-      <template v-if="listGroupMembers">
-        <template v-for="member in items" :key="`student-member${member.raw.id}`">
-          <alex-learningplan-task-members-card
-            v-for="groupMember in member.raw.learning_plan_group?.group_members"
-            :key="`group-member${groupMember.id}`"
-            :member="{
-              name: groupMember.student_member.user.fullname,
-              class: member.raw.learning_plan_group?.learning_class?.name,
-              avatarUrl: groupMember.student_member.user?.avatar?.url,
-              responsable: groupMember.role === learningPlanGroupMemberRolesSimple.IN_CHARGE,
-            }"
-            @to-profile="navigateTo(`/users/${groupMember.student_member.user.username}`)"
-        /></template>
-      </template>
-      <template v-else>
+      <template v-if="!listGroupMembers">
         <alex-learningplan-task-members-card
           v-for="member in items"
           :key="`student-member${member.raw.id}`"
@@ -110,25 +95,32 @@
               member.raw.user?.fullname,
             class:
               member.raw.learning_plan_member?.learning_class?.name ||
-              member.raw.learning_plan_group?.learning_class?.name,
+              member.raw.learning_plan_group?.learning_class.name,
             avatarUrl: member.raw.learning_plan_member?.user?.avatar?.url || member.raw.user?.avatar?.url,
             group: !!member.raw.learning_plan_group,
             participants: member.raw.learning_plan_group
               ? getMembersOfGroup(member.raw.learning_plan_group)
               : undefined,
+            responsable: ['student_leader', 'in_charge'].includes(member.raw.role),
           }"
           :edit="edit"
-          :clickable="!isProject"
-          :no-class="isProject"
-          @remove-click="
-            member.raw.learning_plan_member
-              ? removeMember(
-                  member.raw.learning_plan_member.user.email,
-                  member.raw.id,
-                  member.raw.learning_plan_member.user.fullname,
-                )
-              : removeMember(undefined, member.raw.id, member.raw.learning_plan_group?.title)
+          :clickable="kind !== 'project'"
+          :no-class="kind === 'project'"
+          toggle-responsible
+          @responsible="
+            (responsible: boolean) => {
+              const memberId = member.raw.id;
+
+              projectStudents = projectStudents.map((member) => {
+                if (member.id === memberId) {
+                  member.role = (responsible ? 'in_charge' : 'student') as MemberRoles;
+                }
+
+                return member;
+              });
+            }
           "
+          @remove-click="removeMember(member.raw)"
           @edit-click="() => handleEditClick(member.raw.learning_plan_group, items)"
           @to-profile="
             member.raw.learning_plan_member
@@ -166,15 +158,11 @@
         </p>
       </div>
     </template>
-    <template #loader>
-      <div class="tw-flex tw-items-center tw-justify-center">
-        <v-progress-circular color="secondary-0" indeterminate></v-progress-circular>
-      </div>
-    </template>
+
     <template #footer="{ pageCount, groupedItems }">
-      <div v-if="groupedItems.length && membersRef.length > itemsPerPage" class="d-flex align-center ga-2 pa-6">
+      <div v-if="groupedItems.length && members.data.length > itemsPerPage" class="d-flex align-center ga-2 pa-6">
         <span class="flex-1-1">
-          {{ showingData(membersRef, groupedItems as any[], search, pageCount) }}
+          {{ showingData(members.data, groupedItems as any[], search, pageCount) }}
         </span>
         <alex-custom-pagination v-model="page" :length="pageCount" :total-visible="3" class="extra-mb" />
       </div>
@@ -183,6 +171,7 @@
 </template>
 
 <script setup lang="ts">
+import { MemberRoles } from '#imports';
 import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface MembersProps {
@@ -193,41 +182,59 @@ interface MembersProps {
   sendAfterDeadline?: boolean;
   blockDelete?: boolean;
   edit?: boolean;
-  members: TaskMember[];
-  isProject?: boolean;
-  taskId?: number;
-  learningplanIds?: number[];
 }
 
-const props = withDefaults(defineProps<MembersProps>(), {
+interface TaskMemberProps {
+  learningplanId: number;
+  taskId: number;
+  kind: 'task';
+}
+interface ProjectMemberProps {
+  learningplanIds: number[];
+  students: LearningPlanMemberSimple[];
+  kind: 'project';
+}
+
+type TaskPropsType = MembersProps & TaskMemberProps;
+type ProjectPropsType = MembersProps & ProjectMemberProps;
+
+type PropsType = TaskPropsType | ProjectPropsType;
+
+const props = withDefaults(defineProps<PropsType>(), {
   sendAfterDeadline: false,
   startAt: null,
   finishAt: null,
   type: null,
   blockDelete: false,
-  isProject: false,
   edit: true,
   listGroupMembers: false,
   taskId: 0,
-  learningplanIds: () => [0],
-  members: () => [],
+  learningplanId: 0,
+  kind: 'task',
+  learningplanIds: () => [],
+  students: () => [],
 });
-const { members: membersRef } = toRefs(props);
+
+const projectStudents = ref<LearningPlanMemberSimple[]>([...props.students]);
 
 type Emits = {
   'change-members': [];
-  'set-members': [value: TaskMember[]];
+  'set-members': [value: LearningPlanMemberSimple[]];
   'set-type': [value: TaskType];
 };
+
+watch(
+  () => projectStudents.value,
+  () => {
+    emit('set-members', projectStudents.value);
+  },
+);
 
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
-
 const emit = defineEmits<Emits>();
-
-const isLoading = ref(false);
 const addMemberDialog = ref(false);
 const addGroupDialog = ref(false);
 const addProjectMembersDialog = ref(false);
@@ -244,7 +251,7 @@ const typeOptions: AlexDropdownItem[] = [
     text: t('components.learningPlan.drawer.task.type.individual'),
     onClick: () => {
       emit('set-type', 'individual');
-      if (checkHasFilledDates.value) {
+      if (props.startAt && props.finishAt) {
         addMemberDialog.value = true;
       }
     },
@@ -253,29 +260,26 @@ const typeOptions: AlexDropdownItem[] = [
     text: t('components.learningPlan.drawer.task.type.collective'),
     onClick: () => {
       emit('set-type', 'group');
-      if (checkHasFilledDates.value) {
+      if (props.startAt && props.finishAt) {
         addGroupDialog.value = true;
       }
     },
   },
 ];
 
-const handleAddGroup = async () => {
+const handleAddGroup = () => {
   emit('change-members');
-  await fetchTaskMembers();
+  refresh();
 };
 
-const checkHasFilledDates = computed(() => {
-  const result = !!props.startAt && !!props.finishAt;
-  if (!result) setMessage(t('components.learningPlan.drawer.task.pleaseFillDates'), 'warning', true);
-  return result;
-});
-
-const isTask = computed(() => !props.isProject);
-const isGroup = computed(() => props.type === 'group');
-const isTypeDefined = computed(() => props.type !== null);
-
-const getMembers = () =>
+const checkHasFilledDates = () => {
+  if (!props.startAt || !props.finishAt) {
+    setMessage(t('components.learningPlan.drawer.task.pleaseFillDates'), 'warning', true);
+    return false;
+  }
+  return true;
+};
+const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
       task_submissions: {
@@ -294,10 +298,9 @@ const getMembers = () =>
       },
     },
     filters: {
-      task: props.taskId,
+      task: taskId,
     },
   });
-
 const showingData = (items: any[], pageItems: any[], search: string, pageCount: number) => {
   const itemsPerPageCalc = search ? itemsPerPage : pageItems.length;
   const range = pageItems.length < itemsPerPage ? 2 : 1;
@@ -308,24 +311,26 @@ const showingData = (items: any[], pageItems: any[], search: string, pageCount: 
     from,
     to,
     total,
-    entity: t('components.learningPlan.drawer.members'),
+    entity: t('components.learningPlan.drawer.students'),
   });
 
   return message;
 };
 
-const fetchTaskMembers = async () => {
-  const temp = await getMembers();
-  membersRef.value = temp.data;
-};
+const { data: members, refresh } = await useAsyncData('task-members', () => getMembers(props.taskId), {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskMember[],
+  }),
+});
+
 const addMember = async (members: LearningPlanMemberSimple[]) => {
   if (!props.type) {
     setMessage(t('components.learningPlan.drawer.task.pleaseFillType'), 'warning', true);
     return;
   }
-  if (!checkHasFilledDates.value) return;
+  if (!checkHasFilledDates()) return;
   try {
-    isLoading.value = true;
     await client(`/tasks/${props.taskId}/add-students`, {
       method: 'PUT',
       body: {
@@ -338,48 +343,42 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
           return;
         }
         setMessage(t('components.learningPlan.drawer.task.members.addMembers'), 'success', true);
-        setTimeout(fetchTaskMembers, 100);
+        setTimeout(refresh, 100);
         emit('change-members');
       },
     });
   } catch (error) {
     setMessage(t('components.learningPlan.drawer.task.errors.addMember'), 'error', true);
-  } finally {
-    isLoading.value = false;
   }
 };
-
-const removeMember = async (memberEmail: string | undefined, memberId: number, memberName?: string) => {
-  try {
-    if (props.blockDelete && isTask.value) {
-      setMessage(t('components.learningPlan.drawer.task.status.remove.forbidden'), 'warning', true);
-      return;
-    }
-    isLoading.value = true;
-
-    await strapi.delete('task-members', memberId);
-    membersRef.value = [
-      ...membersRef.value.filter((student) => {
-        return (
-          student.learning_plan_member &&
-          (student.learning_plan_member?.user.id !== memberId ||
-            student.learning_plan_member?.user.email !== memberEmail)
-        );
-      }),
-    ];
-    // setTimeout(fetchTaskMembers, 100);
-    setMessage(
-      t('components.learningPlan.drawer.task.removeMember', {
-        member: memberName,
-      }),
-      'success',
-      true,
+const removeMember = async (member) => {
+  if (props.kind === 'project') {
+    const indexOf = projectStudents.value.findIndex(
+      (student) => student.user.id === member.user.id || student.user.email === member.user.email,
     );
-    emit('change-members');
-  } catch (error) {
-    setMessage(t('components.learningPlan.drawer.task.errors.removeMember'), 'error', true);
-  } finally {
-    isLoading.value = false;
+    projectStudents.value.splice(indexOf, 1);
+  } else {
+    try {
+      if (props.blockDelete) {
+        setMessage(t('Você não pode remover alunos após alguém ter feito uma entrega'), 'warning', true);
+        return;
+      }
+      const memberName = member.learning_plan_member
+        ? member.learning_plan_member?.user?.fullname
+        : member.learning_plan_group?.title;
+      await strapi.delete('task-members', member.id);
+      setTimeout(refresh, 100);
+      setMessage(
+        t('components.learningPlan.drawer.task.removeMember', {
+          member: memberName,
+        }),
+        'success',
+        true,
+      );
+      emit('change-members');
+    } catch (error) {
+      setMessage(t('components.learningPlan.drawer.task.errors.removeMember'), 'error', true);
+    }
   }
 };
 
@@ -389,16 +388,8 @@ const getMembersOfGroup = (group: LearningPlanGroupSimple) =>
     image: { url: member.student_member.user?.avatar?.url || '' },
     className: 'text-body-3',
   }));
-
-const handleEditClick = (
-  selectedGroup: LearningPlanGroupSimple | undefined,
-  taskMembers: { raw: TaskMember }[] | any,
-) => {
-  if (!selectedGroup) {
-    setMessage(t('components.learningPlan.drawer.task.dialog.message.hasSubmission'), 'warning', true);
-    return;
-  }
-  // Checks if there is a submission
+const handleEditClick = (selectedGroup: LearningPlanGroupSimple, taskMembers: { raw: TaskMember }[] | any) => {
+  // Checa se o grupo tem submissões
   const selectedTaskMember = taskMembers.find((member) => member.raw.learning_plan_group?.id === selectedGroup.id);
 
   if (selectedTaskMember?.raw.task_submissions?.length) {
@@ -413,12 +404,12 @@ const handleEditClick = (
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {
-  if (props.isProject) {
-    addProjectMembersDialog.value = props.isProject;
+  if (props.kind === 'project') {
+    addProjectMembersDialog.value = true;
   }
-  if (!props.type || !checkHasFilledDates.value) {
+  if (!props.type || !checkHasFilledDates()) {
     setTypeDropdown.value = true;
-  } else if (isGroup.value) {
+  } else if (props.type === 'group') {
     addGroupDialog.value = true;
   } else {
     addMemberDialog.value = true;
@@ -437,30 +428,21 @@ const getGroups = (learningplanId: number) =>
       learningplan: learningplanId,
     },
   });
-const { data: classes } = await useAsyncData('classes-member-invite', () => getGroups(props.learningplanIds[0]), {
+const { data: classes } = await useAsyncData('classes-member-invite', () => getGroups(props.learningplanId), {
   default: () => ({ meta: 0, data: [] as ClassSimple[] }),
 });
 
 watch(
-  membersRef,
-  () => {
-    isLoading.value = true;
-    emit('set-members', membersRef.value);
-    isLoading.value = false;
-  },
-  { deep: true },
-);
-
-watch(
   () => props.taskId,
-  async () => {
-    await fetchTaskMembers();
+  () => {
+    refresh();
   },
 );
 
-watch(addGroupDialog, async (value) => {
-  if (value) return;
-  await fetchTaskMembers();
+watch(addGroupDialog, (value) => {
+  if (!value) {
+    refresh();
+  }
 });
 </script>
 

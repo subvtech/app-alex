@@ -15,6 +15,7 @@ type Props<T> = {
   group: string;
   title: string;
   columnId: number;
+  isGuest?: boolean;
 };
 
 type Events<T> = {
@@ -43,6 +44,7 @@ const props = withDefaults(defineProps<Props<T>>(), {
   addButtonText: 'Adicionar',
   addButton: true,
   isCreatingTask: false,
+  isGuest: false,
 });
 
 const items = defineModel<T[]>({ default: () => [] });
@@ -94,6 +96,7 @@ const handleBlurAddItem = (group: string) => {
         :color="color"
         :quantity="items.length"
         :title="title"
+        :is-guest="isGuest"
         @add="handleStartAddItem"
         @delete="$emit('delete', group)"
         @empty-title="$emit('cancel-column', group)"
@@ -119,14 +122,14 @@ const handleBlurAddItem = (group: string) => {
         :key="item.raw.id"
         :index="i"
         class="kanban-card-item tw-mb-2"
-        :disabled="disabled"
+        :disabled="disabled || isGuest"
       >
         <slot name="card" :item="item" :index="i" />
       </SlickItem>
     </SlickList>
     <VScaleTransition group>
       <alex-custom-button
-        v-if="addButton && !isAddingItem"
+        v-if="addButton && !isAddingItem && !isGuest"
         :key="`addButton-${group}`"
         variant="outlined"
         class="tw-w-full !tw-border-dashed !tw-border"

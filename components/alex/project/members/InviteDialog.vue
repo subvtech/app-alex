@@ -1,10 +1,5 @@
 <template>
-  <alex-custom-dialog
-    v-model="dialogModel"
-    :title="dialogTitle"
-    activator="parent"
-    no-footer
-  >
+  <alex-custom-dialog v-model="dialogModel" :title="dialogTitle" activator="parent" no-footer>
     <div class="d-flex flex-column gap-4">
       <span v-if="disableInvite" class="text-body-1 text-warning-0">
         {{ $t('components.learningPlan.projects.invite.disabled') }}
@@ -13,18 +8,10 @@
       <div v-else>
         <div class="d-flex tw-justify-between tw-items-center w-100">
           <div class="d-flex gap-4">
-            <alex-custom-button
-              icon="mdi-attachment"
-              variant="secondary"
-              size="large"
-            />
+            <alex-custom-button icon="mdi-attachment" variant="secondary" size="large" />
             <div class="d-flex flex-column">
-              <span class="text-body-4">{{
-                $t('components.learningPlan.projects.invite.subtitle')
-              }}</span>
-              <span class="text-body-5">{{
-                $t('components.learningPlan.projects.invite.description')
-              }}</span>
+              <span class="text-body-4">{{ $t('components.learningPlan.projects.invite.subtitle') }}</span>
+              <span class="text-body-5">{{ $t('components.learningPlan.projects.invite.description') }}</span>
             </div>
           </div>
           <alex-custom-dropdown :items="dropdownItems">
@@ -62,9 +49,7 @@
           :no-data-text="$t('components.learningPlan.projects.invite.noData')"
           :ignore-user-ids="ignoreUserIds"
           :ignore-emails="ignoreUserEmails"
-          :submit-button-text="
-            $t('components.learningPlan.projects.invite.submit')
-          "
+          :submit-button-text="$t('components.learningPlan.projects.invite.submit')"
           :disable-submit-button="disableSubmit"
           show-submit-button
           required
@@ -78,8 +63,7 @@
               :user="{
                 email: item.raw.email,
                 name: item.raw.fullname,
-                image:
-                  item.raw.avatar?.formats?.small?.url || item.raw.avatar?.url,
+                image: item.raw.avatar?.formats?.small?.url || item.raw.avatar?.url,
               }"
               no-delete
               no-checkbox
@@ -115,12 +99,7 @@ const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { generateUrl } = useInvitationLink();
 const { create } = useStrapi();
-const emit = defineEmits([
-  'action',
-  'click:filter',
-  'update:search',
-  'update:members',
-]);
+const emit = defineEmits(['action', 'click:filter', 'update:search', 'update:members']);
 const props = withDefaults(defineProps<InviteDialogProps>(), {
   ignoreUserEmails: () => [],
   ignoreUserIds: () => [],
@@ -133,16 +112,12 @@ const { inviteLinkHash, inviteLinkExpiresAt } = toRefs(props);
 
 const inviteLinkExpiresAtRef = ref<Date | null>(props.inviteLinkExpiresAt);
 
-const plainLink = ref<string | null>(
-  props.inviteLinkHash ? generateUrl(props.inviteLinkHash) : null,
-);
+const plainLink = ref<string | null>(props.inviteLinkHash ? generateUrl(props.inviteLinkHash) : null);
 
 const membersToInvite = ref<UserSimple[]>([]);
 const dialogModel = defineModel<boolean>({ required: true });
 
-const inviteType = ref<MemberRoles.COLLABORATOR | MemberRoles.STUDENT>(
-  MemberRoles.STUDENT,
-);
+const inviteType = ref<MemberRoles.COLLABORATOR | MemberRoles.STUDENT>(MemberRoles.STUDENT);
 
 const dropdownItems: AlexDropdownItem[] = [
   {
@@ -189,17 +164,8 @@ const inviteMembers = async () => {
     dialogModel.value = false;
     membersToInvite.value = [];
     if (successfulInvitations.length > 0) {
-      setMessage(
-        t('components.learningPlan.projects.invite.added'),
-        'green',
-        true,
-      );
-    } else
-      setMessage(
-        t('components.learningPlan.projects.invite.duplicated'),
-        'red',
-        true,
-      );
+      setMessage(t('components.learningPlan.projects.invite.added'), 'green', true);
+    } else setMessage(t('components.learningPlan.projects.invite.duplicated'), 'red', true);
     emit('update:members');
   }
 };
