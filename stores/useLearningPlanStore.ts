@@ -99,7 +99,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const userIsFacilitator = computed(() => {
     return learningPlan.value?.members.some(
       (m: LearningPlanMemberSimple) =>
-        (m.role === MemberRoles.FACILITATOR || m.role === MemberRoles.COLLABORATOR) && m.user?.id === user.value.id,
+        (m?.role === MemberRoles.FACILITATOR || m?.role === MemberRoles.COLLABORATOR) && m?.user?.id === user.value?.id,
     );
   });
 
@@ -176,15 +176,15 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const userIsActiveMember = computed(() => {
-    return activeMembers.value.some((m) => m.user.id === user.value.id);
+    return activeMembers.value.some((m) => m.user.id === user.value?.id);
   });
 
   const userIsPendingMember = computed(() => {
-    return pendingMembers.value.some((m) => m.user?.id === user.value.id || m.email === user.value.email);
+    return pendingMembers.value.some((m) => m.user?.id === user.value?.id || m.email === user.value?.email);
   });
 
   const userClass = computed(() => {
-    return learningPlan.value?.classes?.find((c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id));
+    return learningPlan.value?.classes?.find((c) => c.learning_plan_members?.some((m) => m.user.id === user.value?.id));
   });
 
   const schedules = computed<LearningPlanScheduleSimple[]>(() => {
@@ -201,7 +201,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const generalTags = computed(() => learningPlan.value?.tags?.filter((tag) => tag.isGeneral));
   const technicalTags = computed(() => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral));
   const userLearningMember = computed(
-    () => learningPlan.value?.members.find((member) => member.user.id === user.value.id),
+    () => learningPlan.value?.members.find((member) => member.user.id === user.value?.id),
   );
 
   return {
