@@ -96,11 +96,13 @@ const columns = computed<Column<KanbanColumnTask>[]>({
         group: generateGroup(column.status_type || 'custom', column.id),
         position: column.position,
         status_type: column.status_type,
-        items: column.tasks.map((task) => ({
-          id: task.id,
-          group: `${column.status_type}_${column.id}`,
-          raw: task,
-        })),
+        items: column.tasks
+          .filter((item) => item.task.type === 'group')
+          .map((task) => ({
+            id: task.id,
+            group: `${column.status_type}_${column.id}`,
+            raw: task,
+          })),
       }))
       .sort((a, b) => a.position - b.position) || [],
   set: (value) => {
