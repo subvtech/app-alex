@@ -125,7 +125,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
       await switchNetwork(sepoliaChainId);
 
       const wallet = await withTimeout(12000, browserProvider.getSigner());
-      const budgetInWei = ethers.parseEther(usdToEth(budget).toString());
+      const budgetInWei = ethers.parseEther(usdToEth(budget).toFixed(18));
 
       const { contractABI, contractBinary } = getCompiledContract();
 

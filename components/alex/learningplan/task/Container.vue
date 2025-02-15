@@ -78,7 +78,6 @@
       </v-expansion-panels>
     </Transition>
   </div>
-  <pre>{{ taskDetails }}</pre>
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"

@@ -62,6 +62,8 @@
       </div>
       <div class="mt-6" />
 
+      <pre>{{ status }}</pre>
+
       <alex-learningplan-task-drawer-contracts-create-contract-form
         v-if="(isThereAContract && isThereBalance) || !isThereAContract"
         :is-draft="isDraft"
@@ -125,26 +127,6 @@ const itsNotFinished = computed(() => status.value !== 'finished');
 const isDraft = computed(() => status.value === 'draft');
 
 const canEdit = ref(isThereAContract.value || isUpdatingContract.value);
-
-const taskMemberCount = computed(() => {
-  let count = 0;
-  taskMemberStudents.value.forEach((m) => {
-    if (m.learning_plan_member) {
-      const wallet = m.learning_plan_member?.user?.wallet;
-      if (wallet?.address) {
-        count++;
-      }
-    } else if (m.learning_plan_group?.group_members) {
-      m.learning_plan_group.group_members.forEach((gm) => {
-        const wallet = gm.student_member.user.wallet;
-        if (wallet?.address) {
-          count++;
-        }
-      });
-    }
-  });
-  return count;
-});
 
 const taskMemberStudents = computed(() => {
   return props.taskMembers.flatMap(
