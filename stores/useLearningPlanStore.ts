@@ -23,7 +23,11 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['verb'],
     },
     groups: {
-      populate: ['group_members.student_member.user.avatar', 'task_members'],
+      populate: [
+        'group_members.student_member.user.avatar',
+        'task_members',
+        'group_members.student_member.user.user_wallet',
+      ],
     },
     learning_structures: {
       populate: {
@@ -60,7 +64,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['meetings'],
     },
     members: {
-      populate: ['user.avatar', 'user.cover'],
+      populate: ['user.avatar', 'user.cover', 'user.user_wallet'],
     },
     tasks: {
       populate: [
@@ -69,7 +73,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'trail',
         'tags',
         'task_members.learning_plan_member.user.avatar',
+        'task_members.learning_plan_member.user.user_wallet',
         'task_members.learning_plan_group.group_members.student_member.user.avatar',
+        'task_members.learning_plan_group.group_members.student_member.user.user_wallet',
       ],
     },
   };

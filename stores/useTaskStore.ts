@@ -16,10 +16,14 @@ export const useTaskStore = defineStore('task', () => {
           sort: 'updatedAt:desc',
         },
         learning_plan_member: {
-          populate: ['user.avatar', 'learning_class'],
+          populate: ['user.avatar', 'learning_class', 'user.user_wallet'],
         },
         learning_plan_group: {
-          populate: ['group_members.student_member.user.avatar', 'learning_class'],
+          populate: [
+            'group_members.student_member.user.avatar',
+            'learning_class',
+            'group_members.student_member.user.user_wallet',
+          ],
         },
       },
     },
@@ -32,10 +36,10 @@ export const useTaskStore = defineStore('task', () => {
     task_events: {
       populate: {
         task_member: {
-          populate: ['learning_plan_member.user.avatar'],
+          populate: ['learning_plan_member.user.avatar', 'learning_plan_member.user.user_wallet'],
         },
         learning_plan_member: {
-          populate: ['user.avatar'],
+          populate: ['user.avatar', 'user.user_wallet'],
         },
       },
     },
@@ -71,8 +75,10 @@ export const useTaskStore = defineStore('task', () => {
         populate: [
           'task_submission',
           'learning_plan_member.user.avatar',
+          'learning_plan_member.user.user_wallet',
           'learning_plan_member.learning_class',
           'learning_plan_group.group_members.student_member.user.avatar',
+          'learning_plan_group.group_members.student_member.user.user_wallet',
           'learning_plan_group.learning_class',
         ],
         filters: {

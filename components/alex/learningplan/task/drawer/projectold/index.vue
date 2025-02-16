@@ -135,6 +135,15 @@
         />
       </div>
 
+      <div v-if="contractAddress" class="d-flex flex-column gap-8 mt-2">
+        <div class="d-flex flex-column gap-6">
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+        </div>
+      </div>
+
       <!-- Eventos e atribuições -->
       <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
       <v-window v-model="activePage">
@@ -189,6 +198,7 @@ interface TaskTeacherDrawerProps {
   startDate?: string | null;
   endDate?: string | null;
   members?: TaskMember[];
+  contractAddress: string | null;
 }
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
@@ -205,6 +215,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   description: undefined,
   startDate: undefined,
   endDate: undefined,
+  contractAddress: null,
   restrictions: '',
   goals: () => [],
   tags: () => [],
@@ -213,6 +224,11 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   submissionDescription: '',
   members: () => [],
 });
+
+const { contractAddress } = toRefs(props);
+const { fetchContractReward, isThereAContract, contractBalance } = useContracts(contractAddress);
+
+await fetchContractReward();
 
 // TODO: Refactor to on-change values and remove refs;
 const description = ref<string | any | undefined>(props.description);
@@ -538,6 +554,9 @@ watch(canChangeFromReview, async (value) => {
   }
 });
 watch(tags, (value) => emit('change-tags', value));
+watch([contractAddress, isThereAContract], async () => {
+  await fetchContractReward();
+});
 // Close drawer
 function handleCloseModal() {
   model.value = false;

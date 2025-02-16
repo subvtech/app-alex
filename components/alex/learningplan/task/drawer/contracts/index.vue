@@ -62,8 +62,6 @@
       </div>
       <div class="mt-6" />
 
-      <pre>{{ status }}</pre>
-
       <alex-learningplan-task-drawer-contracts-create-contract-form
         v-if="(isThereAContract && isThereBalance) || !isThereAContract"
         :is-draft="isDraft"
@@ -147,13 +145,13 @@ const taskWallets = computed(() => {
     .filter((m) => m.taskStatus === 'done')
     .forEach((m) => {
       if (m.learning_plan_member) {
-        const wallet = m.learning_plan_member?.user?.wallet;
+        const wallet = m.learning_plan_member?.user?.user_wallet;
         if (wallet && wallet.address) {
           result.push(wallet.address);
         }
       } else if (m.learning_plan_group?.group_members) {
         m.learning_plan_group.group_members.forEach((gm) => {
-          const wallet = gm.student_member.user.wallet;
+          const wallet = gm.student_member.user.user_wallet;
           if (wallet && wallet.address) {
             result.push(wallet.address);
           }

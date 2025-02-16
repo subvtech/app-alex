@@ -46,6 +46,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
   const fetchContractBalance = async () => {
     if (!contractAddress.value) return;
     const balance = await getContractBalance();
+    console.log({ balance });
     if (balance === undefined) return;
     contractBalance.value = weiToUsd(balance);
   };
@@ -55,7 +56,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
   };
 
   const getDefaultProvider = async () => {
-    return await ethers.getDefaultProvider(networkUrl);
+    return await ethers.getDefaultProvider('sepolia');
   };
 
   const getCompiledContract = () => {
@@ -93,9 +94,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
       if (!contractAddress.value) return;
       console.log({ contractAddress: contractAddress.value });
       const provider = await ethers.getDefaultProvider('sepolia');
-
       const contractBalance = (await provider.getBalance(contractAddress.value)) as BigNumberish;
-      console.log({ contractBalance });
       return contractBalance;
     } catch (err) {
       console.log(err);
@@ -105,7 +104,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
   const getContractReward = async () => {
     try {
       if (!contractAddress.value) return;
-      const provider = new ethers.JsonRpcProvider(networkUrl);
+      const provider = await ethers.getDefaultProvider('sepolia');
       const contractBalance = (await provider.getBalance(contractAddress.value)) as BigNumberish;
 
       const redeemers = await getRedeemersArray(getTaskContract(provider));
@@ -260,7 +259,7 @@ export const useContracts = (contractAddress: globalThis.Ref<string | null>) => 
 
     try {
       // Replace with the actual freelancer address
-      const provider = await ethers.getDefaultProvider(networkUrl);
+      const provider = await ethers.getDefaultProvider('sepolia');
       const gasPrice = await provider.getFeeData();
       const taskContract = getTaskContract(provider);
       const estimatedGas = taskContract.estimateGas.redeemRewards(addressList, gradeList);

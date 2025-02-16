@@ -177,6 +177,7 @@ interface DrawerProjectProps {
   sprints?: SprintSimple[];
   canEdit?: boolean;
   individualLearning?: boolean;
+  contractAddress?: string | null;
 }
 
 const props = withDefaults(defineProps<DrawerProjectProps>(), {
@@ -184,9 +185,10 @@ const props = withDefaults(defineProps<DrawerProjectProps>(), {
   sprints: () => [],
   canEdit: true,
   individualLearning: false,
+  contractAddress: null,
 });
 const open = defineModel<boolean>({ required: true });
-const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 'moved']);
+const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 'moved', 'update:contract']);
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { update } = useStrapi();
@@ -245,6 +247,21 @@ const enabledKanban = computed(() => !!selectedSprint.value);
 const { data: groupings } = useGetSprintGroupings(learningplanId);
 const { data: kanban } = useGetKanban(learningplanId, selectedSprint, enabledKanban);
 const allGroups = ref<any>([]);
+
+const { updateTaskContractAddress } = useTaskStore();
+
+const { contractAddress, task } = toRefs(props);
+const { deployContract, fetchContractReward } = useContracts(contractAddress);
+
+const handleUpdateContract = async (newAddress: string | null) => {
+  if (!task.value) return;
+  await updateTaskContractAddress(task.value.id, newAddress);
+  emit('update:contract', newAddress);
+
+  console.log('contract updated');
+};
+
+await fetchContractReward();
 
 const getParentOptions = () => {
   // const hasSprint = !!selectedSprint.value;
@@ -530,6 +547,10 @@ watch(selectedHistory, (story) => {
   if (isFirstTimeOpened.value || !props.task?.id) {
     return;
   }
+
+  watch(task, () => {
+    contractAddress.value = task.value?.contract_address || null;
+  });
 
   update('tasks', props.task?.id, {
     parent_task: story?.id,

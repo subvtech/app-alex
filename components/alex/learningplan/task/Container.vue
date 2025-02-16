@@ -581,7 +581,9 @@ const handleChangeMembers = async () => {
       populate: [
         'task_submission',
         'learning_plan_group.group_members.student_member.user.avatar',
+        'learning_plan_group.group_members.student_member.user.user_wallet',
         'learning_plan_member.user.avatar',
+        'learning_plan_member.user.user_wallet',
         'learning_plan_member.learning_class',
       ],
       filters: {
