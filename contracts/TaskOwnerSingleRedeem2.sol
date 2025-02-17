@@ -25,20 +25,36 @@ contract TaskOwnerSingleRedeem2 {
 
     receive() external payable {}
 
-    function redeemSingleReward(
-        address payable _student,
-        uint grade
-    ) external payable {
+    event RewardRedeemed(address indexed student, uint256 amount);
+    event DealCanceled(address indexed owner, uint256 amount);
+
+    modifier isTheOwner() {
         require(
             msg.sender == owner,
             'The owner must be the one to effect the payment'
         );
+        _;
+    }
 
+    modifier mustHaveFunds() {
+        require(address(this).balance > 0, 'No funds to withdraw');
+        _;
+    }
+
+    modifier validAddress(address _student) {
+        require(_student != address(0), "Invalid address");
+        _;
+    }
+
+    function redeemSingleReward(
+        address payable _student,
+        uint grade
+    ) external payable isTheOwner validAddress(_student){
         require(
             _student != owner,
             'The owner cannot withdraw the funds like this'
         );
-        require(address(this).balance > 0, 'No funds to withdraw');
+
 
         require(
             !containsAddress(_student),
@@ -51,19 +67,14 @@ contract TaskOwnerSingleRedeem2 {
         require(success, 'Transfer failed.');
         redeemers[redeemersCount] = _student;
         redeemersCount += 1;
+        emit RewardRedeemed(_student, individualReward);
     }
 
     function redeemRewards(
         address payable[] memory _students,
         uint[] memory grades,
         bool redeemAll
-    ) external payable {
-        // Uncomment this line, and the import of "hardhat/console.sol", to print a log in your terminal
-        require(
-            msg.sender == owner,
-            'The owner must be the one to effect the payment'
-        );
-
+    ) external payable isTheOwner mustHaveFunds {
         require(
             _students.length + redeemersCount <= redeemers.length,
             'The student list cannot surpass the empty spots in the redeemed array'
@@ -73,8 +84,6 @@ contract TaskOwnerSingleRedeem2 {
             _students.length == grades.length,
             'There must be one grade per address provided'
         );
-
-        require(address(this).balance > 0, 'No funds to withdraw');
 
         for (uint i = 0; i < _students.length; i++) {
             require(
@@ -95,39 +104,24 @@ contract TaskOwnerSingleRedeem2 {
             require(success, 'Transfer failed.');
             redeemers[redeemersCount] = _students[i];
             redeemersCount += 1;
+            emit RewardRedeemed(_students[i], individualReward);
         }
         if (redeemAll) owner.transfer(address(this).balance);
     }
 
-    function cancelDeal() public payable {
-        require(msg.sender == owner, "You aren't the owner");
-        require(address(this).balance > 0, 'No funds to withdraw');
-
-        owner.transfer(address(this).balance);
+    function cancelDeal() external payable isTheOwner mustHaveFunds {
+        uint256 balance = address(this).balance;
+        owner.transfer(balance);
+        emit DealCanceled(owner, balance);
     }
 
-    function containsAddress(address student) public view returns (bool) {
+    function containsAddress(address _student) public view validAddress(_student) returns (bool) {
         for (uint i = 0; i < redeemersCount; i++) {
-            if (student == redeemers[i]) {
+            if (_student == redeemers[i]) {
                 return true;
             }
         }
         return false;
     }
 
-    function insertAddress(address payable student) private returns (bool) {
-        if (redeemersCount == redeemers.length) {
-            return false;
-        }
-
-        for (uint i = 0; i < redeemersCount; i++) {
-            if (msg.sender == redeemers[i]) {
-                return false;
-            }
-        }
-
-        redeemers[redeemersCount] = student;
-        redeemersCount += 1;
-        return true;
-    }
 }
