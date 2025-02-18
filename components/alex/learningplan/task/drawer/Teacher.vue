@@ -38,7 +38,7 @@
       <v-row class="my-5">
         <v-col :cols="!individualJourney ? 6 : 12">
           <alex-learningplan-task-state
-            v-model="status"
+            v-model="statusRef"
             :mode="individualJourney ? 'student' : 'teacher'"
             :edit="(editable || individualJourney) && wasFilledMainInfo"
             :individual-journey="individualJourney"
@@ -60,16 +60,16 @@
             :placeholder="$t(`components.learningPlan.drawer.${editable ? 'task.type.select' : 'missing.type'}`)"
           />
         </v-col>
-        <v-col cols="6"
-          ><p class="text-body-4 text-gray-800 mb-1">
+        <v-col cols="6">
+          <p class="text-body-4 text-gray-800 mb-1">
             <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
           <alex-learningplan-task-date ref="startDateComp" v-model="startDate" :edit="editable" />
         </v-col>
-        <v-col cols="6"
-          ><p class="text-body-4 text-gray-800 mb-1">
+        <v-col cols="6">
+          <p class="text-body-4 text-gray-800 mb-1">
             <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
@@ -260,22 +260,34 @@
         />
       </div>
 
+      <alex-learningplan-task-drawer-contracts
+        v-model:status="statusRef"
+        v-model:contract-address="contractAddress"
+        :edit="editable"
+        :task-members="members || []"
+        @deploy:contract-draft="(cb) => (deployContract = cb)"
+        @cancel:contract-draft="deployContract = null"
+        @update:contract-address="handleUpdateContract"
+      />
+
       <!-- Eventos e atribuições -->
       <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
       <v-window v-model="activePage">
         <v-window-item value="1"> <alex-learningplan-task-events v-model="taskEvents" /></v-window-item>
         <v-window-item v-if="!individualJourney" value="2">
           <alex-learningplan-task-members
-            :learningplan-id="learningplanId"
+            :learningplan-ids="[learningplanId]"
             :task-id="taskId"
             :type="type"
             :start-at="startDate"
             :finish-at="endDate"
+            :members="members || []"
             :submit-after-deadline="sendAfterDeadline"
             :block-delete="hasAtLeastSubmission"
             @change-members="$emit('change-members')"
             @set-type="(value: TaskType) => (type = value)"
-        /></v-window-item>
+          />
+        </v-window-item>
       </v-window>
     </div>
   </v-navigation-drawer>
@@ -292,12 +304,15 @@ import { orderEvents } from '~/utils';
 import type { RestrictionValue } from '../Restrictions.vue';
 const queryClient = useQueryClient();
 const { t } = useI18n();
-const isFirstTimeOpened = ref(true);
+
 const openGradeCompositionDialog = ref(false);
 const openEvaluationGroupDialog = ref(false);
 const { find, findOne, create, update } = useStrapiUtils();
 
 const user = useStrapiUser();
+
+const { updateTaskContractAddress } = useTaskStore();
+const strapi = useStrapi();
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
@@ -324,6 +339,8 @@ interface TaskTeacherDrawerProps {
   endDate?: string | null;
   members?: TaskMember[];
   individualJourney?: boolean;
+
+  contractAddress?: string | null;
 }
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
@@ -343,6 +360,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   startDate: undefined,
   endDate: undefined,
   restrictions: '',
+  contractAddress: null,
   goals: () => [],
   tags: () => [],
   events: () => [],
@@ -352,7 +370,9 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   individualJourney: false,
 });
 
-const description = ref<string | any | undefined>(props.description);
+const isFirstTimeOpened = ref(true);
+const contractAddress = ref(props.contractAddress);
+const description = ref(props.description);
 const submissionDescription = ref(props.submissionDescription);
 const hasSubmission = ref(props.hasSubmission);
 const canChangeFromReview = ref<boolean>(props.canChangeFromReview);
@@ -364,18 +384,16 @@ const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
-const members = toRef(props, 'members');
+const { members } = toRefs(props);
+const { deployContract } = useContracts(contractAddress);
 const type = ref<TaskType | null>(props.type);
 const startDate = ref(props.startDate);
 const endDate = ref(props.endDate);
 
 const hasAtLeastSubmission = computed(() => !!members.value.filter((member) => member.last_submission_at).length);
-const wasFilledMainInfo = computed(() => {
-  if (!startDate.value || !endDate.value || !type.value) {
-    return false;
-  }
-  return true;
-});
+
+const wasFilledMainInfo = computed(() => !!startDate.value && !!endDate.value && !!type.value);
+
 const startDateComp = ref<{
   close: () => void;
 } | null>(null);
@@ -501,11 +519,13 @@ watch(model, (value) => {
     goals.value = props.goals;
     title.value = props.title;
     tags.value = props.tags;
-    status.value = props.status;
+    statusRef.value = props.status;
     type.value = props.type || null;
     startDate.value = props.startDate;
     endDate.value = props.endDate;
+    contractAddress.value = props.contractAddress;
     restrictions.value = props.restrictions;
+
     setTimeout(() => {
       isFirstTimeOpened.value = false;
     }, 200);
@@ -532,7 +552,7 @@ const emit = defineEmits<Emits>();
 
 const { setMessage } = useMessageStore();
 // Status
-const status = ref<TaskStatus | TaskMemberStatus>(props.status);
+const statusRef = ref<TaskStatus | TaskMemberStatus>(props.status);
 
 // Restrições
 const restrictions = ref(props.restrictions);
@@ -625,7 +645,7 @@ const notifyFieldError = (field: string) => {
 const notifyError = () => {
   setMessage(t('components.learningPlan.drawer.task.errors.genericSave'), 'error', true);
 };
-const strapi = useStrapi();
+
 const updateTaskValues = async (
   taskId: number,
   values: Partial<Record<keyof TaskSimple, string | number | boolean | null | undefined | Object>>,
@@ -637,7 +657,7 @@ const updateTaskValues = async (
     const valuesEmit = {
       type: type.value,
       title: title.value,
-      status: status.value,
+      status: statusRef.value,
       start_at: startDate.value,
       finish_at: endDate.value,
       can_submit_after_deadline: sendAfterDeadline.value,
@@ -645,6 +665,15 @@ const updateTaskValues = async (
       learning_goals: goals.value,
       allowed_editor_plugins: restrictions.value,
     } as Partial<TaskSimple>;
+
+    if (deployContract.value && statusRef.value !== 'draft') {
+      const newContractAddress = await deployContract.value();
+      if (!newContractAddress) return;
+      await updateTaskContractAddress(props.taskId, newContractAddress as string);
+      deployContract.value = null;
+      contractAddress.value = newContractAddress;
+    }
+
     await strapi.update('tasks', taskId, values);
     emit('change-values', { ...valuesEmit, task_members: props.members });
   } catch (error) {
@@ -662,7 +691,7 @@ useOnStopTyping(
       await strapi.update('tasks', props.taskId, {
         description: description.value,
       });
-      emit('change-description', description.value);
+      emit('change-description', description.value || '');
     } catch (error) {
       notifyFieldError('description');
     }
@@ -682,7 +711,7 @@ useOnStopTyping(
       await strapi.update('tasks', props.taskId, {
         submission_description: submissionDescription.value,
       });
-      emit('change-submission-description', submissionDescription.value);
+      emit('change-submission-description', submissionDescription.value || '');
     } catch (error) {
       notifyFieldError('submissionDescription');
     }
@@ -718,7 +747,7 @@ watch(endDate, async (value) => {
   }
 
   endDateComp.value?.close();
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     finish_at: value,
   });
   emit('change-members');
@@ -732,32 +761,39 @@ watch(startDate, async (value) => {
   }
 
   startDateComp.value?.close();
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     start_at: value,
   });
   emit('change-members');
   emit('change-date', props.taskId, startDate.value, endDate.value);
 });
 watch(restrictions, async (value) => {
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     allowed_editor_plugins: value,
   });
 });
 watch(type, async (value) => {
   if (!value) return;
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     type: value,
   });
 });
-watch(status, async (value) => {
+watch(statusRef, async (value) => {
   if (!value) return;
+  if (deployContract.value && statusRef.value !== 'draft') {
+    const newContractAddress = await deployContract.value();
+    if (!newContractAddress) return;
+    await updateTaskContractAddress(props.taskId, newContractAddress as string);
+    deployContract.value = null;
+    contractAddress.value = newContractAddress;
+  }
 
   if (props.individualJourney) {
     emit('change-kanban-status', value);
     return;
   }
 
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     status: value,
   });
 });
@@ -765,7 +801,7 @@ watch(goals, async (value) => {
   if (!value) return;
   const goalsId = goals.value.map((goal) => goal.id);
   // if (!goalsId.length) return;
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     learning_goals: {
       set: goalsId,
     },
@@ -773,12 +809,12 @@ watch(goals, async (value) => {
   emit('change-goals', value);
 });
 watch(sendAfterDeadline, async (value) => {
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     can_submit_after_deadline: value,
   });
 });
 watch(hasSubmission, async (value) => {
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     submission_required: value,
   });
 });
@@ -797,4 +833,9 @@ watch(tags, (value) => emit('change-tags', value));
 function handleCloseModal() {
   model.value = false;
 }
+
+const handleUpdateContract = async (newAddress: string | null) => {
+  await updateTaskContractAddress(props.taskId, newAddress);
+  contractAddress.value = newAddress;
+};
 </script>

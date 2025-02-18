@@ -27,6 +27,7 @@ export interface TaskSimple {
   task_members?: TaskMember[];
   task_events?: TaskEvent[];
   tasks?: TaskSimple[];
+  contract_address: string | null;
   parent_task?: TaskSimple;
   sprint?: SprintSimple;
   kanban_column_task: KanbanColumnTask;

@@ -1,42 +1,24 @@
 <template>
-  <div
-    class="position-relative tw-flex tw-gap-6 mt-6 pa-6 bg-white rounded-lg tw-flex-col md:tw-flex-row"
-  >
+  <div class="position-relative tw-flex tw-gap-6 mt-6 pa-6 bg-white rounded-lg tw-flex-col md:tw-flex-row">
     <!-- Seção 1 (Descrição) -->
     <div style="flex: 1 1 50%">
-      <alex-custom-chip
-        :text="statusCfg[status].text"
-        :status="statusCfg[status].status"
-      />
-      <p
-        class="text-h4 text-gray-800 my-4"
-        :class="md ? 'ellipsis lines-2' : ''"
-      >
+      <alex-custom-chip :text="statusCfg[status].text" :status="statusCfg[status].status" />
+      <p class="text-h4 text-gray-800 my-4" :class="md ? 'ellipsis lines-2' : ''">
         {{ title || '(' + $t('components.courses.tasks.noTitle') + ')' }}
       </p>
-      <div
-        ref="descContainer"
-        class="tw-relative overflow-hidden"
-        :class="{ 'tw-max-h-[60px]': collapsed }"
-      >
+      <div ref="descContainer" class="tw-relative overflow-hidden" :class="{ 'tw-max-h-[60px]': collapsed }">
         <TipTap
           ref="descEl"
           v-model="descRef"
           class="pa-0"
           :class="ellipsis && 'tw-shadow-inner'"
-          :edit="false"
           :collaboration="false"
           @change:height="(height) => hasEllipsis(height)"
         />
       </div>
       <div v-if="ellipsis" class="d-flex tw-justify-end">
-        <alex-custom-button
-          variant="text"
-          class="tw-mt-2 px-3 text-p6 text-gray-800"
-          @click="collapsed = !collapsed"
-          >{{
-            $t(`components.courses.tasks.${collapsed ? 'expand' : 'retract'}`)
-          }}
+        <alex-custom-button variant="text" class="tw-mt-2 px-3 text-p6 text-gray-800" @click="collapsed = !collapsed"
+          >{{ $t(`components.courses.tasks.${collapsed ? 'expand' : 'retract'}`) }}
         </alex-custom-button>
       </div>
     </div>
@@ -45,14 +27,7 @@
       <div class="pa-4 bg-gray-blue border border-gray-100 rounded-lg ga-3">
         <!-- Tags -->
         <div v-if="tags.length" class="d-flex flex-wrap ga-2 mb-5">
-          <alex-custom-chip
-            v-for="tag in tags"
-            :key="tag"
-            :text="tag"
-            size="small"
-            status="primary"
-            variant="tonal"
-          />
+          <alex-custom-chip v-for="tag in tags" :key="tag" :text="tag" size="small" status="primary" variant="tonal" />
         </div>
 
         <!-- Informações -->
@@ -79,11 +54,7 @@
                 {{ $t('components.courses.tasks.infos.startAt') }}
               </p>
               <p class="text-body-3 text-gray-800">
-                {{
-                  startAt
-                    ? formatDate(startAt)
-                    : $t('components.courses.tasks.noDate')
-                }}
+                {{ startAt ? formatDate(startAt) : $t('components.courses.tasks.noDate') }}
               </p>
             </v-col>
             <v-col cols="6">
@@ -91,11 +62,7 @@
                 {{ $t('components.courses.tasks.infos.deadlineAt') }}
               </p>
               <p class="text-body-3 text-gray-800">
-                {{
-                  deadlineAt
-                    ? formatDate(deadlineAt)
-                    : `(${$t('components.courses.tasks.noDate')})`
-                }}
+                {{ deadlineAt ? formatDate(deadlineAt) : `(${$t('components.courses.tasks.noDate')})` }}
               </p>
             </v-col>
           </v-row>

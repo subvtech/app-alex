@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 import { TaskSimple } from '@/models/simple/taskSimple.model';
 export const useTaskStore = defineStore('task', () => {
   const { find } = useStrapiUtils();
+  const { update } = useStrapi();
+
   const task = ref<TaskSimple>();
   const loading = ref(false);
   const { setMessage } = useMessageStore();
@@ -14,11 +16,12 @@ export const useTaskStore = defineStore('task', () => {
           sort: 'updatedAt:desc',
         },
         learning_plan_member: {
-          populate: ['user.avatar', 'learning_class'],
+          populate: ['user.avatar', 'user.wallet', 'learning_class'],
         },
         learning_plan_group: {
           populate: [
             'group_members.student_member.user.avatar',
+            'group_members.student_member.user.wallet',
             'learning_class',
           ],
         },
@@ -33,20 +36,16 @@ export const useTaskStore = defineStore('task', () => {
     task_events: {
       populate: {
         task_member: {
-          populate: ['learning_plan_member.user.avatar'],
+          populate: ['learning_plan_member.user.avatar', 'learning_plan_member.user.wallet'],
         },
         learning_plan_member: {
-          populate: ['user.avatar'],
+          populate: ['user.avatar', 'user.avatar'],
         },
       },
     },
   };
 
-  async function loadTaskData(
-    id: number,
-    learningplanID: number,
-    showMessageIfNotFound = true,
-  ) {
+  async function loadTaskData(id: number, learningplanID: number, showMessageIfNotFound = true) {
     try {
       loading.value = true;
       const response = await find<TaskSimple>('tasks', {
@@ -62,11 +61,7 @@ export const useTaskStore = defineStore('task', () => {
       task.value = response.data[0];
       return response;
     } catch (e: any) {
-      if (
-        (e?.error?.name === 'NotFoundError' ||
-          e?.message === 'NotFoundError') &&
-        showMessageIfNotFound
-      ) {
+      if ((e?.error?.name === 'NotFoundError' || e?.message === 'NotFoundError') && showMessageIfNotFound) {
         setMessage(i18n.t('pages.tasks.notFound'), 'red', true);
       }
     } finally {
@@ -83,6 +78,7 @@ export const useTaskStore = defineStore('task', () => {
           'learning_plan_member.learning_class',
           'learning_plan_group.group_members.student_member.user.avatar',
           'learning_plan_group.learning_class',
+          'learning_plan_group.group_members.student_member.user.wallet',
         ],
         filters: {
           task: taskId,
@@ -98,5 +94,27 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
-  return { loadTaskData, task, loading, updateTaskMembers };
+  async function updateTaskContractAddress(taskId: number, contractAddress: string | null) {
+    try {
+      const response = await update(`tasks/${taskId}`, {
+        contract_address: contractAddress,
+      });
+      console.log({ updateTaskContractAddress: contractAddress });
+      console.log(response);
+      const { data } = response;
+      if (task.value) {
+        task.value.contract_address = data.attributes.contract_address || null;
+      }
+      return response;
+    } catch (e: any) {
+      setMessage(i18n.t('pages.tasks.cantUpdateMembers'), 'red', true);
+    }
+  }
+
+  const taskStudents = computed(() => {
+    console.log({ taskStudents: task.value });
+    return task.value;
+  });
+
+  return { loadTaskData, taskStudents, task, loading, updateTaskContractAddress, updateTaskMembers };
 });

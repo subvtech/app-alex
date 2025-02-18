@@ -664,6 +664,12 @@ const handleInputCancel = (index: number) => {
 const updateSprints = () => {
   queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
 };
+
+const updateTaskContract = (newAddress: string | null) => {
+  console.log(editTask.value);
+  if (!editTask.value) return;
+  editTask.value = { ...editTask.value, contract_address: newAddress };
+};
 </script>
 
 <template>
@@ -1011,11 +1017,13 @@ const updateSprints = () => {
         @submit="handleDeleteSprint(sprintToDelete?.id)"
       />
     </div>
+
     <DrawerTaskDetails
       v-model="teacherDrawer"
       :task="editTask"
       :sprints="sprintsValue.sprints"
       :can-edit="!isGuest"
+      :contract-address="editTask?.contract_address"
       @update-value="
         (field) => {
           if (editTask) {
@@ -1023,6 +1031,7 @@ const updateSprints = () => {
           }
         }
       "
+      @update:contract="updateTaskContract"
       @moved="updateTable"
     />
   </div>

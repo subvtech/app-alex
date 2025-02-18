@@ -1,30 +1,22 @@
 <template>
-  <v-container
-    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
-  >
+  <v-container class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15">
     <h1 class="text-h2 text-gray-800">Banner</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
       <strong class="bg-accent pa-1 rounded">alex-custom-banner</strong>
-      é projetado para exibir informações do usuário com recursos
-      personalizáveis, como imagens de capa, imagens de perfil e detalhes
-      adicionais do usuário. Inclui funcionalidades de upload, remoção de fotos
-      de capa e exibição de menu com links personalizáveis.. Isso também pode
-      ser usado como uma pseudo-navegação para uma página ou seção, já que ele
-      faz o uso do
+      é projetado para exibir informações do usuário com recursos personalizáveis, como imagens de capa, imagens de
+      perfil e detalhes adicionais do usuário. Inclui funcionalidades de upload, remoção de fotos de capa e exibição de
+      menu com links personalizáveis.. Isso também pode ser usado como uma pseudo-navegação para uma página ou seção, já
+      que ele faz o uso do
       <strong>alex-custom-tabs</strong>.
     </p>
     <div class="d-flex align-center pa-4 container rounded-lg">
       <img class="align-self-stretch" src="@/assets/svg/vuetify.svg" />
       <div>
         <p class="text-body-1 text-primary align-self-stretch">
-          Esse componente utiliza a estrutura do Vuetify, acesse ele a partir
-          desse link e veja mais informações.<br />
+          Esse componente utiliza a estrutura do Vuetify, acesse ele a partir desse link e veja mais informações.<br />
         </p>
-        <a
-          class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/tabs/"
-          target="_blank"
+        <a class="text-decoration-underline text-blue" href="https://vuetifyjs.com/en/components/tabs/" target="_blank"
           >vuetifyjs.com</a
         >
       </div>
@@ -32,38 +24,25 @@
     <h2 class="text-h2 text-gray-800">Uso Básico</h2>
     <p class="text-subtitle-2 text-gray-500">
       Todas as propriedades são opcionais. Ele herda as propriedades de
-      <strong>alex-custom-info</strong> e <strong>alex-custom-tabs</strong>,
-      aqui ilustraremos apenas as propriedades únicas ao
-      <strong>alex-custom-banner</strong> juntamente com os comportamentos mais
-      comuns.
+      <strong>alex-custom-info</strong> e <strong>alex-custom-tabs</strong>, aqui ilustraremos apenas as propriedades
+      únicas ao <strong>alex-custom-banner</strong> juntamente com os comportamentos mais comuns.
     </p>
 
     <div v-if="user" v-for="(item, index) in documentation">
       <p class="text-subtitle-2 text-gray-500" v-html="item.text" />
 
       <div class="d-flex flex-column w-100">
-        <div
-          class="d-flex align-center rounded-lg my-2 justify-center bg-gray-100 w-100 px-3 rounded-t"
-        >
+        <div class="d-flex align-center rounded-lg my-2 justify-center bg-gray-100 w-100 px-3 rounded-t">
           <alex-custom-banner
             :key="index"
             v-bind="item.props as any"
             @select:option="item.props.selectOption"
-            @display:settings="
-              item.props.displaySettings
-                ? item.props.displaySettings()
-                : () => {}
-            "
+            @display:settings="item.props.displaySettings ? item.props.displaySettings() : () => {}"
           />
         </div>
         <div class="px-3" style="position: relative">
           <prism>{{ examples[index] }}</prism>
-          <v-btn
-            class="copy-icon"
-            variant="text"
-            color="gray-400"
-            @click="copyToClipboard(index)"
-          >
+          <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(index)">
             <v-icon
               v-if="copiedIndex === index"
               size="x-large"
@@ -81,11 +60,7 @@
       <div
         class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in propsDocumentation"
-        :style="
-          index % 2 === 0
-            ? 'background-color: #EBEDEF'
-            : 'background-color: #D1F6FA'
-        "
+        :style="index % 2 === 0 ? 'background-color: #EBEDEF' : 'background-color: #D1F6FA'"
       >
         <p class="text-subtitle-2 text-gray-500">{{ item.name }}</p>
 
@@ -95,68 +70,49 @@
         </p>
         <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
           Type:
-          <span class="text-red-darken-2 font-weight-regular">{{
-            item.type
-          }}</span>
+          <span class="text-red-darken-2 font-weight-regular">{{ item.type }}</span>
         </p>
         <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
           Default:
-          <span class="text-purple-darken-2 font-weight-regular">{{
-            item.default
-          }}</span>
+          <span class="text-purple-darken-2 font-weight-regular">{{ item.default }}</span>
         </p>
       </div>
       <div
         class="pa-6 d-flex flex-column rounded-lg align-baseline"
-        :style="
-          propsDocumentation.length % 2 === 0
-            ? 'background-color: #EBEDEF'
-            : 'background-color: #D1F6FA'
-        "
+        :style="propsDocumentation.length % 2 === 0 ? 'background-color: #EBEDEF' : 'background-color: #D1F6FA'"
       >
         <p class="text-subtitle-2 text-gray-500">app-custom-info</p>
 
         <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
           Descrição:
           <span class="font-weight-regular"
-            >todas as propriedades do <strong>app-custom-info</strong> são
-            aplicáveis</span
+            >todas as propriedades do <strong>app-custom-info</strong> são aplicáveis</span
           >
         </p>
       </div>
       <div
         class="pa-6 d-flex flex-column rounded-lg align-baseline"
-        :style="
-          propsDocumentation.length % 2 !== 0
-            ? 'background-color: #EBEDEF'
-            : 'background-color: #D1F6FA'
-        "
+        :style="propsDocumentation.length % 2 !== 0 ? 'background-color: #EBEDEF' : 'background-color: #D1F6FA'"
       >
         <p class="text-subtitle-2 text-gray-500">app-user-avatar</p>
 
         <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
           Descrição:
           <span class="font-weight-regular"
-            >todas as propriedades do <strong>app-user-avatar</strong> são
-            aplicáveis</span
+            >todas as propriedades do <strong>app-user-avatar</strong> são aplicáveis</span
           >
         </p>
       </div>
       <div
         class="pa-6 d-flex flex-column rounded-lg align-baseline"
-        :style="
-          propsDocumentation.length % 2 === 0
-            ? 'background-color: #EBEDEF'
-            : 'background-color: #D1F6FA'
-        "
+        :style="propsDocumentation.length % 2 === 0 ? 'background-color: #EBEDEF' : 'background-color: #D1F6FA'"
       >
         <p class="text-subtitle-2 text-gray-500">app-custom-tabs</p>
 
         <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
           Descrição:
           <span class="font-weight-regular"
-            >todas as propriedades do <strong>app-custom-tabs</strong> são
-            aplicáveis</span
+            >todas as propriedades do <strong>app-custom-tabs</strong> são aplicáveis</span
           >
         </p>
       </div>
@@ -167,11 +123,7 @@
       <div
         class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in eventsDocumentation"
-        :style="
-          index % 2 === 0
-            ? 'background-color: #EBEDEF'
-            : 'background-color: #D1F6FA'
-        "
+        :style="index % 2 === 0 ? 'background-color: #EBEDEF' : 'background-color: #D1F6FA'"
       >
         <p class="text-subtitle-2 text-gray-500">{{ item.name }}</p>
 
@@ -181,9 +133,7 @@
         </p>
         <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
           parameters:
-          <span class="text-red-darken-2 font-weight-regular">{{
-            item.parameters
-          }}</span>
+          <span class="text-red-darken-2 font-weight-regular">{{ item.parameters }}</span>
         </p>
       </div>
     </div>
@@ -568,7 +518,6 @@ const examples = [
     />`,
   `<alex-custom-banner
         v-if="user"
-        :can-edit="false"
         :cover-picture="user.cover"
         :profile-picture-size="24"
         :profile-picture="user.avatar"
@@ -611,15 +560,13 @@ const propsDocumentation = [
     name: 'showShade',
     type: 'Boolean',
     default: 'false',
-    description:
-      'Um boolean que indica se a um shading deve ser exibido na parte debaixo da imagem.',
+    description: 'Um boolean que indica se a um shading deve ser exibido na parte debaixo da imagem.',
   },
   {
     name: 'showSettings',
     type: 'Boolean',
     default: 'false',
-    description:
-      'Um boolean que indica se o botão de settings deve ser exibido',
+    description: 'Um boolean que indica se o botão de settings deve ser exibido',
   },
   {
     name: 'settingsMenu',
@@ -658,8 +605,7 @@ const eventsDocumentation = [
   {
     name: 'select:option',
     parameters: 'index: Number',
-    description:
-      'Dispara quando uma opção do menu é selecionada. Ele passa o index da opção selecionada.',
+    description: 'Dispara quando uma opção do menu é selecionada. Ele passa o index da opção selecionada.',
   },
   {
     name: 'display:settings',

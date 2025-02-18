@@ -21,8 +21,8 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '../../custom/Dropdown.vue';
 import { TaskMemberStatus, TaskStatus } from '~/models/simple/taskSimple.model';
+import { AlexDropdownItem } from '../../custom/Dropdown.vue';
 
 // Tipos
 interface StateConfig {

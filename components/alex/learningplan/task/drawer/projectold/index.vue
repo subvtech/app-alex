@@ -37,7 +37,11 @@
 
       <v-row class="my-5">
         <v-col cols="6">
-          <alex-learningplan-task-state v-model="status" :edit="editable && wasFilledMainInfo" />
+          <alex-learningplan-task-state
+            v-model="status"
+            :edit="editable && wasFilledMainInfo"
+            :config="{ title: status }"
+          />
         </v-col>
         <v-col cols="6">
           <!-- <state v-model="status" :edit="editable && wasFilledMainInfo" /> -->
@@ -141,7 +145,7 @@
         <v-window-item value="1"> <alex-learningplan-task-events v-model="taskEvents" /></v-window-item>
         <v-window-item value="2">
           <alex-learningplan-task-members
-            :learningplan-id="learningplanId"
+            :learningplan-ids="[learningplanId]"
             :task-id="taskId"
             :type="type"
             :start-at="startDate"

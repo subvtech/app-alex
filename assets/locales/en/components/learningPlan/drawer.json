@@ -27,7 +27,8 @@
       },
       "remove": {
         "title": "Remove task from review",
-        "subtitle": "Do you want to remove this task from the review?"
+        "subtitle": "Do you want to remove this task from the review?",
+        "forbidden": "You cannot remove students after one of them having completed an assignment"
       }
     },
     "date": {
@@ -161,7 +162,7 @@
     "members": {
       "allClass": "The entire class {name} was added in task",
       "allSelectedMembers": "All selected members already added in task",
-      "addMembers": "The selected members was added in task"
+      "addMembers": "The selected members were added in task"
     },
     "events": {
       "task_created": "Task was created",

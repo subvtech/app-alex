@@ -99,8 +99,9 @@
     :start-date="taskDetails?.start_at"
     :end-date="taskDetails?.finish_at"
     :restrictions="taskDetails?.allowed_editor_plugins"
-    :editable="true"
-    :kanban-button="true"
+    :contract-address="taskDetails?.contract_address"
+    editable
+    kanban-button
     @change-goals="handleChangeGoals"
     @change-values="handleChangeValues"
     @change-description="handleChangeDescription"
@@ -168,6 +169,8 @@ const teacherDrawer = ref(false);
 const slideTransition = (i: number) => (tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up');
 
 const route = useRoute();
+const router = useRouter();
+
 const groupsArray = ['draft', 'published', 'finished', 'archived'];
 const groups = {};
 
@@ -342,6 +345,22 @@ const taskDetails = computed(() => {
   }
   return null;
 });
+
+const contractAddress = ref(taskDetails.value?.contract_address || null);
+const { cancelContract, getContractBalance } = useContracts(contractAddress);
+
+const handlePendingContract = async () => {
+  let isThereAPendingContract = !!taskDetails?.value?.contract_address;
+  if (isThereAPendingContract) {
+    const balance = await getContractBalance();
+    if (balance && Number(balance) > 0) {
+      const result = await cancelContract();
+      if (result) isThereAPendingContract = false;
+    }
+  }
+
+  return isThereAPendingContract;
+};
 
 const filteredTasks = computed(() => {
   const draft = tasksArray.value[0].filter((task) =>

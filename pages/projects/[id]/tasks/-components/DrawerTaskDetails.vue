@@ -177,6 +177,7 @@ interface DrawerProjectProps {
   sprints?: SprintSimple[];
   canEdit?: boolean;
   individualLearning?: boolean;
+  contractAddress?: string | null;
 }
 
 const props = withDefaults(defineProps<DrawerProjectProps>(), {
@@ -184,13 +185,17 @@ const props = withDefaults(defineProps<DrawerProjectProps>(), {
   sprints: () => [],
   canEdit: true,
   individualLearning: false,
+  contractAddress: null,
 });
+
 const open = defineModel<boolean>({ required: true });
-const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 'moved']);
+const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 'moved', 'update:contract']);
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { update } = useStrapi();
 const { find } = useStrapiUtils();
+
+const { updateTaskContractAddress } = useTaskStore();
 
 const isFirstTimeOpened = ref(true);
 const title = ref<string>('');
@@ -245,6 +250,19 @@ const enabledKanban = computed(() => !!selectedSprint.value);
 const { data: groupings } = useGetSprintGroupings(learningplanId);
 const { data: kanban } = useGetKanban(learningplanId, selectedSprint, enabledKanban);
 const allGroups = ref<any>([]);
+const { contractAddress, task } = toRefs(props);
+const { deployContract } = useContracts(contractAddress);
+
+const { data: students } = useAsyncData(
+  'students',
+  async () =>
+    await find('learning-plan-members', {
+      filters: {
+        id: task.value?.id || 0,
+      },
+    }),
+  { transform: (value) => value.data, watch: [task] },
+);
 
 const getParentOptions = () => {
   // const hasSprint = !!selectedSprint.value;
@@ -311,6 +329,14 @@ const groupOptions = computed(() => {
 
   return options;
 });
+
+const handleUpdateContract = async (newAddress: string | null) => {
+  if (!task.value) return;
+  await updateTaskContractAddress(task.value.id, newAddress);
+  emit('update:contract', newAddress);
+
+  console.log('contract updated');
+};
 
 watch(selectedParent, (parent) => {
   if (parent === undefined || !props.task?.id || isFirstTimeOpened.value) {
@@ -502,6 +528,10 @@ watch(selectedSprint, (sprint, oldSprint) => {
       // getParentOptions();
     })
     .catch(() => setMessage(t('pages.projects.tasks.actions.moved_fail'), 'error', true));
+});
+
+watch(task, () => {
+  contractAddress.value = task.value?.contract_address || null;
 });
 
 watch(startDate, (date) => {
