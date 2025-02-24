@@ -97,7 +97,7 @@ const columns = computed<Column<KanbanColumnTask>[]>({
         position: column.position,
         status_type: column.status_type,
         items: column.tasks
-          .filter((item) => item.task.type === 'group')
+          .filter((item) => item?.task?.type === 'group')
           .map((task) => ({
             id: task.id,
             group: `${column.status_type}_${column.id}`,
