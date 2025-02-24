@@ -21,6 +21,8 @@ const learningPlanStore = useLearningPlanStore();
 const dataStore = ref<DataStore>();
 const loading = ref(true);
 
+const ganttMaximized = ref<boolean>(false);
+
 const statistics = computed(() => ({
   epics: {
     icon: 'alex:ManageHistory',
@@ -82,7 +84,13 @@ onBeforeMount(async () => {
       <StatisticCard v-for="item in Object.values(statistics)" :key="item.title" v-bind="item" />
     </div>
     <div class="tw-grid tw-grid-cols-12 tw-gap-4">
-      <GanttWidget :items="dataStore?.tasks" :sprints="dataStore?.sprints" :loading="loading" />
+      <GanttWidget
+        :items="dataStore?.tasks"
+        :sprints="dataStore?.sprints"
+        :loading="loading"
+        :maximized="ganttMaximized"
+        @toggle-gantt="() => (ganttMaximized = !ganttMaximized)"
+      />
       <TaskProgressWidget
         class="tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
         categories="total"
@@ -95,7 +103,7 @@ onBeforeMount(async () => {
         @remove="handleRemoveInstitution"
         @update="handleUpdateInstitution"
       />
-      <EventsWidget />
+      <EventsWidget :gantt-maximized="ganttMaximized" />
     </div>
   </div>
 </template>
