@@ -32,7 +32,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         },
         trails: {
           sort: 'id:desc',
-          populate: ['cover_image', 'structures.blocks'],
+          populate: ['cover_image', 'structures.blocks', 'learning_structure'],
         },
       },
     },
