@@ -140,6 +140,7 @@
               "
               @configurations="navigate(item.learningPlan.id, 'settings')"
               @open="isAvailable(item.learningPlan.id) ? navigate(item.learningPlan.id, 'page') : displayUnavailable()"
+              @copy="copyLearningPlan(item.learningPlan.id)"
             />
           </div>
           <v-data-table
@@ -269,6 +270,7 @@ const props = defineProps<ListingProps>();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const user = useStrapiUser<User>();
+const client = useStrapiClient();
 const query = useGetMyLearningPlan(props.type, user.value?.id);
 const search = ref('');
 const page = ref(1);
@@ -482,6 +484,15 @@ const navigate = (id: number, page: string) => {
     navigateTo(`/${listType}/${id}`);
   }
 };
+const copyLearningPlan = async (id: number) => {
+  await client(`learningplans/${id}/copy`, {
+    method: 'POST',
+    body: {},
+  });
+
+  await query.refetch();
+};
+
 const showingData = (groupedItems: any, items: Array<any>) => {
   const itemsPerPage = search.value === '' ? itemsPerPageValue : groupedItems.length;
   const from = (page.value - 1) * itemsPerPage + 1;
