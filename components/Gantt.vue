@@ -132,7 +132,7 @@ const resize = () => {
   if (timeline && timelineRef.value) {
     timeline.setOptions({
       height: timelineRef.value.clientHeight,
-      width: timelineRef.value.clientWidth,
+      // width: timelineRef.value.clientWidth,
     });
   }
 };

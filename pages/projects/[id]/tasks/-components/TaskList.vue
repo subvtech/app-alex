@@ -192,13 +192,21 @@ const sprintBacklog = computed(() => {
   showInputs.value = new Array(sprintsValue.value.sprints.length + 1).fill(false);
   tasksTitles.value = new Array(sprintsValue.value.sprints.length + 1).fill('');
 
-  return sprintsValue.value.sprints
-    .slice()
-    .sort((a, b) => a.order - b.order)
-    .map((sprint) => ({
-      ...sprint,
-      tasks: sprint.tasks.map(formatTasks),
-    }));
+  return (
+    sprintsValue.value.sprints
+      .slice()
+      .sort((a, b) => {
+        const aDate = new Date(a.start_at);
+        const bDate = new Date(b.start_at);
+
+        return bDate.getTime() - aDate.getTime();
+      })
+      // .sort((a, b) => a.order - b.order)
+      .map((sprint) => ({
+        ...sprint,
+        tasks: sprint.tasks.map(formatTasks),
+      }))
+  );
 });
 
 const checkForCompletedTasks = (sprint: Sprint) => {

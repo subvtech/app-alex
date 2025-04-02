@@ -5,12 +5,16 @@ export interface GanttWidgetProps {
   items: GanttItem[];
   loading?: boolean;
   sprints: GanttSprint[];
+  maximized: boolean;
 }
 
-withDefaults(defineProps<GanttWidgetProps>(), {
+const props = withDefaults(defineProps<GanttWidgetProps>(), {
   items: () => [],
   sprints: () => [],
+  maximized: false,
 });
+
+const emit = defineEmits(['toggle-gantt']);
 
 const ganttRef = ref<GanttInstance | null>(null);
 const ganttView = ref(GanttViewType.Month);
@@ -23,10 +27,13 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
     no-header
     title="Linha temporal"
     class="tw-col-span-12 md:tw-col-span-12 lg:tw-col-span-8"
+    :class="props.maximized && '!tw-col-span-12'"
     content-class-name="tw-flex-1"
   >
     <template #header>
-      <div class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-px-6 tw-py-4 tw-border-b">
+      <div
+        class="tw-flex tw-flex-col md:tw-flex-row tw-items-center tw-justify-between tw-flex-wrap tw-gap-2 tw-px-6 tw-py-4 tw-border-b"
+      >
         <div class="tw-flex tw-items-center tw-gap-4">
           <span class="tw-text-gray-600 tw-font-bold tw-text-xl tw-leading-8">
             {{ $t('pages.projects.overview.timeline') }}
@@ -35,7 +42,7 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
             {{ $t('pages.projects.overview.timeline_today') }}
           </alex-custom-button>
         </div>
-        <div class="tw-flex tw-gap-1 tw-overflow-auto">
+        <div class="tw-flex tw-gap-1 tw-overflow-auto tw-items-center">
           <alex-custom-button
             v-for="view in viewTypes"
             :key="view"
@@ -44,6 +51,13 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
           >
             {{ $t(`pages.projects.overview.timeline_${view}`) }}
           </alex-custom-button>
+
+          <alex-custom-button
+            class="!tw-hidden lg:!tw-block"
+            :icon="props.maximized ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+            variant="text"
+            @click="() => emit('toggle-gantt')"
+          />
         </div>
       </div>
     </template>
@@ -56,7 +70,6 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
           v-else-if="items.length"
           ref="ganttRef"
           class="tw-flex-1"
-          :max-height="360"
           :items="items"
           :sprints="sprints"
           :view="ganttView"

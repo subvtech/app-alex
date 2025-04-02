@@ -7,7 +7,7 @@ import Loader from './-components/Loader.vue';
 const i18dir = 'components.projects.individual_learning.trails';
 
 const { t } = useI18n();
-const { update } = useStrapi();
+const { update, create } = useStrapi();
 const { findOne, find } = useStrapiUtils();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
@@ -26,6 +26,38 @@ const learningStructure = computed<number | null>(
       (structure) => structure.type === 'standard' && structure.author_member?.user?.id === +route.params.memberId,
     )?.id ?? null,
 );
+
+const copyTrail = (trail) => {
+  let newTitle;
+  let counter = 1;
+
+  const allTrails = [...(myTrails?.value ?? []), ...(myCollabs?.value ?? [])];
+
+  while (!newTitle) {
+    if (!allTrails.some(({ title }) => title === `${trail.title} (${counter})`)) {
+      newTitle = `${trail.title} (${counter})`;
+    }
+
+    counter++;
+  }
+
+  create('trails', {
+    title: newTitle,
+    description: trail.description,
+    hidden: trail.hidden,
+    cover_image: trail.cover_image,
+    content: trail.content,
+    learning_structure: trail.learning_structure,
+    blocks: [],
+  })
+    .then(() => {
+      getData();
+      setMessage('Trilha copiada com sucesso!', 'success', true);
+    })
+    .catch(() => {
+      setMessage('Falha ao copiar trilha', 'error', true);
+    });
+};
 
 const filteredMyTrails = computed<TrailSimple[]>(
   () =>
@@ -111,21 +143,12 @@ const handleTrailCreate = async (trailId: number, newStructure) => {
   }
 };
 
-onBeforeMount(async () => {
+const getData = () => {
   const user = +route.params.memberId;
-
-  if (!learningPlanStore.learningPlan) {
-    await learningPlanStore.loadLearningPlan(+route.params.id);
-  }
-
-  isGuest.value =
-    !learningPlanStore.userIsFacilitator &&
-    !learningPlanStore.userIsActiveMember &&
-    !learningPlanStore.userIsPendingMember;
 
   // My trails
   find('trails', {
-    populate: ['structures.blocks', 'cover_image'],
+    populate: ['structures.blocks', 'cover_image', 'learning_structure'],
     filters: {
       learning_structure: {
         author_member: {
@@ -142,7 +165,7 @@ onBeforeMount(async () => {
 
   // My collabs
   find('trails', {
-    populate: ['structures.blocks', 'cover_image'],
+    populate: ['structures.blocks', 'cover_image', 'learning_structure'],
     filters: {
       partners: {
         user,
@@ -156,6 +179,19 @@ onBeforeMount(async () => {
       myCollabs.value = (data as TrailSimple[]).map(formatTrail);
     })
     .catch(() => setMessage(t(`${i18dir}.messages.failMyCollabs`), 'error', true));
+};
+
+onBeforeMount(async () => {
+  if (!learningPlanStore.learningPlan) {
+    await learningPlanStore.loadLearningPlan(+route.params.id);
+  }
+
+  isGuest.value =
+    !learningPlanStore.userIsFacilitator &&
+    !learningPlanStore.userIsActiveMember &&
+    !learningPlanStore.userIsPendingMember;
+
+  getData();
 });
 </script>
 
@@ -199,7 +235,7 @@ onBeforeMount(async () => {
           :blocks="item?.blocks ?? []"
           class="flex-stretch tw-flex-[0_0_316px]"
           :can-edit="!isGuest"
-          hide-copy
+          @copy="copyTrail(item)"
           @toggle-visibility="toggleVisibility(item.id, item.hidden)"
           @configurations="navigate(item.id, 'settings')"
           @open="navigate(item.id)"
@@ -226,7 +262,7 @@ onBeforeMount(async () => {
           :blocks="item?.blocks ?? []"
           class="flex-stretch tw-flex-[0_0_316px]"
           can-edit
-          hide-copy
+          @copy="copyTrail(item)"
           @toggle-visibility="toggleVisibility(item.id, item.hidden)"
           @configurations="navigate(item.id, 'settings')"
           @open="navigate(item.id)"

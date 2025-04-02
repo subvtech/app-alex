@@ -1,8 +1,5 @@
 <template>
-  <div
-    style="flex: 1"
-    class="d-flex bg-white flex-column rounded-lg pa-6 wrapper"
-  >
+  <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6 wrapper">
     <div
       class="d-flex flex-wrap w-100 gap-4 gap-sm-1"
       :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
@@ -35,31 +32,16 @@
       v-if="!trails.length"
       style="flex: 1"
       class="d-flex"
-      :class="
-        learningPlanStore.loading
-          ? ''
-          : 'align-center justify-center flex-column'
-      "
+      :class="learningPlanStore.loading ? '' : 'align-center justify-center flex-column'"
     >
       <div v-if="learningPlanStore.loading">
-        <alex-custom-skeleton
-          color="gray-200"
-          class="width-80 height-10 mb-6"
-          rounded="lg"
-        />
+        <alex-custom-skeleton color="gray-200" class="width-80 height-10 mb-6" rounded="lg" />
         <div class="d-flex gap-5">
-          <alex-learningplan-skeleton-trail-card
-            v-for="index in 3"
-            :key="index"
-          />
+          <alex-learningplan-skeleton-trail-card v-for="index in 3" :key="index" />
         </div>
       </div>
       <div v-else class="d-flex align-center justify-center flex-column">
-        <img
-          class="emptyProjects-img"
-          src="public/images/emptyTrails.svg"
-          :alt="$t('pages.trails.emptyStateText')"
-        />
+        <img class="emptyProjects-img" src="public/images/emptyTrails.svg" :alt="$t('pages.trails.emptyStateText')" />
         <p class="text-h3 text-gray-400 mt-4">
           {{ $t('pages.trails.emptyStateText') }}
         </p>
@@ -92,7 +74,7 @@
               @toggle-visibility="changeItemVisibility(index, item.raw.id)"
               @configurations="navigate(item.raw.id, 'settings')"
               @open="navigate(item.raw.id, 'trails')"
-              @copy="console.log(item.raw.id)"
+              @copy="copyTrail(item.raw)"
             />
           </div>
         </template>
@@ -134,7 +116,8 @@ const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 const { findOne } = useStrapiUtils();
-const { update } = useStrapi();
+const { create, update } = useStrapi();
+const { setMessage } = useMessageStore();
 
 const search = ref('');
 const page = ref(1);
@@ -145,17 +128,24 @@ const learningPlanStore = useLearningPlanStore();
 
 const learningStructure = computed(() => {
   return (
-    learningPlanStore.learningPlan?.learning_structures.find(
-      (structure) => structure.type === 'standard',
-    )?.id || 0
+    learningPlanStore.learningPlan?.learning_structures.find((structure) => structure.type === 'standard')?.id || 0
   );
 });
 
 const trails = computed<TrailSimple[]>(() => {
+  console.log('Trilhas');
+  console.log(
+    learningPlanStore.standardTrails?.map((trail) => {
+      const lastStructure = trail.structures[trail.structures?.length - 1 || 0] || {};
+      return {
+        ...trail,
+        blocks: lastStructure.blocks || [],
+      };
+    }),
+  );
   return (
     learningPlanStore.standardTrails?.map((trail) => {
-      const lastStructure =
-        trail.structures[trail.structures?.length - 1 || 0] || {};
+      const lastStructure = trail.structures[trail.structures?.length - 1 || 0] || {};
       return {
         ...trail,
         blocks: lastStructure.blocks || [],
@@ -164,14 +154,41 @@ const trails = computed<TrailSimple[]>(() => {
   );
 });
 
+const copyTrail = (trail) => {
+  let newTitle;
+  let counter = 1;
+
+  while (!newTitle) {
+    if (!trails.value.some(({ title }) => title === `${trail.title} (${counter})`)) {
+      newTitle = `${trail.title} (${counter})`;
+    }
+
+    counter++;
+  }
+
+  create('trails', {
+    title: newTitle,
+    description: trail.description,
+    hidden: trail.hidden,
+    cover_image: trail.cover_image,
+    content: trail.content,
+    learning_structure: trail.learning_structure,
+    blocks: [],
+  })
+    .then(async () => {
+      await learningPlanStore.loadLearningPlan(+route.params.id);
+      setMessage('Trilha copiada com sucesso!', 'success', true);
+    })
+    .catch(() => {
+      setMessage('Falha ao copiar trilha', 'error', true);
+    });
+};
+
 const showingData = (groupedItems) => {
   const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
 
   const from = (page.value - 1) * itemsPerPage + 1;
-  const to =
-    page.value * itemsPerPage > trails.value.length
-      ? trails.value.length
-      : page.value * itemsPerPage;
+  const to = page.value * itemsPerPage > trails.value.length ? trails.value.length : page.value * itemsPerPage;
   const total = trails.value.length;
   const message = t('pages.trails.showingData', {
     from,
@@ -200,9 +217,7 @@ const { id } = route.params;
 const navigate = (trailId: number, page) => {
   const isSettingsPage = page === 'settings';
 
-  navigateTo(
-    `/courses/${id}/trails/${trailId}${isSettingsPage ? '/settings' : ''}/`,
-  );
+  navigateTo(`/courses/${id}/trails/${trailId}${isSettingsPage ? '/settings' : ''}/`);
 };
 
 const handleCreatedTrail = async (id) => {
