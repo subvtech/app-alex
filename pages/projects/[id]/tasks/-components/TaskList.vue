@@ -39,7 +39,7 @@ const { setMessage } = useMessageStore();
 const route = useRoute();
 const learninplanId = computed(() => parseInt(route.params.id.toString()));
 const learningPlanStore = useLearningPlanStore();
-const { update } = useStrapi();
+const { create, update } = useStrapi();
 const dragDrop = useMultipleDragDrop();
 
 // Drag and drop
@@ -246,25 +246,46 @@ const getHigherIndex = (sprintId?: number) => {
 
 // Methods
 const handleAddEpic = () => {
+  // const newTask = {
+  //   id: Math.round(Math.random() * 1234526),
+  //   position: getHigherIndex(),
+  //   status: 'draft',
+  //   title: '',
+  //   tasks: [],
+  //   organization: 'epic',
+  //   local: true,
+  // } as any;
+  // queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
+  //   if (!oldData) {
+  //     return oldData;
+  //   }
+  //   return {
+  //     ...oldData,
+  //     backlog: [...oldData.backlog, newTask],
+  //   };
+  // });
   const newTask = {
     id: Math.round(Math.random() * 1234526),
     position: getHigherIndex(),
     status: 'draft',
-    title: '',
+    type: 'group',
+    title: 'Novo Épico',
     tasks: [],
     organization: 'epic',
     local: true,
-  } as any;
-  queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
-    if (!oldData) {
-      return oldData;
-    }
-    return {
-      ...oldData,
-      backlog: [...oldData.backlog, newTask],
-    };
-  });
-  editingTask.value = newTask;
+    learningplan: +route.params.id,
+  };
+
+  create('tasks', newTask)
+    .then(() => {
+      refetchSprints().then(() => {
+        setMessage('Épico criado com sucesso', 'success', true);
+        editingTask.value = newTask as any;
+      });
+    })
+    .catch(() => {
+      setMessage('Falha ao criar épico', 'error', true);
+    });
 };
 
 // Otimizar isso
@@ -329,6 +350,7 @@ const handleAddTask = (task?: SprintTask, sprintId?: number) => {
     status: 'draft',
     title: '',
     organization: 'standard',
+    type: 'group',
     local: true,
     epic: task?.organization === 'story' ? task?.parent_task?.id : task?.id,
     story: task?.organization === 'story' ? task?.id : undefined,
@@ -429,6 +451,26 @@ const handleAddStory = (id: number) => {
     };
   });
   editingTask.value = newTask;
+
+  // const newTask = {
+  //   id: Math.round(Math.random() * 1234526),
+  //   position: getHigherIndex(),
+  //   status: 'draft',
+  //   title: '',
+  //   tasks: [],
+  //   organization: 'story',
+  //   local: true,
+  //   learningplan: +route.params.id,
+  // };
+
+  // create('tasks', newTask)
+  //   .then(() => {
+  //     setMessage('História criada com sucesso', 'success', true);
+  //     editingTask.value = newTask as any;
+  //   })
+  //   .catch(() => {
+  //     setMessage('Falha ao criar história', 'error', true);
+  //   });
 };
 
 const getSlideTransition = () => {
