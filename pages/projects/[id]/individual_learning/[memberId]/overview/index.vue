@@ -208,7 +208,7 @@ const getData = () => {
   // Get progress
   find('learning-goals', {
     filters: {
-      learningplan: learningPlanStore.learningPlan?.id,
+      // learningplan: learningPlanStore.learningPlan?.id,
       author: member.id,
     },
     populate: {
