@@ -338,11 +338,11 @@ defineExpose({ canDrag, setCanDrag });
             <template #card="{ item }">
               <TaskCard
                 v-if="item.raw.task"
-                :date="item.raw.task.finish_at ? new Date(item.raw.task.finish_at.replaceAll('-', '/')) : undefined"
-                :name="item.raw.task.title"
-                :tags="item.raw.task.tags"
-                :participants="getMembers(item.raw?.task.task_members)"
-                @click="editTask = item.raw.task"
+                :date="item.raw?.task?.finish_at ? new Date(item.raw?.task?.finish_at.replaceAll('-', '/')) : undefined"
+                :name="item.raw?.task?.title"
+                :tags="item.raw?.task?.tags"
+                :participants="getMembers(item.raw?.task?.task_members)"
+                @click="editTask = item.raw?.task"
               />
             </template>
           </KanbanColumn>
