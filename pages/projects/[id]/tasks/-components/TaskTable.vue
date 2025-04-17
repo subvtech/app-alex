@@ -416,7 +416,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     density="compact"
                     variant="plain"
                     hide-details
-                    maxlength="64"
+                    maxlength="120"
                     autofocus
                     autocomplete="off"
                     @blur="handleFieldEdit"
@@ -510,7 +510,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       density="compact"
                       variant="plain"
                       hide-details
-                      maxlength="64"
+                      maxlength="120"
                       autofocus
                       autocomplete="off"
                       @blur="handleFieldEdit"

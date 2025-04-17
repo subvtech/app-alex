@@ -97,7 +97,7 @@ const columns = computed<Column<KanbanColumnTask>[]>({
         position: column.position,
         status_type: column.status_type,
         items: column.tasks
-          .filter((item) => item.task.type === 'group')
+          .filter((item) => item.task?.type === 'group')
           .map((task) => ({
             id: task.id,
             group: `${column.status_type}_${column.id}`,
@@ -338,11 +338,11 @@ defineExpose({ canDrag, setCanDrag });
             <template #card="{ item }">
               <TaskCard
                 v-if="item.raw.task"
-                :date="item.raw.task.finish_at ? new Date(item.raw.task.finish_at.replaceAll('-', '/')) : undefined"
-                :name="item.raw.task.title"
-                :tags="item.raw.task.tags"
-                :participants="getMembers(item.raw?.task.task_members)"
-                @click="editTask = item.raw.task"
+                :date="item.raw?.task?.finish_at ? new Date(item.raw?.task?.finish_at.replaceAll('-', '/')) : undefined"
+                :name="item.raw?.task?.title"
+                :tags="item.raw?.task?.tags"
+                :participants="getMembers(item.raw?.task?.task_members)"
+                @click="editTask = item.raw?.task"
               />
             </template>
           </KanbanColumn>
