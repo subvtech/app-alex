@@ -14,33 +14,33 @@ const hoveredTree = ref<any | null>(null);
 
 const { t } = useI18n();
 
+const defaultColSize = 225;
 const header = [
   {
     title: t('pages.projects.tasks.header_title'),
     key: 'title',
     sortable: false,
-    width: 356,
+    width: 'auto',
   },
   {
     title: t('pages.projects.tasks.header_deadline_at'),
     key: 'deadline_at',
     sortable: false,
-    width: 192,
+    width: defaultColSize,
   },
   {
     title: t('pages.projects.tasks.header_members'),
     key: 'students',
     sortable: false,
-    width: 192,
+    width: defaultColSize,
   },
   {
     title: t('pages.projects.tasks.header_delivered'),
     key: 'delivered',
     sortable: false,
-
-    width: 192,
+    width: defaultColSize,
   },
-  { title: '', key: 'actions', sortable: false },
+  { title: '', key: 'actions', sortable: false, width: 75 },
 ];
 type CreateItemPayload = {
   epic: number;
@@ -135,6 +135,7 @@ const isEditing = ref<LocalSprintTask | null>(null);
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
+  console.log('Array', array);
   // const index = array.findIndex((task) => task.id === props.over?.id);
   // const oldIndex = array.findIndex((task) => task.id === -1);
 
@@ -157,7 +158,7 @@ const tasksArray = computed(() => {
   // if (index !== -1) {
   //   props.over?.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
   // }
-  return array;
+  return array.map((array) => ({ ...array, width: 500 }));
 });
 
 const scrollToNewTask = () => {
@@ -443,15 +444,14 @@ const setDragStart = (id: number, e: DragEvent) => {
                     "
                   >
                     <td
-                      class="text-body-4 text-overflow text-left task-title"
-                      :class="`width-${85 - level * 4}`"
+                      class="!tw-w-[calc(100%-225px-225px-225px-75px)] text-body-4 text-overflow text-left task-title"
                       :style="taskItemMargin(level)"
                       @dragover.prevent="(e) => emit('dragOver', props.group, task.id, task.position, e)"
                     >
                       {{ item.title }}
                     </td>
 
-                    <td class="min-w-48">
+                    <td class="!tw-w-[225px]">
                       <alex-learningplan-task-date-chip
                         v-if="item.finish_at"
                         :date="item.finish_at"
@@ -461,13 +461,13 @@ const setDragStart = (id: number, e: DragEvent) => {
                         {{ $t('pages.projects.tasks.not_informed') }}
                       </span>
                     </td>
-                    <td class="min-w-48">
+                    <td class="!tw-w-[225px]">
                       <div v-if="getUsers(item).length" class="ml-2" :class="{ 'gray-filter': isArchived }">
                         <alex-custom-avatar-group :avatar-items="getUsers(item) || []" :max="3" />
                       </div>
                       <span v-else>{{ $t('pages.projects.tasks.no_members') }}</span>
                     </td>
-                    <td class="min-w-48">
+                    <td class="!tw-w-[225px]">
                       <alex-learningplan-task-submissions-status
                         v-if="item.delivered"
                         :submitted="item.delivered"
@@ -480,7 +480,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                         </span>
                       </div>
                     </td>
-                    <td class="ml-auto">
+                    <td class="!tw-w-[75px]">
                       <alex-custom-dropdown
                         variant="text"
                         prepend-icon="mdi-dots-vertical"
