@@ -6,6 +6,7 @@ import Button from '~/components/ui/button/Button.vue';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { useUserPermissions } from '~/composables/useUserPermissions';
 import InstitutionsWidgetDialog from './InstitutionsWidgetDialog.vue';
+import { id } from 'ethers';
 
 type InstitutionWidgetEvents = {
   (event: 'remove', institution: Institution): void;
@@ -27,21 +28,47 @@ const { $toast } = useNuxtApp();
 const strapiClient = useStrapiClient();
 const userPermissions = useUserPermissions();
 const route = useRoute();
+const userStore = useStrapiUser();
+const learningPlanStore = useLearningPlanStore();
 
 const users = ref<StrapiUser[]>([]);
 const removedInstitution = ref<Institution | null>(null);
 const selectedInstitution = ref<Institution | null>(null);
 
 const canCreateInstitution = computed(() => {
-  return userPermissions.value.includes('api::learningplan.learningplan:createInstitution');
+  const member = learningPlanStore.learningPlan?.members?.find(
+    (member) => member?.user?.id === userStore?.value?.id && userStore?.value,
+  );
+
+  if (userPermissions.value.includes('api::learningplan.learningplan:createInstitution')) {
+    return true;
+  }
+
+  return ['student_leader', 'facilitator'].includes(member?.role ?? '');
 });
 
 const canUpdateInstitution = computed(() => {
-  return userPermissions.value.includes('api::learningplan.learningplan:updateInstitution');
+  const member = learningPlanStore.learningPlan?.members?.find(
+    (member) => member?.user?.id === userStore?.value?.id && userStore?.value,
+  );
+
+  if (userPermissions.value.includes('api::learningplan.learningplan:updateInstitution')) {
+    return true;
+  }
+
+  return ['student_leader', 'facilitator'].includes(member?.role ?? '');
 });
 
 const canRemoveInstitution = computed(() => {
-  return userPermissions.value.includes('api::learningplan.learningplan:removeInstitution');
+  const member = learningPlanStore.learningPlan?.members?.find(
+    (member) => member?.user?.id === userStore?.value?.id && userStore?.value,
+  );
+
+  if (userPermissions.value.includes('api::learningplan.learningplan:removeInstitution')) {
+    return true;
+  }
+
+  return ['student_leader', 'facilitator'].includes(member?.role ?? '');
 });
 
 const removeInstitution = useMutation({
@@ -86,6 +113,12 @@ const handleInstitutionClick = (institution: Institution) => {
     selectedInstitution.value = institution;
   }
 };
+
+onMounted(() => {
+  if (!learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(+route.params.id);
+  }
+});
 
 watchEffect(() => {
   try {
