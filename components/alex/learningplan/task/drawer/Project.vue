@@ -58,7 +58,7 @@
           <alex-learningplan-task-date
             ref="endDateComp"
             v-model="endDate"
-            :can-set-value="checkEndDate(startDate, endDate)"
+            :can-set-value="checkEndDate(startDate?.toString() ?? '', endDate?.toString() ?? '')"
             edit
           />
         </v-col>

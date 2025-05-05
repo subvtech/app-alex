@@ -166,18 +166,18 @@ const contributions = computed(() => {
   const trailId = trailStore.trail?.id;
   const userId = canEdit.value
     ? -1
-    : learningPlanStore.activeMembers.find((member) => member.user.id === user.value.id)?.id;
+    : learningPlanStore.activeMembers.find((member) => member?.user?.id ?? null === user?.value?.id ?? 0)?.id;
   contributions?.forEach((contribution) => {
     const student = contribution.student_member;
-    if (contribution.student_member?.user.id === user.value.id) {
+    if (contribution.student_member?.user?.id ?? null === user?.value?.id ?? 0) {
       myContributions.push(contribution);
     } else {
       const studentIndex = otherContributions.findIndex(
-        (student) => student.id === contribution.student_member.user.id,
+        (student) => student.id === contribution.student_member?.user?.id,
       );
       if (studentIndex > -1 && !hideBlocked(contribution)) {
         otherContributions[studentIndex].contributions.push(contribution);
-      } else if (!hideBlocked(contribution)) {
+      } else if (!hideBlocked(contribution) && student?.user) {
         otherContributions.push({
           id: student.user.id,
           name: student.user.fullname,
