@@ -180,7 +180,7 @@ const onCancel = () => {
   isEditing.value = false;
 };
 const onSave = async () => {
-  await client(`/learningplans/${props.courseId}/goals`, {
+  await client(`/learningplans/${props.courseId}/individualgoals`, {
     method: 'PUT',
     body: {
       goals: localData.value.map((item, index) => ({
