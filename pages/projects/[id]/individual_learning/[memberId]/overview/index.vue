@@ -262,7 +262,7 @@ const getData = () => {
     });
 
     const percentagesSum = allPercentages.reduce((total, curr) => total + curr, 0);
-    const filteredCompletedGoals = percentagesSum / allPercentages.length;
+    const filteredCompletedGoals = percentagesSum / allPercentages.length || 0;
 
     newTotalizers.objectives = {
       ...newTotalizers.objectives,
