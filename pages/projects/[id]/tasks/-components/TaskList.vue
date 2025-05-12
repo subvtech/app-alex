@@ -195,6 +195,16 @@ const sprintBacklog = computed(() => {
   return sprintsValue.value.sprints
     .slice()
     .sort((a, b) => a.order - b.order)
+    .sort((a, b) => {
+      const dateA = new Date(a.start_at).getTime();
+      const dateB = new Date(b.start_at).getTime();
+
+      if (isNaN(dateA) && isNaN(dateB)) return 0;
+      if (isNaN(dateA)) return 1;
+      if (isNaN(dateB)) return -1;
+
+      return dateB - dateA;
+    })
     .map((sprint) => ({
       ...sprint,
       tasks: sprint.tasks.map(formatTasks),
