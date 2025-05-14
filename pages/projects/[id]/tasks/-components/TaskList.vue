@@ -47,8 +47,6 @@ const hoveredSprint = ref<any | null>(0);
 const hoveredTask = ref<any | null>(null);
 const draggedTask = ref<any | null>(null);
 
-// watch(hoveredSprint, (val) => console.log('Hovered sprint', val));
-
 // Querys
 const queryClient = useQueryClient();
 const { data: sprintsValue, refetch: refetchSprints } = useGetSprints(learninplanId);
@@ -572,9 +570,10 @@ const handleEdit = async (task: SprintTask) => {
   await refetchSprints();
 };
 
-const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint = null) => {
-  hoveredSprint.value = sprint ?? null;
-  dragDrop.onDragOver('backlog', -index, -1, dragEvent);
+const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint: any = null) => {
+  hoveredSprint.value = sprint === '_backlog' ? { title: 'backlog' } : sprint;
+  // hoveredSprint.value = sprint ?? null;
+  // dragDrop.onDragOver('backlog', -index, -1, dragEvent);
 };
 
 // const handleEmptyStateLeave = () => {
@@ -742,8 +741,19 @@ const updateSprints = () => {
                     type="backlog"
                     :index="backlogIndex"
                     :drop-area="dragDrop.over.value.list === 'backlog'"
-                    @drag-over="handleEmptyStateOver"
-                    @drag-leave="(e) => dragDrop.onDragLeave(e)"
+                    @drag-over="(index, e) => handleEmptyStateOver(index, e, '_backlog')"
+                    @drag-end="
+                      (item, __, e) => {
+                        onDrop(item, __, e);
+                        draggedTask = null;
+                      }
+                    "
+                    @drag-leave="
+                      (e) => {
+                        hoveredSprint = null;
+                        dragDrop.onDragLeave(e);
+                      }
+                    "
                   />
                 </div>
                 <div v-else>
@@ -769,7 +779,6 @@ const updateSprints = () => {
                     @start-drag="
                       (idVal, e, dropTo, dragGhost) => {
                         dragDrop.startDrag(idVal, e, dropTo, dragGhost);
-
                         const data = e?.target?.attributes?.id?.value;
 
                         if (!data) {
@@ -917,7 +926,12 @@ const updateSprints = () => {
                     :index="backlogIndex"
                     :drop-area="dragDrop.over.value.list === 'backlog'"
                     @drag-over="(index, event) => handleEmptyStateOver(index, event, sprint)"
-                    @drag-leave="dragDrop.onDragLeave"
+                    @drag-leave="
+                      (e) => {
+                        hoveredSprint = null;
+                        dragDrop.onDragLeave(e);
+                      }
+                    "
                   />
                 </div>
                 <div v-else>
