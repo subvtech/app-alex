@@ -166,6 +166,7 @@
       :type="taskDetails?.type"
       :events="taskDetails?.task_events"
       :goals="taskDetails?.learning_goals"
+      :author-id="memberId"
       :members="taskDetails?.task_members"
       :description="taskDetails?.description || undefined"
       :submission-description="taskDetails?.submission_description"
@@ -540,6 +541,14 @@ const listTasks = computed(() => {
       completed: status === 'done' ? 1 : 0,
     },
   }));
+});
+
+const memberId = computed(() => {
+  if (!learningPlanStore.learningPlan) {
+    return undefined;
+  }
+
+  return learningPlanStore.learningPlan.members.find((member) => member.user.id === +route.params.memberId)?.id;
 });
 
 // - Update kanban

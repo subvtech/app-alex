@@ -20,6 +20,7 @@ const learningPlanStore = useLearningPlanStore();
 
 const dataStore = ref<DataStore>();
 const loading = ref(true);
+const ganttExpanded = ref<boolean>(false);
 
 const statistics = computed(() => ({
   epics: {
@@ -78,11 +79,33 @@ onBeforeMount(async () => {
 
 <template>
   <div>
+    <alex-custom-dialog
+      v-model="ganttExpanded"
+      body-classes="!tw-p-0 tw-h-full"
+      max-width="100%"
+      no-header
+      no-footer
+      fullscreen
+    >
+      <GanttWidget
+        :items="dataStore?.tasks"
+        :sprints="dataStore?.sprints"
+        :loading="loading"
+        close
+        @close="() => (ganttExpanded = false)"
+      />
+    </alex-custom-dialog>
     <div class="tw-flex tw-flex-wrap gap-4 tw-mb-5">
       <StatisticCard v-for="item in Object.values(statistics)" :key="item.title" v-bind="item" />
     </div>
     <div class="tw-grid tw-grid-cols-12 tw-gap-4">
-      <GanttWidget :items="dataStore?.tasks" :sprints="dataStore?.sprints" :loading="loading" />
+      <GanttWidget
+        :items="dataStore?.tasks"
+        :sprints="dataStore?.sprints"
+        :loading="loading"
+        fullscreen
+        @fullscreen="() => (ganttExpanded = true)"
+      />
       <TaskProgressWidget
         class="tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
         categories="total"
