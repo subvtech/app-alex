@@ -5,6 +5,8 @@ export interface GanttWidgetProps {
   items: GanttItem[];
   loading?: boolean;
   sprints: GanttSprint[];
+  fullscreen?: boolean;
+  close?: boolean;
 }
 
 withDefaults(defineProps<GanttWidgetProps>(), {
@@ -35,7 +37,7 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
             {{ $t('pages.projects.overview.timeline_today') }}
           </alex-custom-button>
         </div>
-        <div class="tw-flex tw-gap-1 tw-overflow-auto">
+        <div class="tw-flex tw-items-center tw-gap-1 tw-overflow-auto">
           <alex-custom-button
             v-for="view in viewTypes"
             :key="view"
@@ -44,6 +46,14 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
           >
             {{ $t(`pages.projects.overview.timeline_${view}`) }}
           </alex-custom-button>
+
+          <hr v-if="fullscreen || close" class="tw-h-[24px] tw-w-[1px] tw-rounded tw-mx-1 bg-gray-300" />
+          <alex-custom-button
+            v-if="fullscreen || close"
+            :icon="fullscreen ? 'mdi-fullscreen' : 'mdi-close'"
+            variant="text"
+            @click="$emit(fullscreen ? 'fullscreen' : 'close')"
+          />
         </div>
       </div>
     </template>
@@ -56,7 +66,7 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
           v-else-if="items.length"
           ref="ganttRef"
           class="tw-flex-1"
-          :max-height="360"
+          :max-height="!close ? 360 : undefined"
           :items="items"
           :sprints="sprints"
           :view="ganttView"
