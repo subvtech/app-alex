@@ -8,18 +8,10 @@
       <v-menu v-if="props.edit" v-model="open" :close-on-content-click="false">
         <!-- Adicionar objetivo -->
         <template #activator="{ props: vMenuProps }">
-          <alex-custom-button
-            v-bind="vMenuProps"
-            icon="mdi-plus"
-            size="small"
-            variant="tertiary"
-          />
+          <alex-custom-button v-bind="vMenuProps" icon="mdi-plus" size="small" variant="tertiary" />
         </template>
 
-        <v-list
-          class="alex-task-goals-search pa-4 rounded-lg"
-          style="width: 320px; max-height: 95%"
-        >
+        <v-list class="alex-task-goals-search pa-4 rounded-lg" style="width: 320px; max-height: 95%">
           <!-- Header -->
           <p class="text-body-1 text-gray-800">
             {{ $t('components.learningPlan.drawer.task.goals.select') }}
@@ -30,9 +22,7 @@
             autofocus
             name="goals"
             class="alex-search-goals tw-w-full mt-2"
-            :placeholder="
-              $t('components.learningPlan.drawer.task.goals.search')
-            "
+            :placeholder="$t('components.learningPlan.drawer.task.goals.search')"
             append-inner-icon="mdi-magnify"
             density="compact"
           />
@@ -74,6 +64,7 @@
 <script setup lang="ts">
 interface CompProps {
   edit?: boolean;
+  authorId?: number;
 }
 
 const props = defineProps<CompProps>();
@@ -84,6 +75,7 @@ const search = ref<string>('');
 const searchedGoals = ref<LearningPlanGoalSimple[]>([]);
 
 const learningPlanStore = useLearningPlanStore();
+const { find } = useStrapiUtils();
 
 const selectedIds = computed(() => selectedGoals.value.map((goal) => goal.id));
 
@@ -115,25 +107,31 @@ function addGoal(goal: LearningPlanGoalSimple) {
 
   if (!selectedGoalsId.includes(goal.id)) {
     const selected = [...selectedGoals.value, goal];
-    selectedGoals.value = selected.sort(
-      (a, b) => ids.value[a.id] - ids.value[b.id],
-    );
+    selectedGoals.value = selected.sort((a, b) => ids.value[a.id] - ids.value[b.id]);
   }
 
   open.value = false;
 }
 
 function removeGoal(goal: LearningPlanGoalSimple) {
-  selectedGoals.value = selectedGoals.value.filter(
-    (selectedGoal) => selectedGoal.id !== goal.id,
-  );
+  selectedGoals.value = selectedGoals.value.filter((selectedGoal) => selectedGoal.id !== goal.id);
 }
 
-function queryGoals() {
+async function queryGoals() {
   const isNumber = !isNaN(Number(search.value));
 
-  const unfilteredGoals =
-    learningPlanStore.learningPlan?.learning_goals.map((goal) => goal) || [];
+  let unfilteredGoals = learningPlanStore.learningPlan?.learning_goals.map((goal) => goal) || [];
+
+  if (props.authorId) {
+    await find('learning-goals', {
+      filters: {
+        author: {
+          id: props.authorId,
+        },
+      },
+      populate: ['verb'],
+    }).then(({ data }) => (unfilteredGoals = data));
+  }
 
   const goals: LearningPlanGoalSimple[] = unfilteredGoals.filter((goal) => {
     if (selectedIds.value.includes(goal.id)) {
@@ -145,10 +143,7 @@ function queryGoals() {
 
     const targetText: string = `${verb}${verb ? ' ' : ''}${description}`;
 
-    return (
-      targetText.includes(search.value.toLowerCase().trim()) ||
-      (isNumber && goal.id === parseInt(search.value))
-    );
+    return targetText.includes(search.value.toLowerCase().trim()) || (isNumber && goal.id === parseInt(search.value));
   });
 
   searchedGoals.value = goals;
@@ -160,6 +155,8 @@ watch(open, () => {
   if (!open.value) {
     resetTextField();
   }
+
+  queryGoals();
 });
 </script>
 

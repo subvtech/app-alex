@@ -7,6 +7,7 @@ import Performance from './-components/performance.vue';
 
 const learningPlanStore = useLearningPlanStore();
 const { setMessage } = useMessageStore();
+const userStore = useStrapiUser();
 const { find } = useStrapiUtils();
 const { t } = useI18n();
 const route = useRoute();
@@ -354,7 +355,7 @@ watch(
           :user-id="memberId"
           :data="formattedYourGoals"
           :tooltip="$t('components.courses.goals.tooltip')"
-          :can-edit="!isGuest"
+          :can-edit="+route.params.memberId === userStore?.id"
           no-icon
           @update="() => getData()"
         />
