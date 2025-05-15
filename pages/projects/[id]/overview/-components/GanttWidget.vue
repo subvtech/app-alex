@@ -24,11 +24,13 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
     no-footer
     no-header
     title="Linha temporal"
-    class="tw-col-span-12 md:tw-col-span-12 lg:tw-col-span-8"
+    class="tw-col-span-12 md:tw-col-span-12 lg:tw-col-span-8 tw-relative"
     content-class-name="tw-flex-1"
   >
     <template #header>
-      <div class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-px-6 tw-py-4 tw-border-b">
+      <div
+        class="tw-sticky tw-top-0 tw-left-0 bg-white tw-z-[1000] tw-flex tw-items-center tw-justify-between tw-gap-2 tw-px-6 tw-py-4 tw-border-b"
+      >
         <div class="tw-flex tw-items-center tw-gap-4">
           <span class="tw-text-gray-600 tw-font-bold tw-text-xl tw-leading-8">
             {{ $t('pages.projects.overview.timeline') }}
@@ -58,7 +60,7 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
       </div>
     </template>
     <template #content>
-      <div class="tw-flex tw-flex-col tw-flex-1 tw-gap-2 tw-w-full tw-pt-6">
+      <div class="tw-flex tw-flex-col tw-flex-1 tw-gap-2 tw-w-full tw-pt-6 tw-overflow-y-auto">
         <div v-if="loading" class="tw-flex tw-justify-center tw-items-center tw-w-full">
           <v-progress-circular indeterminate />
         </div>
@@ -66,7 +68,7 @@ const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
           v-else-if="items.length"
           ref="ganttRef"
           class="tw-flex-1"
-          :max-height="!close ? 360 : undefined"
+          :max-height="!close ? 360 : 'auto'"
           :items="items"
           :sprints="sprints"
           :view="ganttView"

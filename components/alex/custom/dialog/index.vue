@@ -159,6 +159,7 @@ const handleChange = (value: boolean) => {
   emits('update:modelValue', value);
 };
 
+console.log('full', props.fullscreen);
 const isFullscreen = ref(props.fullscreen);
 
 const slots = useSlots();

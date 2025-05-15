@@ -53,7 +53,7 @@ export interface GanttProps {
   view?: GanttViewType;
   items?: GanttItem[];
   sprints?: GanttSprint[];
-  maxHeight?: number;
+  maxHeight?: number | string;
 }
 </script>
 

@@ -79,7 +79,14 @@ onBeforeMount(async () => {
 
 <template>
   <div>
-    <alex-custom-dialog v-model="ganttExpanded" body-classes="!tw-p-0 tw-h-full" max-width="90%" no-header no-footer>
+    <alex-custom-dialog
+      v-model="ganttExpanded"
+      body-classes="!tw-p-0 tw-h-full"
+      max-width="100%"
+      no-header
+      no-footer
+      fullscreen
+    >
       <GanttWidget
         :items="dataStore?.tasks"
         :sprints="dataStore?.sprints"
