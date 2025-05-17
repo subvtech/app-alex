@@ -210,6 +210,7 @@ const openCopyDialog = ref<TrailSimple | null>(null);
 const yourProjects = ref<LearningPlanMemberSimple[]>([]);
 const yourCourses = ref<LearningPlanMemberSimple[]>([]);
 const selectedTrails = ref<number[]>([]);
+const isCopying = ref<boolean>(false);
 
 const search = ref('');
 const page = ref(1);
@@ -263,6 +264,8 @@ const toggleSelectedTrails = (id: number) => {
 
 const copyTrail = async () => {
   let reloadAfter = selectedTrails.value.includes(+route.params.id);
+  isCopying.value = true;
+
   await strapiClient('/learningplans/copy-trail', {
     method: 'POST',
     body: {
@@ -278,6 +281,9 @@ const copyTrail = async () => {
     })
     .catch(() => {
       setMessage('Falha ao copiar trilhas', 'error', true);
+    })
+    .finally(() => {
+      isCopying.value = false;
     });
 };
 

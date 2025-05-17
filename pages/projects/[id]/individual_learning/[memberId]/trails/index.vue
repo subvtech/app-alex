@@ -23,6 +23,7 @@ const openCopyDialog = ref<TrailSimple | null>(null);
 const yourProjects = ref<LearningPlanMemberSimple[]>([]);
 const yourCourses = ref<LearningPlanMemberSimple[]>([]);
 const selectedTrails = ref<number[]>([]);
+const isCopying = ref<boolean>(false);
 
 const myCollabs = ref<TrailSimple[] | undefined>(undefined);
 const myTrails = ref<TrailSimple[] | undefined>(undefined);
@@ -75,6 +76,8 @@ const toggleSelectedTrails = (id: number) => {
 
 const copyTrail = async () => {
   let reloadAfter = selectedTrails.value.includes(+route.params.id);
+  isCopying.value = true;
+
   await strapiClient('/learningplans/copy-trail', {
     method: 'POST',
     body: {
@@ -90,6 +93,9 @@ const copyTrail = async () => {
     })
     .catch(() => {
       setMessage('Falha ao copiar trilhas', 'error', true);
+    })
+    .finally(() => {
+      isCopying.value = false;
     });
 };
 
@@ -210,6 +216,10 @@ onMounted(() => {
     );
   });
 });
+
+watch(openCopyDialog, () => {
+  selectedTrails.value = [];
+});
 </script>
 
 <template>
@@ -292,6 +302,7 @@ onMounted(() => {
       title="Copiar trilha"
       main-button-text="Copiar"
       :main-button-disabled="!selectedTrails.length"
+      :main-button-loading="isCopying"
       @on-main-action="() => copyTrail()"
       @on-secondary-action="() => (openCopyDialog = null)"
     >
