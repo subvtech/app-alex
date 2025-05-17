@@ -5,12 +5,7 @@
       <p class="text-body-1" :class="`text-${textColor}`">
         {{ label }}
       </p>
-      <v-icon
-        v-if="info"
-        class="ml-1 align-self-center"
-        :size="20"
-        :title="info"
-        :color="textColor"
+      <v-icon v-if="info" class="ml-1 align-self-center" :size="20" :title="info" :color="textColor"
         >mdi-information-outline</v-icon
       >
     </div>
@@ -22,7 +17,7 @@
       class="w-100"
       type="date"
       :append-inner-icon="!hideIcon ? 'mdi-calendar' : ''"
-      :error-messages="errorMessage"
+      :error-messages="!hideError ? errorMessage : undefined"
       :disabled="disabled"
       :required="required"
       :class="{ 'no-value': !inputValue, theme }"
@@ -66,6 +61,7 @@ interface DatePickerProps {
   hideIcon?: boolean;
   info?: string;
   theme?: 'light' | 'dark';
+  hideError?: boolean;
   allowedDates?: (value?: any) => boolean;
 }
 const mobile = navigator.userAgent.toLowerCase().includes('mobile');
@@ -77,6 +73,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   hideIcon: false,
   info: undefined,
   theme: 'light',
+  hideError: false,
   allowedDates: () => true,
 });
 
@@ -204,8 +201,7 @@ watch(inputValue, () => (menu.value = false));
     color: rgb(var(--v-theme-gray-300)) !important;
   }
 
-  &.v-field:hover:not(.v-field--active):not(.v-field--error)
-    > .v-field__outline {
+  &.v-field:hover:not(.v-field--active):not(.v-field--error) > .v-field__outline {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
@@ -222,10 +218,7 @@ watch(inputValue, () => (menu.value = false));
     color: rgb(var(--v-theme-gray-300));
   }
 
-  .light
-    .v-field--dirty:not(.v-field--disabled)
-    > .v-field__field
-    > .v-field__input {
+  .light .v-field--dirty:not(.v-field--disabled) > .v-field__field > .v-field__input {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
