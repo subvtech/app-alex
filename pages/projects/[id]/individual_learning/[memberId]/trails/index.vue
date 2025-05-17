@@ -75,7 +75,6 @@ const toggleSelectedTrails = (id: number) => {
 };
 
 const copyTrail = async () => {
-  let reloadAfter = selectedTrails.value.includes(+route.params.id);
   isCopying.value = true;
 
   await strapiClient('/learningplans/copy-trail', {
@@ -86,13 +85,20 @@ const copyTrail = async () => {
     },
   })
     .then(() => {
-      setMessage('Trilhas copiadas com sucesso', 'success', true);
+      setMessage(
+        selectedTrails.value.length === 1 ? `Trilha copiada com sucesso` : `Trilhas copiadas com sucesso`,
+        'success',
+        true,
+      );
       openCopyDialog.value = null;
-
-      if (reloadAfter) getData();
+      getData();
     })
     .catch(() => {
-      setMessage('Falha ao copiar trilhas', 'error', true);
+      setMessage(
+        selectedTrails.value.length === 1 ? `Falha ao copiar trilha` : `Falha ao copiar trilhas`,
+        'error',
+        true,
+      );
     })
     .finally(() => {
       isCopying.value = false;
@@ -170,7 +176,9 @@ const getData = async () => {
     filters: {
       learning_structure: {
         author_member: {
-          user,
+          user: {
+            id: user,
+          },
         },
         learningplan: learningPlanStore.learningPlan?.id,
       },
