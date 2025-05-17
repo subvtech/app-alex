@@ -3,12 +3,13 @@
     <alex-learningplan-trails-contributions-side-bar
       :model-value="sidebar"
       :contributions="highlightedContributionsSimple"
-      :is-professor="learningPlanStore.userIsFacilitator"
+      :is-professor="true"
       @show-contribution="showContribution"
       @remove-highlight="removeContributionHighlight"
       @update:model-value="(value) => (sidebar = value)"
       @dragged:items="(value) => handlePositions(value)"
     />
+    {{ editorData }}
     <div id="editor-container" class="bg-white rounded w-100 container-min-height">
       <div section="0" class="d-flex justify-end px-6 pt-6" :class="!readOnly ? 'sticky-buttons' : ''">
         <alex-custom-button
@@ -212,7 +213,8 @@ const sidebar = ref(false);
 
 const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
-  return !trailStore.loading && (editorData.value.blocks.length || !readOnly.value);
+  return true;
+  // !trailStore.loading && (editorData.value.blocks.length || !readOnly.value);
 });
 const { t } = useI18n();
 const editorData = computed(() => {
