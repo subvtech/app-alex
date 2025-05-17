@@ -262,6 +262,7 @@ const toggleSelectedTrails = (id: number) => {
 };
 
 const copyTrail = async () => {
+  let reloadAfter = selectedTrails.value.includes(+route.params.id);
   await strapiClient('/learningplans/copy-trail', {
     method: 'POST',
     body: {
@@ -269,8 +270,11 @@ const copyTrail = async () => {
       learningPlans: selectedTrails.value,
     },
   })
-    .then((res) => {
+    .then(() => {
       setMessage('Trilhas copiadas com sucesso', 'success', true);
+      openCopyDialog.value = null;
+
+      if (reloadAfter) learningPlanStore.loadLearningPlan(+route.params.id);
     })
     .catch(() => {
       setMessage('Falha ao copiar trilhas', 'error', true);
