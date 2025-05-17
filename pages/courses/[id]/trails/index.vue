@@ -1,8 +1,5 @@
 <template>
-  <div
-    style="flex: 1"
-    class="d-flex bg-white flex-column rounded-lg pa-6 wrapper"
-  >
+  <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6 wrapper">
     <div
       class="d-flex flex-wrap w-100 gap-4 gap-sm-1"
       :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
@@ -35,31 +32,16 @@
       v-if="!trails.length"
       style="flex: 1"
       class="d-flex"
-      :class="
-        learningPlanStore.loading
-          ? ''
-          : 'align-center justify-center flex-column'
-      "
+      :class="learningPlanStore.loading ? '' : 'align-center justify-center flex-column'"
     >
       <div v-if="learningPlanStore.loading">
-        <alex-custom-skeleton
-          color="gray-200"
-          class="width-80 height-10 mb-6"
-          rounded="lg"
-        />
+        <alex-custom-skeleton color="gray-200" class="width-80 height-10 mb-6" rounded="lg" />
         <div class="d-flex gap-5">
-          <alex-learningplan-skeleton-trail-card
-            v-for="index in 3"
-            :key="index"
-          />
+          <alex-learningplan-skeleton-trail-card v-for="index in 3" :key="index" />
         </div>
       </div>
       <div v-else class="d-flex align-center justify-center flex-column">
-        <img
-          class="emptyProjects-img"
-          src="public/images/emptyTrails.svg"
-          :alt="$t('pages.trails.emptyStateText')"
-        />
+        <img class="emptyProjects-img" src="public/images/emptyTrails.svg" :alt="$t('pages.trails.emptyStateText')" />
         <p class="text-h3 text-gray-400 mt-4">
           {{ $t('pages.trails.emptyStateText') }}
         </p>
@@ -82,7 +64,7 @@
               :key="item.raw.title + index"
               :hide="item.raw.hidden"
               :name="item.raw.title"
-              :can-edit="learningPlanStore.userIsFacilitator"
+              :can-edit="learningPlanStore.userIsFacilitator || true"
               :description="item.raw.description"
               :image="{
                 url: item.raw?.cover_image?.url,
@@ -92,7 +74,7 @@
               @toggle-visibility="changeItemVisibility(index, item.raw.id)"
               @configurations="navigate(item.raw.id, 'settings')"
               @open="navigate(item.raw.id, 'trails')"
-              @copy="console.log(item.raw.id)"
+              @copy="() => (openCopyDialog = item.raw)"
             />
           </div>
         </template>
@@ -115,6 +97,91 @@
       </v-data-iterator>
     </div>
 
+    <alex-custom-dialog
+      v-model="openCopyDialog"
+      title="Copiar trilha"
+      main-button-text="Copiar"
+      :main-button-disabled="!selectedTrails.length"
+      @on-main-action="() => copyTrail()"
+      @on-secondary-action="() => (openCopyDialog = null)"
+    >
+      <p class="text-h4 text-gray-600 mb-3">Seus projetos</p>
+      <div v-if="yourProjects.length" class="tw-flex tw-flex-col tw-gap-1">
+        <div
+          v-for="project in yourProjects"
+          :key="project.learningplan.id"
+          class="tw-flex tw-items-center tw-gap-4 tw-rounded-xl tw-px-2 tw-py-2 tw-cursor-pointer hover:tw-shadow tw-transition"
+          @click="() => toggleSelectedTrails(project.id)"
+        >
+          <div class="tw-w-full tw-overflow-hidden tw-flex-[0_0_88.8px] tw-h-[60px] tw-rounded-xl tw-shadow-lg">
+            <img
+              class="tw-w-full tw-h-full tw-object-cover tw-bg-center"
+              :src="project.learningplan?.cover_image?.url || '/images/cover_image_course.svg'"
+              alt="Capa do projeto"
+              aspect-ratio="16/9"
+            />
+          </div>
+          <div class="tw-flex-1">
+            <p class="tw-text-lg tw-font-semibold text-gray-800">
+              {{ project.learningplan.title }}
+            </p>
+            <p class="tw-text-sm tw-font-semibold text-gray-700">Em sua jornada individual</p>
+          </div>
+          <v-checkbox
+            v-model="selectedTrails"
+            class="tw-pointer-events-none !tw-pa-0 !tw-ma-0"
+            color="rgb(0, 183, 204)"
+            :value="project.id"
+            hide-spin-buttons
+            hide-details
+          />
+        </div>
+      </div>
+      <div v-else class="text-center mt-4">
+        <p class="text-gray-600 text-h4 mb-1">Não há projetos disponíveis</p>
+        <p class="text-gray-500 tw-text-sm">Participe de projetos para copiar trilhas</p>
+      </div>
+
+      <p class="text-h4 text-gray-600 mb-3 mt-6">Seus cursos</p>
+      <!-- Lembrar de mudar pra yourProjects -->
+      <div v-if="yourCourses.length" class="tw-flex tw-flex-col tw-gap-1">
+        <div
+          v-for="project in yourCourses"
+          :key="project.learningplan.id"
+          class="tw-flex tw-items-center tw-gap-4 tw-rounded-xl tw-px-2 tw-py-2 tw-cursor-pointer hover:tw-shadow tw-transition"
+          @click="() => toggleSelectedTrails(project.id)"
+        >
+          <div class="tw-w-full tw-overflow-hidden tw-flex-[0_0_88.8px] tw-h-[60px] tw-rounded-xl tw-shadow-lg">
+            <img
+              class="tw-w-full tw-h-full tw-object-cover tw-bg-center"
+              :src="project.learningplan?.cover_image?.url || '/images/cover_image_course.svg'"
+              alt="Capa do projeto"
+              aspect-ratio="16/9"
+            />
+          </div>
+          <div class="tw-flex-1">
+            <p class="tw-text-lg tw-font-semibold text-gray-800">
+              {{ project.learningplan.title }}
+            </p>
+            <p class="tw-text-sm tw-font-semibold text-gray-700">Disponível para todos</p>
+          </div>
+          <div class="tw-flex-[0_0_50px] tw-pt-[3px] tw-items-center tw-justify-center">
+            <v-checkbox
+              v-model="selectedTrails"
+              class="tw-pointer-events-none tw-h-[24px] tw-w-[24px] !tw-pa-0 !tw-ma-0"
+              color="rgb(0, 183, 204)"
+              :value="project.id"
+              hide-spin-buttons
+              hide-details
+            />
+          </div>
+        </div>
+      </div>
+      <div v-else class="text-center mt-4">
+        <p class="text-gray-600 text-h4 mb-1">Não há cursos disponíveis</p>
+        <p class="text-gray-500 tw-text-sm">Em cursos, você precisa ser facilitador para criar ou copiar trilhas</p>
+      </div>
+    </alex-custom-dialog>
     <alex-learningplan-trails-dialogs-create
       v-if="learningPlanStore.userIsFacilitator && !!learningStructure"
       :model-value="createTrailDialog"
@@ -133,8 +200,16 @@ import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTr
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const { findOne } = useStrapiUtils();
+const { find, findOne } = useStrapiUtils();
 const { update } = useStrapi();
+const userStore = useStrapiUser();
+const strapiClient = useStrapiClient();
+const { setMessage } = useMessageStore();
+
+const openCopyDialog = ref<TrailSimple | null>(null);
+const yourProjects = ref<LearningPlanMemberSimple[]>([]);
+const yourCourses = ref<LearningPlanMemberSimple[]>([]);
+const selectedTrails = ref<number[]>([]);
 
 const search = ref('');
 const page = ref(1);
@@ -145,17 +220,14 @@ const learningPlanStore = useLearningPlanStore();
 
 const learningStructure = computed(() => {
   return (
-    learningPlanStore.learningPlan?.learning_structures.find(
-      (structure) => structure.type === 'standard',
-    )?.id || 0
+    learningPlanStore.learningPlan?.learning_structures.find((structure) => structure.type === 'standard')?.id || 0
   );
 });
 
 const trails = computed<TrailSimple[]>(() => {
   return (
     learningPlanStore.standardTrails?.map((trail) => {
-      const lastStructure =
-        trail.structures[trail.structures?.length - 1 || 0] || {};
+      const lastStructure = trail.structures[trail.structures?.length - 1 || 0] || {};
       return {
         ...trail,
         blocks: lastStructure.blocks || [],
@@ -168,10 +240,7 @@ const showingData = (groupedItems) => {
   const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
 
   const from = (page.value - 1) * itemsPerPage + 1;
-  const to =
-    page.value * itemsPerPage > trails.value.length
-      ? trails.value.length
-      : page.value * itemsPerPage;
+  const to = page.value * itemsPerPage > trails.value.length ? trails.value.length : page.value * itemsPerPage;
   const total = trails.value.length;
   const message = t('pages.trails.showingData', {
     from,
@@ -182,6 +251,30 @@ const showingData = (groupedItems) => {
     return t('pages.trails.noData');
   }
   return message;
+};
+
+const toggleSelectedTrails = (id: number) => {
+  if (selectedTrails.value.includes(id)) {
+    selectedTrails.value = selectedTrails.value.filter((value) => value !== id);
+  } else {
+    selectedTrails.value = [...selectedTrails.value, id];
+  }
+};
+
+const copyTrail = async () => {
+  await strapiClient('/learningplans/copy-trail', {
+    method: 'POST',
+    body: {
+      trailId: openCopyDialog.value?.id,
+      learningPlans: selectedTrails.value,
+    },
+  })
+    .then((res) => {
+      setMessage('Trilhas copiadas com sucesso', 'success', true);
+    })
+    .catch(() => {
+      setMessage('Falha ao copiar trilhas', 'error', true);
+    });
 };
 
 const changeItemVisibility = (index: number, id: number) => {
@@ -200,9 +293,7 @@ const { id } = route.params;
 const navigate = (trailId: number, page) => {
   const isSettingsPage = page === 'settings';
 
-  navigateTo(
-    `/courses/${id}/trails/${trailId}${isSettingsPage ? '/settings' : ''}/`,
-  );
+  navigateTo(`/courses/${id}/trails/${trailId}${isSettingsPage ? '/settings' : ''}/`);
 };
 
 const handleCreatedTrail = async (id) => {
@@ -218,6 +309,24 @@ const handleCreatedTrail = async (id) => {
 const headerStore = usePageHeaderStore();
 onBeforeMount(() => {
   headerStore.showHeader = true;
+});
+
+onMounted(() => {
+  find('learning-plan-members', {
+    filters: { user: userStore?.value?.id },
+    populate: ['learningplan.cover_image'],
+  }).then(({ data }) => {
+    yourProjects.value = (data as LearningPlanMemberSimple[]).filter(
+      (member) => member.status === 'joined' && ['project', 'course-project'].includes(member.learningplan.type),
+    );
+    yourCourses.value = (data as LearningPlanMemberSimple[]).filter(
+      (member) => member.status === 'joined' && member.learningplan.type === 'course' && member.role === 'facilitator',
+    );
+  });
+});
+
+watch(openCopyDialog, () => {
+  selectedTrails.value = [];
 });
 
 watch(
