@@ -574,7 +574,7 @@ const handleEdit = async (task: SprintTask) => {
 
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint = null) => {
   hoveredSprint.value = sprint ?? null;
-  dragDrop.onDragOver('backlog', -index, -1, dragEvent);
+  dragDrop.onDragOver(sprint ? sprint.title : 'backlog', -index, -1, dragEvent);
 };
 
 // const handleEmptyStateLeave = () => {
@@ -913,9 +913,9 @@ const updateSprints = () => {
                 <div v-if="!sprint.tasks.length">
                   <alex-learningplan-task-empty-state
                     key="empty-state"
-                    type="backlog"
+                    type="sprint"
                     :index="backlogIndex"
-                    :drop-area="dragDrop.over.value.list === 'backlog'"
+                    :drop-area="dragDrop.over.value.list === sprint.title"
                     @drag-over="(index, event) => handleEmptyStateOver(index, event, sprint)"
                     @drag-leave="dragDrop.onDragLeave"
                   />
