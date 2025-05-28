@@ -55,25 +55,34 @@ const memberId = computed<number>(() => {
   return member?.id ?? 0;
 });
 
-const formattedYourGoals = computed(() =>
-  yourGoals.value.map((goal, index) => ({
-    id: goal.id,
-    title: goal.description,
-    keyWord: goal.verb?.text,
-    errorKeyWord: false,
-    errorTitle: false,
-    contentData: {
+const formattedYourGoals = computed(() => {
+  return [...yourGoals.value]
+    .sort((a, b) => {
+      if (a.position === null && b.position === null) return 0;
+      if (a.position === null) return -1;
+      if (b.position === null) return 1;
+
+      return a.position - b.position;
+    })
+    .map((goal, index) => ({
       id: goal.id,
-      index,
-      description: goal.description,
-      verb: {
-        id: goal.verb?.id,
-        text: goal.verb?.text,
-        general: goal.verb?.general,
+      position: goal.position,
+      title: goal.description,
+      keyWord: goal.verb?.text,
+      errorKeyWord: false,
+      errorTitle: false,
+      contentData: {
+        id: goal.id,
+        index,
+        description: goal.description,
+        verb: {
+          id: goal.verb?.id,
+          text: goal.verb?.text,
+          general: goal.verb?.general,
+        },
       },
-    },
-  })),
-);
+    }));
+});
 
 const getPercentage = (amount: number, total: number): number => {
   const result = amount > 0 ? Math.floor((amount / total) * 100) : 0;
