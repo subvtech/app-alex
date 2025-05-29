@@ -135,7 +135,6 @@ const isEditing = ref<LocalSprintTask | null>(null);
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
-  console.log('Array', array);
   // const index = array.findIndex((task) => task.id === props.over?.id);
   // const oldIndex = array.findIndex((task) => task.id === -1);
 

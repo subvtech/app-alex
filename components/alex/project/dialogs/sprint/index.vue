@@ -47,6 +47,7 @@
         :label="$t('components.projects.sprint.startDate')"
         required
         density="comfortable"
+        hide-error
         :allowed-dates="projectRange"
       />
       <alex-inputs-date
@@ -57,6 +58,7 @@
         required
         :label="$t('components.projects.sprint.endDate')"
         :disabled="!isEndDateEnabled"
+        hide-error
         :allowed-dates="projectRange"
       />
     </div>
@@ -203,8 +205,8 @@ watch(dialog, (newValue) => {
       sprint.value = {
         type: 'single',
         title: '',
-        start_at: '',
-        end_at: '',
+        start_at: sprint.value.start_at,
+        end_at: sprint.value.end_at,
         interval: null,
       };
     }
