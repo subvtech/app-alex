@@ -19,7 +19,7 @@ const header = [
     title: t('pages.projects.tasks.header_title'),
     key: 'title',
     sortable: false,
-    width: 500,
+    width: 716,
   },
   {
     title: t('pages.projects.tasks.header_deadline_at'),
@@ -39,8 +39,7 @@ const header = [
     sortable: false,
     width: 192,
   },
-  // { title: '', key: 'actions', sortable: false, width 50, },
-  { title: '', key: 'actions', sortable: false },
+  { title: '', key: 'actions', sortable: false, minWidth: '96px', width: 'auto' },
 ];
 type CreateItemPayload = {
   epic: number;
@@ -395,11 +394,15 @@ const setDragStart = (id: number, e: DragEvent) => {
                       } else {
                         emit('drop', props.group);
                       }
-
                       hoveredTree = null;
                     "
                   >
-                    <p>{{ header.title }}</p>
+                    <v-tooltip location="top">
+                      <template #activator="{ props: tooltipProps }">
+                        <span v-bind="tooltipProps" class="tree-title-ellipsis">{{ header.title }}</span>
+                      </template>
+                      {{ header.title }}
+                    </v-tooltip>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
@@ -428,7 +431,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none"
+                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none max-w-full"
                     :class="[
                       edit ? 'draggable-row' : '',
                       dragging && dragFrom == item.id ? 'dragging' : '',
@@ -444,13 +447,17 @@ const setDragStart = (id: number, e: DragEvent) => {
                   >
                     <td
                       class="text-body-4 text-overflow text-left task-title"
-                      :class="`width-${125 - level * 4}`"
+                      :class="`width-${175 - level * 4} min-w-${175 - level * 4}`"
                       :style="taskItemMargin(level)"
                       @dragover.prevent="(e) => emit('dragOver', props.group, task.id, task.position, e)"
                     >
-                      {{ item.title }}
+                      <v-tooltip location="top">
+                        <template #activator="{ props: tooltipProps }">
+                          <span v-bind="tooltipProps" class="tree-title-ellipsis">{{ item.title }}</span>
+                        </template>
+                        {{ item.title }}
+                      </v-tooltip>
                     </td>
-
                     <td class="min-w-48">
                       <alex-learningplan-task-date-chip
                         v-if="item.finish_at"
@@ -480,7 +487,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                         </span>
                       </div>
                     </td>
-                    <td class="ml-auto">
+                    <td class="ml-auto tw-min-w-12">
                       <alex-custom-dropdown
                         variant="text"
                         prepend-icon="mdi-dots-vertical"
@@ -546,7 +553,9 @@ const setDragStart = (id: number, e: DragEvent) => {
 </template>
 
 <style scoped>
-.text-overflow {
+.tree-title-ellipsis {
+  max-width: 100%;
+  width: auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
