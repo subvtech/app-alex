@@ -14,28 +14,16 @@
       />
     </div>
     <div v-if="group" class="d-flex gap-2 align-center mt-2">
-      <alex-custom-avatar-group
-        :avatar-items="group.participants"
-        class="tw-ml-2"
-      />
+      <alex-custom-avatar-group :avatar-items="group.participants" class="tw-ml-2" />
     </div>
     <div class="d-flex gap-2 justify-end w-100 tw-mt-auto">
       <alex-custom-chip
         status="secondary"
         variant="outlined"
-        :text="
-          group
-            ? $t('pages.task.table.type.group')
-            : $t('pages.task.table.type.individual')
-        "
+        :text="group ? $t('pages.task.table.type.group') : $t('pages.task.table.type.individual')"
         size="small"
       />
-      <alex-custom-chip
-        :status="dateColor"
-        :text="formattedDate"
-        size="small"
-        prepend-icon="mdi-calendar-range"
-      />
+      <alex-custom-chip :status="dateColor" :text="formattedDate" size="small" prepend-icon="mdi-calendar-range" />
     </div>
   </div>
 </template>
@@ -75,11 +63,15 @@ const dateColor = computed(() => {
   };
   return mapedColors[props.status] as 'secondary' | 'blue' | 'orange' | 'green';
 });
-const formattedDate = computed(() =>
-  format(props.date, `d MMM y`, {
-    locale: i18n.locale.value === 'pt' ? ptBR : enIN,
-  }),
-);
+const formattedDate = computed(() => {
+  try {
+    return format(props.date, `d MMM y`, {
+      locale: i18n.locale.value === 'pt' ? ptBR : enIN,
+    });
+  } catch (e) {
+    return '';
+  }
+});
 </script>
 
 <style scoped>

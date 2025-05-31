@@ -20,7 +20,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['learning_class'],
     },
     learning_goals: {
-      populate: ['verb'],
+      populate: ['verb', 'author'],
     },
     groups: {
       populate: ['group_members.student_member.user.avatar', 'task_members'],

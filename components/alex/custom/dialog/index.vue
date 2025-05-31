@@ -31,7 +31,7 @@
     />
     <div
       class="pa-1 gap-4 overflow-y-auto alex-scrollbar-white w-100 tw-h-full bg-white"
-      :class="noFooter ? 'rounded-b-lg' : ''"
+      :class="`${noFooter ? 'rounded-b-lg' : ''} ${noHeader ? 'rounded-t-lg' : ''}`"
     >
       <v-row dense>
         <v-col v-if="stepper" dense :class="bodyStyles" class="rounded-b-lg">

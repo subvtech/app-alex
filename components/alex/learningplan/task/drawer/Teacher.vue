@@ -85,7 +85,7 @@
       <alex-learningplan-task-description v-model="description" :mention-users="mentionUsers" :edit="editable" />
 
       <!-- Objetivos de aprendizagem -->
-      <alex-learningplan-task-goals v-model="goals" :edit="editable" />
+      <alex-learningplan-task-goals v-model="goals" :author-id="authorId" :edit="editable" />
 
       <!-- Entregas-->
       <p class="text-h3 mt-6">
@@ -311,6 +311,7 @@ interface TaskTeacherDrawerProps {
   tags?: TagSimple[];
   type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
+  authorId?: number;
   events?: TaskEvent[];
   description?: string;
   submissionDescription?: string;
@@ -344,6 +345,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   endDate: undefined,
   restrictions: '',
   goals: () => [],
+  authorId: undefined,
   tags: () => [],
   events: () => [],
   type: null,
