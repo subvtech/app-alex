@@ -24,6 +24,7 @@ logs
 .envrc
 .env.*
 !.env.example
+.envrc
 
 #test
 coverage
