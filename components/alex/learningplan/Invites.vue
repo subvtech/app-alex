@@ -1,10 +1,7 @@
 <template>
   <div class="relative">
     <p v-if="className" class="text-body-1 text-gray-800">{{ className }}</p>
-    <div
-      class="invite justify-space-between my-2"
-      :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
-    >
+    <div class="invite justify-space-between my-2" :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']">
       <alex-custom-tooltip v-if="theresTimeAndUrl" :text="urlRef" class="url">
         <template #content>
           <p
@@ -44,11 +41,7 @@
         </alex-custom-tooltip>
       </div>
     </div>
-    <div
-      v-if="theresTime"
-      class="timer d-flex justify-end gap-1"
-      :class="dark ? 'dark' : ''"
-    >
+    <div v-if="theresTime" class="timer d-flex justify-end gap-1" :class="dark ? 'dark' : ''">
       <span>{{ $t('components.courses.invites.countdown') }}</span>
       <p>{{ msToHHMMSS(remainingTime) }}</p>
     </div>
@@ -83,21 +76,14 @@ const props = withDefaults(defineProps<InviteProps>(), {
 });
 
 const { inviteLinkExpiresAt, url } = toRefs(props);
-
-const { msToHHMMSS, generateNewInvite, calcRemainingTime, generateUrl } =
-  useInvitationLink();
+console.log({ props });
+const { msToHHMMSS, generateNewInvite, calcRemainingTime, generateUrl } = useInvitationLink();
 const inviteId = ref<string | null>(props.inviteId);
 const urlRef = ref<string | null>(props.url);
 const inviteLinkExpiresAtRef = ref<Date | null>(props.inviteLinkExpiresAt);
-const {
-  remainingTime,
-  timeSpan,
-  timeRunning,
-  theresTime,
-  setTimeSpan,
-  setTimeRunning,
-  stopTimeout,
-} = useTimeout(props.duration * 1000);
+const { remainingTime, timeSpan, timeRunning, theresTime, setTimeSpan, setTimeRunning, stopTimeout } = useTimeout(
+  props.duration * 1000,
+);
 
 const handleUpdateLink = async () => {
   const result = await generateNewInvite(
@@ -122,9 +108,7 @@ const handleUpdateLink = async () => {
   resetTimeout();
 };
 
-const theresTimeAndUrl = computed(
-  () => theresTime.value && !!urlRef.value && !!props.courseId,
-);
+const theresTimeAndUrl = computed(() => theresTime.value && !!urlRef.value && !!props.courseId);
 
 const resetTimeout = () => {
   if (inviteLinkExpiresAtRef.value) {

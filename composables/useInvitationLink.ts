@@ -2,33 +2,24 @@ import { MemberRoles } from '#imports';
 
 export const useInvitationLink = () => {
   const { create, delete: _delete } = useStrapi();
-  function removeAfterLastSlash(url) {
-    const lastSlashIndex = url.lastIndexOf('/');
-    if (lastSlashIndex !== -1) {
-      return url.substring(0, lastSlashIndex);
-    } else {
-      return url;
-    }
-  }
-  const fullPath = removeAfterLastSlash(window.location.href);
-
+  const { id: learningPlanIdParam } = useRoute().params;
+  const linkRegex = /^(https?:\/\/[^\/]+)\/(projects|courses)\/(\d+)\/join\/(.+)$/;
   const generateUrl = (hash, learningPlanId?) => {
-    const fullPathWithoutLastThreeChars =
-      /\/\d+\d$/.test(fullPath) && learningPlanId
-        ? fullPath.substring(0, fullPath.length - 3)
-        : fullPath;
-
-    return `${fullPathWithoutLastThreeChars}/${
-      learningPlanId ? learningPlanId + '/' : ''
+    const learningPlanIdValue = learningPlanId || learningPlanIdParam;
+    const isProject = window.location.href.includes('projects');
+    const domain = window.location.origin;
+    const url = `${domain}/${isProject ? 'projects' : 'courses'}/${
+      learningPlanIdValue ? learningPlanIdValue + '/' : ''
     }join/${hash}`;
+
+    const match = linkRegex.test(url);
+    return match ? url.replaceAll('//', '/') : '';
   };
 
   function msToHHMMSS(ms) {
     const totalSeconds = Math.floor(ms / 1000);
     let hours: string | number = Math.floor(totalSeconds / 3600);
-    let minutes: string | number = Math.floor(
-      (totalSeconds - hours * 3600) / 60,
-    );
+    let minutes: string | number = Math.floor((totalSeconds - hours * 3600) / 60);
     let seconds: string | number = totalSeconds - hours * 3600 - minutes * 60;
 
     // Pad the hours, minutes, and seconds with leading zeros, if required
