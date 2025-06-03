@@ -22,6 +22,7 @@ logs
 # Local env files
 .env
 .env.*
+.envrc
 !.env.example
 
 #test
