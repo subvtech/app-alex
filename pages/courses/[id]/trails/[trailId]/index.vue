@@ -9,7 +9,6 @@
       @update:model-value="(value) => (sidebar = value)"
       @dragged:items="(value) => handlePositions(value)"
     />
-    {{ editorData }}
     <div id="editor-container" class="bg-white rounded w-100 container-min-height">
       <div section="0" class="d-flex justify-end px-6 pt-6" :class="!readOnly ? 'sticky-buttons' : ''">
         <alex-custom-button
