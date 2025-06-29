@@ -185,6 +185,11 @@ const getWelcomeMessage = () => {
 </script>
 
 <template>
+  <v-row justify="center">
+    <v-col cols="12">Bem vindo ao Alex</v-col>
+  </v-row>
+
+  <!--
   <div class="tw-space-y-6">
     <v-card class="tw-bg-white tw-shadow-lg" rounded="lg" elevation="0">
       <v-card-text class="pa-6">
@@ -237,4 +242,5 @@ const getWelcomeMessage = () => {
       </v-col>
     </v-row>
   </div>
+  -->
 </template>

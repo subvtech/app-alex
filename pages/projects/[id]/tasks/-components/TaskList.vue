@@ -570,9 +570,6 @@ const handleEdit = async (task: SprintTask) => {
   await refetchSprints();
 };
 
-const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint = null) => {
-  hoveredSprint.value = sprint ?? null;
-  dragDrop.onDragOver(sprint ? sprint.title : 'backlog', -index, -1, dragEvent);
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint: any = null) => {
   hoveredSprint.value = sprint === '_backlog' ? { title: 'backlog' } : sprint;
   // hoveredSprint.value = sprint ?? null;
