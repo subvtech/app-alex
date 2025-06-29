@@ -16,18 +16,12 @@
       @input="updateAttributes({ url })"
     >
       <template #append-inner>
-        <alex-custom-button
-          variant="text"
-          :loading="isLoading"
-          icon="mdi-send"
-          color="gray-600"
-          @click="fetchData"
-        />
+        <alex-custom-button variant="text" :loading="isLoading" icon="mdi-send" color="gray-600" @click="fetchData" />
       </template>
     </alex-inputs-text-field>
     <nuxt-link
       v-else-if="urlData.title"
-      :href="readOnly ? url : ''"
+      :href="url"
       target="_blank"
       class="mx-auto tw-w-100 sm:tw-w-[80%] d-flex rounded-lg pa-3 pa-sm-5 text-break bookmark text-decoration-none"
     >
@@ -40,12 +34,7 @@
         </p>
         <p class="text-decoration tw-text-gray-400">{{ urlData.domain }}</p>
       </div>
-      <v-img
-        v-if="urlData.image?.url"
-        :src="urlData.image.url"
-        class="tw-w-4/5 ml-3 rounded-lg"
-        max-width="30%"
-      />
+      <v-img v-if="urlData.image?.url" :src="urlData.image.url" class="tw-w-4/5 ml-3 rounded-lg" max-width="30%" />
     </nuxt-link>
   </node-view-wrapper>
 </template>
