@@ -1,5 +1,19 @@
 <template>
   <div class="d-flex justify-center align-center">
+    <v-tooltip
+      :text="t('components.tiptap.mediaUpload.tooltip.fullscreen')"
+      content-class="bg-white tw-text-white tw-rounded-md tw-p-2 tw-shadow-md"
+      location="top center"
+      transition="fade-transition"
+    >
+      <template #activator="{ props: tooltip }">
+        <alex-custom-button v-bind="tooltip" icon variant="text" @click="$emit('fullscreen')">
+          <Expand class="tw-h-4 tw-w-4" />
+        </alex-custom-button>
+      </template>
+    </v-tooltip>
+    <v-divider class="divider mx-2" vertical></v-divider>
+
     <ToggleGroup v-model="imagePosition" type="single" size="sm">
       <v-tooltip
         v-for="option in options"
@@ -10,25 +24,14 @@
         transition="fade-transition"
       >
         <template #activator="{ props: tooltip }">
-          <ToggleGroupItem
-            :value="option.value"
-            :aria-label="option.value"
-            v-bind="tooltip"
-          >
+          <ToggleGroupItem :value="option.value" :aria-label="option.value" v-bind="tooltip">
             <component :is="option.icon" class="tw-h-4 tw-w-4" />
           </ToggleGroupItem>
         </template>
       </v-tooltip>
     </ToggleGroup>
     <v-divider class="divider mx-2" vertical></v-divider>
-    <Slider
-      v-model="imageSize"
-      :max="100"
-      :min="25"
-      :step="25"
-      color="green"
-      class="tw-cursor-pointer"
-    />
+    <Slider v-model="imageSize" :max="100" :min="25" :step="25" color="green" class="tw-cursor-pointer" />
     <span class="mx-2">{{ imageSize[0] }}%</span>
   </div>
 </template>
@@ -38,6 +41,7 @@ import {
   AlignHorizontalDistributeCenter,
   AlignHorizontalDistributeEnd,
   AlignHorizontalDistributeStart,
+  Expand,
 } from 'lucide-vue-next';
 
 const { t } = useI18n();
@@ -49,7 +53,7 @@ interface propsValue {
   };
 }
 
-const emit = defineEmits(['update:imageSize', 'update:imagePosition']);
+const emit = defineEmits(['update:imageSize', 'update:imagePosition', 'fullscreen']);
 
 const props = defineProps<propsValue>();
 

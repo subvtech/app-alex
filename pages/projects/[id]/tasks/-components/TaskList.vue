@@ -922,9 +922,9 @@ const updateSprints = () => {
                 <div v-if="!sprint.tasks.length">
                   <alex-learningplan-task-empty-state
                     key="empty-state"
-                    type="backlog"
+                    type="sprint"
                     :index="backlogIndex"
-                    :drop-area="dragDrop.over.value.list === 'backlog'"
+                    :drop-area="dragDrop.over.value.list === sprint.title"
                     @drag-over="(index, event) => handleEmptyStateOver(index, event, sprint)"
                     @drag-leave="
                       (e) => {

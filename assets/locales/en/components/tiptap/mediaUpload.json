@@ -29,7 +29,8 @@
   "tooltip": {
     "center": "Align Center",
     "start": "Align Left",
-    "end": "Align Right"
+    "end": "Align Right",
+    "fullscreen": "Open in full screen"
   },
   "inputPlaceholder": "Paste the URL here",
   "fileButton": "File",

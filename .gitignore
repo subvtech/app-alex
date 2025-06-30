@@ -21,8 +21,10 @@ logs
 
 # Local env files
 .env
+.envrc
 .env.*
 !.env.example
+.envrc
 
 #test
 coverage

@@ -10,7 +10,8 @@
     "backlog": "No tasks in Backlog!",
     "published": "No published tasks!",
     "done": "No closed tasks!",
-    "archived": "No archived tasks!"
+    "archived": "No archived tasks!",
+    "sprint": "No tasks in this Sprint!"
   },
   "submissions": {
     "toDo": "To Do",

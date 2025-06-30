@@ -29,7 +29,8 @@
   "tooltip": {
     "center": "Alinhar ao Centro",
     "start": "Alinhar à Esquerda",
-    "end": "Alinhar à Direita"
+    "end": "Alinhar à Direita",
+    "fullscreen": "Abrir em tela cheia"
   },
   "inputPlaceholder": "Cole a URL aqui",
   "fileButton": "Arquivo",
