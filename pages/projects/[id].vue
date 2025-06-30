@@ -83,22 +83,10 @@ const fetchData = async () => {
     !learningPlanStore.userIsFacilitator &&
     !learningPlanStore.userIsActiveMember &&
     !learningPlanStore.userIsPendingMember;
-  // if (
-  //   !learningPlanStore.userIsFacilitator &&
-  //   !learningPlanStore.userIsActiveMember &&
-  //   !learningPlanStore.userIsPendingMember &&
-  //   !isJoinRoute.value
-  // ) {
-  //   console.log(
-  //     'Sem learning plan 2',
-  //     !learningPlanStore.userIsFacilitator,
-  //     !learningPlanStore.userIsActiveMember,
-  //     !learningPlanStore.userIsPendingMember,
-  //     !isJoinRoute.value,
-  //   );
-  //   return;
-  //   // return navigateTo('/projects/me');
-  // }
+
+  if (isGuest && !isJoinRoute.value) {
+    return await navigateTo('/projects/me');
+  }
 
   if (!isGuest && learningPlanStore.userIsPendingMember && !isJoinRoute.value) {
     const invite = learningPlanStore.learningPlan?.invitation_links.find(

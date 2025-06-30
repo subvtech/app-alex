@@ -10,7 +10,8 @@
     "backlog": "Nenhuma tarefa na Backlog!",
     "published": "Nenhuma tarefa publicada!",
     "done": "Nenhuma tarefa encerrada!",
-    "archived": "Nenhuma tarefa arquivada!"
+    "archived": "Nenhuma tarefa arquivada!",
+    "sprint": "Nenhuma tarefa nesse Sprint!"
   },
   "submissions": {
     "toDo": "A fazer",

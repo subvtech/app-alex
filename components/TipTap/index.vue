@@ -235,6 +235,42 @@ onMounted(async () => {
   editor.value = new Editor({
     enableContentCheck: true,
     editable: isEditable.value,
+    editorProps: {
+      handlePaste: (_view, event, _slice) => {
+        const text = event.clipboardData?.getData('text/plain');
+
+        if (!text) return false;
+
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+/;
+        const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com)\/.+/;
+
+        if (youtubeRegex.test(text.trim()) || vimeoRegex.test(text.trim())) {
+          event.preventDefault();
+
+          editor.value
+            .chain()
+            .focus()
+            .insertContent({
+              type: 'mediaUpload',
+              attrs: {
+                media: {
+                  src: text.trim(),
+                  title: 'Video',
+                  id: null,
+                  size: 100,
+                  align: 'center',
+                },
+                format: 'video',
+              },
+            })
+            .run();
+
+          return true;
+        }
+
+        return false;
+      },
+    },
     extensions: [
       Document,
       Text,
