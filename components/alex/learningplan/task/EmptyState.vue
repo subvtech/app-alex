@@ -8,10 +8,7 @@
     >
       <v-fade-transition>
         <div v-if="!dropArea">
-          <v-img
-            :src="taskSections[type].image"
-            class="max-w-40 mb-4 mx-auto height-30 width-40"
-          ></v-img>
+          <v-img :src="taskSections[type].image" class="max-w-40 mb-4 mx-auto height-30 width-40"></v-img>
           <p class="text-h4 text-gray-400 text-center">
             {{ taskSections[type].text }}
           </p>
@@ -55,8 +52,8 @@ const taskSections = {
     image: '/svg/emptyArchivedTasks.svg',
   },
   sprint: {
-    text: props.message,
-    image: 'public/svg/emptySprint.svg',
+    text: props.message || t('pages.task.emptyState.sprint'),
+    image: '/svg/emptyDraftTasks.svg',
   },
 };
 </script>

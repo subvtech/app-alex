@@ -27,7 +27,7 @@
     </alex-inputs-text-field>
     <nuxt-link
       v-else-if="urlData.title"
-      :href="readOnly ? url : ''"
+      :href="url"
       target="_blank"
       class="mx-auto tw-w-100 sm:tw-w-[80%] d-flex rounded-lg pa-3 pa-sm-5 text-break bookmark text-decoration-none"
     >
