@@ -62,13 +62,12 @@ build-app2: # This job runs in the build stage, which runs first.
 
 deploy_vercel:
   stage: vercel
-  image: node:20
-  before_script:
+  image: node:20    
+  script:
     - yarn config set registry https://registry.npmjs.org
     - yarn config set network-timeout 600000
     - yarn config set cache-folder .yarn
     - yarn install
-  script:
     - export YARN_REGISTRY=https://registry.npmjs.org
     - export NODE_OPTIONS="--max_old_space_size=2048"
     - export NPM_CONFIG_FETCH_RETRIES=5
