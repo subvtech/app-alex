@@ -32,7 +32,7 @@ ENV TIPTAP_KEY=$tiptap_key
 RUN npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
 RUN npm config set //registry.tiptap.dev/:_authToken $tiptap_key
 
-RUN yarn --ignore-scripts
+RUN yarn --ignore-scripts --frozen-lockfile --network-timeout 600000
 
 ADD --chown=alex:alex . .
 
