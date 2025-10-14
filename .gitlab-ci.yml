@@ -69,7 +69,7 @@ deploy_vercel:
     - yarn config set cache-folder .yarn
     - yarn install
     - export YARN_REGISTRY=https://registry.npmjs.org
-    - export NODE_OPTIONS="--max_old_space_size=2048"
+    - export NODE_OPTIONS="--max_old_space_size=8192"
     - export NPM_CONFIG_FETCH_RETRIES=5
     - export NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000
     - export NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000
