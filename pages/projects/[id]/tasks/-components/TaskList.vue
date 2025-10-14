@@ -42,6 +42,8 @@ const learningPlanStore = useLearningPlanStore();
 const { create, update } = useStrapi();
 const dragDrop = useMultipleDragDrop();
 
+const mode = ref<'project-planning' | 'backlog'>('backlog');
+
 // Drag and drop
 const hoveredSprint = ref<any | null>(0);
 const hoveredTask = ref<any | null>(null);
@@ -91,6 +93,14 @@ const isLoading = computed(() => {
     return isCreatingTaskRequest.value && createdIndex.value === index;
   };
 });
+
+const toggleViewMode = () => {
+  if (mode.value === 'project-planning') {
+    return (mode.value = 'backlog');
+  }
+
+  mode.value = 'project-planning';
+};
 
 const addToSprint = () => {
   return [
@@ -272,6 +282,8 @@ const handleAddEpic = () => {
   //     backlog: [...oldData.backlog, newTask],
   //   };
   // });
+  mode.value = 'project-planning';
+
   const newTask = {
     id: Math.round(Math.random() * 1234526),
     position: getHigherIndex(),
@@ -726,11 +738,45 @@ const updateSprints = () => {
             <v-expansion-panel-title disabled hide-actions class="tw-cursor-default">
               <v-icon :icon="expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'" @click="toggleExpand" />
               <span class="text-h5 text-gray-800">
-                {{ taskSections[backlogIndex - 1] }}
+                {{ mode === 'backlog' ? 'Backlog' : 'Project Planning' }}
               </span>
-              <alex-custom-chip size="small" status="secondary" :text="`${filteredTasks.length}`" />
-              <div v-if="!isGuest" class="ml-auto">
-                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="addToSprint()" />
+              <alex-custom-chip
+                size="small"
+                status="secondary"
+                :text="`${
+                  filteredTasks.filter((task) => {
+                    if (mode === 'project-planning') return true;
+
+                    return task.organization === 'standard';
+                  }).length
+                }`"
+              />
+
+              <div class="tw-flex tw-items-center tw-justify-end gap-2 ml-auto">
+                <alex-custom-tooltip
+                  text="'Project Planning' é a listagem do 'Backlog' com hierarquia, ou seja, com a exibição de épicos"
+                >
+                  <template #content>
+                    <v-icon class="tw-px-[12px]" size="24px" color="gray-400">mdi-help-circle-outline</v-icon>
+                  </template>
+                </alex-custom-tooltip>
+
+                <alex-custom-tooltip
+                  :text="mode === 'backlog' ? 'Exibir Project Planning' : 'Exibir Backlog'"
+                  extraClasses="text-gray-600"
+                >
+                  <template #content>
+                    <alex-custom-button
+                      variant="text"
+                      :icon="mode === 'backlog' ? 'mdi-format-list-bulleted-type' : 'mdi-format-list-bulleted'"
+                      @click="() => toggleViewMode()"
+                    />
+                  </template>
+                </alex-custom-tooltip>
+
+                <div class="tw-w-[1px] tw-h-[20px] bg-gray-300 rounded"></div>
+
+                <alex-custom-dropdown v-if="!isGuest" icon="mdi-plus" variant="text" :items="addToSprint()" />
               </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
@@ -771,6 +817,7 @@ const updateSprints = () => {
                     :sprints="sprintGroups"
                     :tasks="backlogTasks.filter(({ type }) => type === 'group')"
                     :dragged-task="draggedTask"
+                    :hide-levels="mode === 'backlog'"
                     @add-story="handleAddStory"
                     @add-task="handleAddTask"
                     @create-item="createItem"

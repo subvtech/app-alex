@@ -62,8 +62,18 @@ build-app2: # This job runs in the build stage, which runs first.
 
 deploy_vercel:
   stage: vercel
-  image: node:20
+  image: node:20    
   script:
+    - yarn config set registry https://registry.npmjs.org
+    - yarn config set network-timeout 600000
+    - yarn config set cache-folder .yarn
+    - yarn install
+    - export YARN_REGISTRY=https://registry.npmjs.org
+    - export NODE_OPTIONS="--max_old_space_size=8192"
+    - export NPM_CONFIG_FETCH_RETRIES=5
+    - export NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000
+    - export NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000
+    - export YARN_ENABLE_IMMUTABLE_INSTALLS=false
     - npm install --global vercel
     - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
     - NITRO_PRESET=vercel vercel build --token=$VERCEL_TOKEN

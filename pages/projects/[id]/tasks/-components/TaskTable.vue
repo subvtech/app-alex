@@ -14,33 +14,6 @@ const hoveredTree = ref<any | null>(null);
 
 const { t } = useI18n();
 
-const header = [
-  {
-    title: t('pages.projects.tasks.header_title'),
-    key: 'title',
-    sortable: false,
-    width: 716,
-  },
-  {
-    title: t('pages.projects.tasks.header_deadline_at'),
-    key: 'deadline_at',
-    sortable: false,
-    width: 192,
-  },
-  {
-    title: t('pages.projects.tasks.header_members'),
-    key: 'students',
-    sortable: false,
-    width: 232,
-  },
-  {
-    title: t('pages.projects.tasks.header_delivered'),
-    key: 'delivered',
-    sortable: false,
-    width: 192,
-  },
-  { title: '', key: 'actions', sortable: false, minWidth: '96px', width: 'auto' },
-];
 type CreateItemPayload = {
   epic: number;
   id: number;
@@ -91,6 +64,7 @@ const props = withDefaults(
     tasks: SprintTask[];
     editingTask?: SprintTask | null;
     draggedTask: any;
+    hideLevels?: boolean;
   }>(),
   {
     dragFrom: -1,
@@ -100,6 +74,7 @@ const props = withDefaults(
     editingTask: null,
     draggedTask: null,
     edit: true,
+    hideLevels: false,
   },
 );
 
@@ -130,33 +105,87 @@ const draggedTaskSprintTitle = computed(() => {
   return undefined;
 });
 
+const header = computed(() => {
+  return [
+    {
+      title: t('pages.projects.tasks.header_title'),
+      key: 'title',
+      sortable: false,
+      width: 716,
+    },
+    ...(props.hideLevels
+      ? [
+          {
+            title: 'Épico',
+            key: 'epic',
+            sortable: false,
+            width: 192,
+          },
+
+          {
+            title: 'História',
+            key: 'story',
+            sortable: false,
+            width: 192,
+          },
+        ]
+      : []),
+    {
+      title: t('pages.projects.tasks.header_deadline_at'),
+      key: 'deadline_at',
+      sortable: false,
+      width: 192,
+    },
+    {
+      title: t('pages.projects.tasks.header_members'),
+      key: 'students',
+      sortable: false,
+      width: 232,
+    },
+
+    ...(!props.hideLevels
+      ? [
+          {
+            title: t('pages.projects.tasks.header_delivered'),
+            key: 'delivered',
+            sortable: false,
+            width: 192,
+          },
+        ]
+      : []),
+
+    { title: '', key: 'actions', sortable: false, minWidth: '96px', width: 'auto' },
+  ];
+});
+
 const isEditing = ref<LocalSprintTask | null>(null);
+
+const removeTaskChildren = (acc: SprintTask[], curr: SprintTask) => {
+  const currArray = [curr];
+
+  if (curr.tasks) {
+    currArray.push(...curr.tasks);
+  }
+
+  return [...acc, ...currArray];
+};
+
+const filterNoLevelTasks = (acc: SprintTask[], curr: SprintTask) => {
+  const noRepeatedAcc = acc.filter((t) => t.id !== curr.id && !['epic', 'story'].includes(t.organization as string));
+  return [...noRepeatedAcc, curr];
+};
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
-  // const index = array.findIndex((task) => task.id === props.over?.id);
-  // const oldIndex = array.findIndex((task) => task.id === -1);
 
-  // if (oldIndex === props.over?.id || tableSortBy.value.length || props.activeFilter) return array;
-  // if (oldIndex !== -1) array.splice(oldIndex, 1);
+  if (!props.hideLevels) return array;
 
-  // const item = {
-  //   id: -1,
-  //   title: '',
-  //   status: props.over?.list as TaskStatus,
-  //   position: index,
-  //   delivered: {
-  //     toDo: 0,
-  //     doing: 0,
-  //     underReview: 0,
-  //     completed: 0,
-  //   },
-  // };
+  const noLevelsArray = array
+    .reduce(removeTaskChildren, [])
+    .reduce(removeTaskChildren, [])
+    .reduce(filterNoLevelTasks, []);
 
-  // if (index !== -1) {
-  //   props.over?.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
-  // }
-  return array;
+  return noLevelsArray;
 });
 
 const scrollToNewTask = () => {
@@ -458,6 +487,34 @@ const setDragStart = (id: number, e: DragEvent) => {
                         {{ item.title }}
                       </v-tooltip>
                     </td>
+
+                    <td v-if="hideLevels" class="min-w-48">
+                      <span
+                        :class="
+                          item.parent_task?.organization === 'epic' ||
+                          item.parent_task?.parent_task?.organization === 'epic'
+                            ? 'tree-title-ellipsis'
+                            : 'tw-text-black/30'
+                        "
+                        >{{
+                          item.parent_task?.organization === 'epic'
+                            ? item.parent_task.title
+                            : item.parent_task?.parent_task?.organization === 'epic'
+                            ? item.parent_task.parent_task.title
+                            : 'Sem épico'
+                        }}
+                      </span>
+                    </td>
+
+                    <td v-if="hideLevels" class="min-w-48">
+                      <span
+                        :class="item.parent_task?.organization === 'story' ? 'tree-title-ellipsis' : 'tw-text-black/30'"
+                        >{{
+                          item.parent_task?.organization === 'story' ? item.parent_task.title : 'Sem historia'
+                        }}</span
+                      >
+                    </td>
+
                     <td class="min-w-48">
                       <alex-learningplan-task-date-chip
                         v-if="item.finish_at"
@@ -474,7 +531,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       </div>
                       <span v-else>{{ $t('pages.projects.tasks.no_members') }}</span>
                     </td>
-                    <td class="min-w-48">
+                    <td class="min-w-48" v-if="!hideLevels">
                       <alex-learningplan-task-submissions-status
                         v-if="item.delivered"
                         :submitted="item.delivered"
