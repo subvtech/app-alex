@@ -23,7 +23,7 @@
         member.name || '(' + $t('components.learningPlan.members.missing.name') + ')'
       }}</span>
 
-      <span v-if="!noClass" class="text-body-3 text-gray-400 tw-ml-2">{{
+      <span v-if="!noClass" class="text-body-3 text-gray-400">{{
         `(${member.class || $t('components.learningPlan.members.missing.class')})`
       }}</span>
     </div>

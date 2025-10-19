@@ -1,19 +1,5 @@
 <template>
-  <v-data-iterator
-    :search="search"
-    :page="page"
-    :items="kind === 'project' ? projectStudents : members.data"
-    :items-per-page="itemsPerPage"
-    class="members"
-    :filter-keys="[
-      'student_member.user.fullname',
-      'student_member.user.name',
-      'student_member.user.email',
-      'student_member.learning_class.name',
-      'user.fullname',
-      'user.email',
-    ]"
-  >
+  <v-data-iterator :page="page" :items="filteredMembers" :items-per-page="itemsPerPage" class="members">
     <!-- Header -->
     <template v-if="!listGroupMembers" #header>
       <div class="header d-flex tw-align-center py-4 px-2">
@@ -267,6 +253,58 @@ const typeOptions: AlexDropdownItem[] = [
   },
 ];
 
+watch(search, () => {
+  page.value = 1;
+});
+
+const normalizeText = (value?: string | null) =>
+  (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+const filteredMembers = computed(() => {
+  const normalizedQuery = normalizeText(search.value).trim();
+  const baseMembers = props.kind === 'project' ? projectStudents.value : members.value?.data ?? [];
+
+  if (!normalizedQuery) return baseMembers;
+
+  if (props.kind === 'project') {
+    return projectStudents.value.filter((member: any) => {
+      const name = normalizeText(
+        member?.learning_plan_member?.user?.fullname ?? member?.user?.fullname ?? member?.user?.name ?? '',
+      );
+      const className = normalizeText(
+        member?.learning_plan_member?.learning_class?.name ?? member?.learning_class?.name ?? '',
+      );
+
+      return name.includes(normalizedQuery) || className.includes(normalizedQuery);
+    });
+  }
+
+  return baseMembers.filter((member: any) => {
+    const name = normalizeText(
+      member?.learning_plan_member?.user?.fullname ??
+        member?.learning_plan_group?.title ??
+        member?.user?.fullname ??
+        member?.user?.name ??
+        '',
+    );
+
+    const className = normalizeText(
+      member?.learning_plan_member?.learning_class?.name ?? member?.learning_plan_group?.learning_class?.name ?? '',
+    );
+
+    if (props.listGroupMembers && member?.learning_plan_group?.group_members?.length) {
+      const hitInGroup = member.learning_plan_group.group_members.some((groupMember: any) =>
+        normalizeText(groupMember?.student_member?.user?.fullname).includes(normalizedQuery),
+      );
+      return hitInGroup || name.includes(normalizedQuery) || className.includes(normalizedQuery);
+    }
+
+    return name.includes(normalizedQuery) || className.includes(normalizedQuery);
+  });
+});
 const handleAddGroup = () => {
   emit('change-members');
   refresh();

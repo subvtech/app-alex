@@ -47,11 +47,7 @@
           :loading="loadingSecondButton"
           @click="$emit('secondButtonAction')"
         />
-        <slot
-          name="secondButton"
-          :click="() => $emit('secondButtonAction')"
-          :loading="loadingSecondButton"
-        />
+        <slot name="secondButton" :click="() => $emit('secondButtonAction')" :loading="loadingSecondButton" />
         <alex-custom-button
           v-if="!noDelete"
           icon="mdi-trash-can-outline"
@@ -63,16 +59,10 @@
       </template>
     </template>
     <template #title
-      ><p
-        v-if="!user.name"
-        class="text-body-4 text-gray-900 ellipsis lines-1 overflow-x-hidden"
-      >
+      ><p v-if="!user.name" class="text-body-4 text-gray-900 ellipsis lines-1 overflow-x-hidden">
         {{ user.email }}
       </p>
-      <p
-        v-else
-        class="text-body-4 text-gray-900 ellipsis lines-1 overflow-x-hidden"
-      >
+      <p v-else class="text-body-4 text-gray-900 ellipsis lines-1 overflow-x-hidden">
         {{ user.name }}
       </p></template
     >
