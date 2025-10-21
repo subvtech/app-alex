@@ -59,6 +59,7 @@
     <alex-learningplan-task-drawer-student
       v-if="studentDetails"
       v-model="studentDrawer"
+      v-model:contract-address="taskStore.task.contract_address"
       :task-id="taskId"
       :submission="{
         constraints: taskStore.task.allowed_editor_plugins ? taskStore.task.allowed_editor_plugins?.split(',') : [],

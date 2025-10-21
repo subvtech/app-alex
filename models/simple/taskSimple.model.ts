@@ -4,6 +4,7 @@ export type TaskStatus = 'published' | 'draft' | 'finished' | (string & {});
 export type TaskType = 'individual' | 'group';
 export type TaskMemberStatus = 'to_do' | 'in_progress' | 'in_review' | 'done';
 export interface TaskSimple {
+  contract_address: string | null;
   id: number;
   position: number;
   submission_required: boolean;

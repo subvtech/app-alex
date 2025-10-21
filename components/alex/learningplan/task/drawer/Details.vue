@@ -12,12 +12,7 @@
   >
     <template #prepend>
       <div class="d-flex align-center justify-end">
-        <alex-custom-button
-          icon="mdi-close"
-          size="small"
-          variant="text"
-          @click="model = false"
-        />
+        <alex-custom-button icon="mdi-close" size="small" variant="text" @click="model = false" />
       </div>
     </template>
 
@@ -40,9 +35,7 @@
           v-model="type"
           :config="{
             group: $t('components.learningPlan.drawer.task.type.collective'),
-            individual: $t(
-              'components.learningPlan.drawer.task.type.individual',
-            ),
+            individual: $t('components.learningPlan.drawer.task.type.individual'),
           }"
           :placeholder="$t('components.learningPlan.drawer.missing.type')"
         />
@@ -71,20 +64,13 @@
       </p>
 
       <template v-if="submission">
-        <alex-learningplan-task-restrictions
-          v-model="restrictionsValue"
-          class="mt-4"
-        />
+        <alex-learningplan-task-restrictions v-model="restrictionsValue" class="mt-4" />
 
         <alex-learningplan-task-description
           v-if="submissionDescription"
           v-model="submissionDescription"
           class="mt-4"
-          :title="
-            $t(
-              'components.learningPlan.drawer.task.description.submissionLabel',
-            )
-          "
+          :title="$t('components.learningPlan.drawer.task.description.submissionLabel')"
         />
 
         <div class="mt-4">
@@ -108,22 +94,12 @@
             @update-submission="$emit('update-submission')"
           />
           <div v-if="loadingSubmission">
-            <alex-custom-skeleton
-              color="gray-blue"
-              class="tw-w-full tw-h-[61px]"
-            />
+            <alex-custom-skeleton color="gray-blue" class="tw-w-full tw-h-[61px]" />
           </div>
         </div>
       </template>
-      <alex-custom-chip
-        v-else
-        class="mt-2"
-        text="Sem entrega"
-        variant="outlined"
-        size="small"
-      />
+      <alex-custom-chip v-else class="mt-2" text="Sem entrega" variant="outlined" size="small" />
     </div>
-
     <alex-learningplan-task-resources
       v-if="blocks && blocks.length > 0 && trail"
       v-model="resourcesOpen"
@@ -134,6 +110,15 @@
       :blocks="blocks"
       :task-member-id="taskMemberId"
     />
+
+    <div v-if="contractAddress" class="d-flex flex-column gap-8 mt-2">
+      <div class="d-flex flex-column gap-6">
+        <alex-learningplan-task-drawer-contracts-balance
+          :balance="contractBalance"
+          :text="$t('components.learningPlan.contract.reward.remaining')"
+        />
+      </div>
+    </div>
 
     <alex-learningplan-task-tabs
       v-model="activeTab"
@@ -236,6 +221,7 @@ interface DetailsDrawerProps {
   trail?: TrailSimple;
   restrictions?: string;
   taskEvents?: TaskEvent[];
+  contractAddress: string | null;
 }
 
 const props = withDefaults(defineProps<DetailsDrawerProps>(), {
@@ -253,7 +239,13 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   restrictions: '',
   taskEvents: () => [],
   submission: undefined,
+  contractAddress: null,
 });
+
+const { contractAddress } = toRefs(props);
+const { fetchContractReward, isThereAContract, contractBalance } = useContracts(contractAddress);
+
+await fetchContractReward();
 
 // Pegar esses dados
 const tags = ref<TagSimple[]>(props.tags);
@@ -302,12 +294,11 @@ const getEvents = (memberID: number) =>
     },
   });
 
-const { data: submissions, execute: executeSubmissions } =
-  await useTaskSubmission(taskMemberId, {
-    lazy: true,
-    watch: [taskMemberId],
-    dedupe: 'cancel',
-  });
+const { data: submissions, execute: executeSubmissions } = await useTaskSubmission(taskMemberId, {
+  lazy: true,
+  watch: [taskMemberId],
+  dedupe: 'cancel',
+});
 const {
   data: events,
   execute: executeEvents,
@@ -337,14 +328,8 @@ const evaluatedSubmissions = computed(() =>
       : [],
   ),
 );
-const mostRecentSubmission = computed(
-  () =>
-    submissions.value.data.filter((submission) => submission.evaluated_at)[0],
-);
-const getSubmissionStatus = (
-  submission?: TaskSubmissionSimple,
-  status?: TaskMemberStatus,
-) => {
+const mostRecentSubmission = computed(() => submissions.value.data.filter((submission) => submission.evaluated_at)[0]);
+const getSubmissionStatus = (submission?: TaskSubmissionSimple, status?: TaskMemberStatus) => {
   if (!submission) {
     return 'not_started';
   }
@@ -375,9 +360,7 @@ const handleSubmitMessage = async (
 ) => {
   try {
     if ((!text && !audio) || !user.value) return;
-    let learningMember = learningplanStore.activeMembers.find(
-      (member) => member.user.id === user?.value?.id,
-    );
+    let learningMember = learningplanStore.activeMembers.find((member) => member.user.id === user?.value?.id);
     if (learningplanStore.facilitator?.user.id === user.value.id) {
       learningMember = learningplanStore.facilitator;
     }
@@ -425,11 +408,7 @@ const handleSubmitMessage = async (
     });
     messages.value.data = [...messages.value.data, message];
   } catch (error) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.sendMessage'),
-      'error',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.errors.sendMessage'), 'error', true);
   } finally {
     isSendingMessage.value = false;
   }
@@ -520,6 +499,9 @@ watch(status, (newStatus, oldStatus) => {
       newStatus,
     );
   }
+});
+watch([contractAddress, isThereAContract], async () => {
+  await fetchContractReward();
 });
 </script>
 

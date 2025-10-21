@@ -22,4 +22,5 @@ export interface UserSimple {
   role: UserRoles;
   phone: string | null;
   info?: null;
+  user_wallet?: Wallet;
 }

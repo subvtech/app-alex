@@ -30,6 +30,7 @@
                   :over="setOver(i - 1)"
                   :drag-from="dragFrom"
                   :dragging="dragging"
+                  :handle-pending-contract="handlePendingContract"
                   @start-drag="startDrag"
                   @drag-over="onDragOver"
                   @drag-end="onDrop"
@@ -99,8 +100,9 @@
     :start-date="taskDetails?.start_at"
     :end-date="taskDetails?.finish_at"
     :restrictions="taskDetails?.allowed_editor_plugins"
-    :editable="true"
-    :kanban-button="true"
+    :contract-address="taskDetails?.contract_address"
+    editable
+    kanban-button
     @change-goals="handleChangeGoals"
     @change-values="handleChangeValues"
     @change-description="handleChangeDescription"
@@ -343,6 +345,22 @@ const taskDetails = computed(() => {
   return null;
 });
 
+const contractAddress = ref(taskDetails.value?.contract_address || null);
+const { cancelContract, getContractBalance } = useContracts(contractAddress);
+
+const handlePendingContract = async () => {
+  let isThereAPendingContract = !!taskDetails?.value?.contract_address;
+  if (isThereAPendingContract) {
+    const balance = await getContractBalance();
+    if (balance && Number(balance) > 0) {
+      const result = await cancelContract();
+      if (result) isThereAPendingContract = false;
+    }
+  }
+
+  return isThereAPendingContract;
+};
+
 const filteredTasks = computed(() => {
   const draft = tasksArray.value[0].filter((task) =>
     task.title.toLowerCase().includes(searchField.value.toLowerCase()),
@@ -505,6 +523,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.type = values.type;
     task.start_at = values.start_at;
     task.finish_at = values.finish_at;
+    task.contract_address = values.contract_address!;
     task.submission_required = values.submission_required!;
     task.can_submit_after_deadline = values.can_submit_after_deadline!;
     task.allowed_editor_plugins = values.allowed_editor_plugins!;
@@ -562,7 +581,9 @@ const handleChangeMembers = async () => {
       populate: [
         'task_submission',
         'learning_plan_group.group_members.student_member.user.avatar',
+        'learning_plan_group.group_members.student_member.user.user_wallet',
         'learning_plan_member.user.avatar',
+        'learning_plan_member.user.user_wallet',
         'learning_plan_member.learning_class',
       ],
       filters: {

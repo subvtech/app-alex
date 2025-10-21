@@ -37,6 +37,7 @@
     <alex-learningplan-task-drawer-details
       v-if="selectedTask?.task"
       v-model="detailsDrawer"
+      v-model:contract-address="selectedTask.task.contract_address"
       :task-id="selectedTask.task.id"
       :learningplan-id="learningplanId"
       :doc-name="selectedTask.doc_name"
