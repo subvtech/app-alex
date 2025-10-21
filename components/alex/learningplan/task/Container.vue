@@ -1,7 +1,8 @@
 <template>
   <div v-for="i in 4" :key="i">
     <Transition name="slide">
-      <v-expansion-panels v-if="shouldDisplay(i)" v-model="expand[i - 1]" class="task-accordion my-6 rounded-lg">
+      <!-- v-if="shouldDisplay(i)" -->
+      <v-expansion-panels v-model="expand[i - 1]" class="task-accordion my-6 rounded-lg">
         <v-expansion-panel class="rounded-lg">
           <v-expansion-panel-title class="cursor-default" disabled hide-actions>
             <v-icon :icon="expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'" @click="toggleExpand(i)" />
@@ -13,7 +14,7 @@
               <div v-if="!tasksArray[i - 1].length && i">
                 <alex-learningplan-task-empty-state
                   key="empty-state"
-                  :type="taskSectionsValue[i]"
+                  :type="taskSectionsValue[i - 1]"
                   :index="i"
                   :drop-area="over.list === groups[i - 1]"
                   @drag-over="handleEmptyStateOver"

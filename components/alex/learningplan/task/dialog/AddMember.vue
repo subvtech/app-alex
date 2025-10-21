@@ -14,9 +14,7 @@
       v-model="search"
       name="search"
       class="tw-mb-6"
-      :placeholder="
-        $t('components.learningPlan.drawer.task.dialog.searchMembers')
-      "
+      :placeholder="$t('components.learningPlan.drawer.task.dialog.searchMembers')"
       prepend-inner-icon="mdi-magnify"
       density="comfortable"
       hide-details
@@ -26,23 +24,11 @@
     </p>
     <v-expansion-panels class="task-student-card" multiple>
       <template v-for="classValue in filteredClasses" :key="classValue.id">
-        <v-expansion-panel v-if="classValue.learning_plan_members?.length">
+        <v-expansion-panel>
           <v-expansion-panel-title
             ><alex-inputs-checkbox
-              :model-value="
-                !!getSelectedUsersStatus(
-                  classValue.id,
-                  filteredClasses,
-                  selectedUsers,
-                )
-              "
-              :indeterminate="
-                getSelectedUsersStatus(
-                  classValue.id,
-                  filteredClasses,
-                  selectedUsers,
-                ) === -1
-              "
+              :model-value="!!getSelectedUsersStatus(classValue.id, filteredClasses, selectedUsers)"
+              :indeterminate="getSelectedUsersStatus(classValue.id, filteredClasses, selectedUsers) === -1"
               class="checkbox"
               @click.stop="selectAllUsers(classValue.id, classes.data)"
             />
@@ -58,12 +44,11 @@
                 :user="{
                   name: member.user.fullname,
                   email: member.email,
-                  image:
-                    member.user?.avatar?.formats?.small?.url ||
-                    member.user?.avatar?.url,
+                  image: member.user?.avatar?.formats?.small?.url || member.user?.avatar?.url,
                 }"
                 no-chip
                 :is-selected-value="
+                  !!membersID.some((memberId) => memberId === member.id) ||
                   !!selectedUsers.find((user) => user.id === member.id)
                 "
                 @click.stop="selectUser(member)"
@@ -90,9 +75,7 @@ const emit = defineEmits<Emits>();
 const search = ref('');
 const loadingAdd = ref(false);
 const strapi = useStrapiUtils();
-const membersID = computed(() =>
-  props.members.map((member) => member.learning_plan_member?.id),
-);
+const membersID = computed(() => props.members.map((member) => member.learning_plan_member?.id));
 const getMembers = (learningplanId: number) =>
   strapi.find<ClassSimple>('classes', {
     populate: {
@@ -105,11 +88,11 @@ const getMembers = (learningplanId: number) =>
             fields: ['id'],
           },
         },
-        filters: {
-          id: {
-            $notIn: membersID.value,
-          },
-        },
+        // filters: {
+        //   id: {
+        //     $notIn: membersID.value,
+        //   },
+        // },
       },
     },
     filters: { learningplan: learningplanId },
@@ -118,14 +101,10 @@ const {
   data: classes,
   execute,
   refresh,
-} = await useAsyncData(
-  'classes-member-invite',
-  () => getMembers(props.learningplanId),
-  {
-    default: () => ({ meta: 0, data: [] as ClassSimple[] }),
-    lazy: true,
-  },
-);
+} = await useAsyncData('classes-member-invite', () => getMembers(props.learningplanId), {
+  default: () => ({ meta: 0, data: [] as ClassSimple[] }),
+  lazy: true,
+});
 const selectedUsers = ref<LearningPlanMemberSimple[]>([]);
 const filteredClasses = computed(() => {
   if (!search.value) return classes.value.data;
@@ -141,37 +120,25 @@ const filteredClasses = computed(() => {
   }));
 });
 const hasStudentsToAdd = computed(
-  () =>
-    filteredClasses.value.filter(
-      (studentClass) => !!studentClass.learning_plan_members?.length,
-    ).length > 0,
+  () => filteredClasses.value.filter((studentClass) => !!studentClass.learning_plan_members?.length).length > 0,
 );
 const selectUser = (user: LearningPlanMemberSimple) => {
-  const alreadyUser = selectedUsers.value.find(
-    (already) => user.id === already.id,
-  );
+  const alreadyUser = selectedUsers.value.find((already) => user.id === already.id);
   if (alreadyUser) {
-    selectedUsers.value = selectedUsers.value.filter(
-      (user) => user.id !== alreadyUser.id,
-    );
+    selectedUsers.value = selectedUsers.value.filter((user) => user.id !== alreadyUser.id);
     return;
   }
   selectedUsers.value = [...selectedUsers.value, toRaw(user)];
 };
 const getAllStudentsByClass = (classID: number, classesArray: ClassSimple[]) =>
-  classesArray.flatMap((classValue) =>
-    classValue.id === classID ? toRaw(classValue.learning_plan_members!) : [],
-  );
+  classesArray.flatMap((classValue) => (classValue.id === classID ? toRaw(classValue.learning_plan_members!) : []));
 const getSelectedUsersStatus = (
   classID: number,
   classesArray: ClassSimple[],
   selectedUsers: LearningPlanMemberSimple[],
 ) => {
   const users = getAllStudentsByClass(classID, classesArray);
-  const unSelectedUsers = users.filter(
-    (user) =>
-      !selectedUsers.find((selectedUser) => user.id === selectedUser.id),
-  );
+  const unSelectedUsers = users.filter((user) => !selectedUsers.find((selectedUser) => user.id === selectedUser.id));
   if (users.length === unSelectedUsers.length) {
     return 0; // No one selected
   }
@@ -183,13 +150,10 @@ const getSelectedUsersStatus = (
 const selectAllUsers = (classID: number, classesArray: ClassSimple[]) => {
   const users = getAllStudentsByClass(classID, classesArray);
   const unSelectedUsers = users.filter(
-    (user) =>
-      !selectedUsers.value.find((selectedUser) => user.id === selectedUser.id),
+    (user) => !selectedUsers.value.find((selectedUser) => user.id === selectedUser.id),
   );
   if (!unSelectedUsers.length) {
-    selectedUsers.value = selectedUsers.value.filter(
-      (user) => user.learning_class?.id !== classID,
-    );
+    selectedUsers.value = selectedUsers.value.filter((user) => user.learning_class?.id !== classID);
     return;
   }
   selectedUsers.value = [...selectedUsers.value, ...users];
