@@ -68,9 +68,7 @@ const sprintGroups = computed(() => sprints.value.map((s) => s.group));
 const isFilterActive = computed(() => !isEmpty(props.filter));
 
 const filteredTasks = computed(() => {
-  return backlogTasks.value.filter((task) =>
-    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
-  );
+  return backlogTasks.value.filter((task) => task.title.toLowerCase().includes(searchField.value.toLowerCase()));
 });
 
 const slideTransition = () => {
@@ -159,9 +157,7 @@ const toggleExpand = () => {
 
 const handleDeleteTask = async (id: number) => {
   try {
-    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex(
-      (task) => task.id === id,
-    );
+    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex((task) => task.id === id);
 
     if (+deleteIndex! > -1) {
       learningPlanStore.learningPlan?.tasks.splice(deleteIndex!, 1);
@@ -174,13 +170,7 @@ const handleDeleteTask = async (id: number) => {
   }
 };
 
-const handleMoveTask = async ({
-  id,
-  status,
-}: {
-  id: number;
-  status: TaskStatus;
-}) => {
+const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
   try {
     const taskPosition = getHigherIndex();
     const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
@@ -246,36 +236,16 @@ onMounted(async () => {
 <template>
   <div v-if="learningPlanStore.learningPlan">
     <Transition name="slide">
-      <v-expansion-panels
-        v-model="expandBacklog"
-        class="task-accordion my-6 rounded-lg"
-      >
+      <v-expansion-panels v-model="expandBacklog" class="task-accordion my-6 rounded-lg">
         <v-expansion-panel class="rounded-lg">
-          <v-expansion-panel-title
-            class="tw-cursor-default"
-            disabled
-            hide-actions
-          >
-            <v-icon
-              :icon="
-                expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'
-              "
-              @click="toggleExpand"
-            />
+          <v-expansion-panel-title class="tw-cursor-default" disabled hide-actions>
+            <v-icon :icon="expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'" @click="toggleExpand" />
             <span class="text-h5 text-gray-800">
               {{ taskSections[backlogIndex - 1] }}
             </span>
-            <alex-custom-chip
-              status="secondary"
-              size="small"
-              :text="filteredTasks.length.toString()"
-            />
+            <alex-custom-chip status="secondary" size="small" :text="filteredTasks.length.toString()" />
             <div class="ml-auto">
-              <alex-custom-dropdown
-                variant="text"
-                icon="mdi-plus"
-                :items="editSprints"
-              />
+              <alex-custom-dropdown variant="text" icon="mdi-plus" :items="editSprints" />
             </div>
           </v-expansion-panel-title>
           <v-expansion-panel-text>
@@ -337,11 +307,7 @@ onMounted(async () => {
                     @keyup.esc="isCreatingTask = false"
                     @keyup.enter="handleCreateTask"
                   />
-                  <alex-custom-button
-                    size="large"
-                    :loading="loader"
-                    @click="handleCreateTask"
-                  >
+                  <alex-custom-button size="large" :loading="loader" @click="handleCreateTask">
                     {{ $t('pages.task.addButton') }}
                   </alex-custom-button>
                 </div>
@@ -353,11 +319,7 @@ onMounted(async () => {
     </Transition>
     <div class="tw-flex tw-w-full tw-justify-between">
       <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
-      <alex-custom-button
-        size="large"
-        prepend-icon="alex:Sprint"
-        @click="createSprintDialog = true"
-      >
+      <alex-custom-button size="large" prepend-icon="alex:Sprint" @click="createSprintDialog = true">
         {{ 'Nova Sprint' }}
       </alex-custom-button>
     </div>
