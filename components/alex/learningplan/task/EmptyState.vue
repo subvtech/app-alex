@@ -8,9 +8,9 @@
     >
       <v-fade-transition>
         <div v-if="!dropArea">
-          <v-img :src="taskSections[type].image" class="max-w-40 mb-4 mx-auto height-30 width-40"></v-img>
+          <v-img :src="taskSections[type]?.image" class="max-w-40 mb-4 mx-auto height-30 width-40"></v-img>
           <p class="text-h4 text-gray-400 text-center">
-            {{ taskSections[type].text }}
+            {{ taskSections[type]?.text }}
           </p>
         </div>
       </v-fade-transition>
