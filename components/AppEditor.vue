@@ -6,8 +6,7 @@
       :class="[
         viewerId,
         {
-          'disabled-paragraph':
-            allowedBlocks !== undefined && allowedBlocks?.length <= 2,
+          'disabled-paragraph': allowedBlocks !== undefined && allowedBlocks?.length <= 2,
         },
       ]"
       :is-editing="isEditing"
@@ -18,11 +17,7 @@
       @dragleave.prevent="handleDragLeave"
       @drop.prevent="handleDrop"
     ></div>
-    <alex-custom-viewer
-      ref="viewer"
-      v-model="viewerInstance"
-      :container="viewerId"
-    />
+    <alex-custom-viewer ref="viewer" v-model="viewerInstance" :container="viewerId" />
   </client-only>
 </template>
 
@@ -129,20 +124,8 @@ const handleDrop = (event: DragEvent) => {
     if (dropFiles?.length === 1 && dropFiles[0].type.startsWith('image')) {
       instance.value.blocks.insert('image', { file: dropFiles });
     } else if (dropFiles) {
-      instance.value.blocks.insert(
-        'fileset',
-        { dropFiles },
-        {},
-        instance.value.blocks.getBlocksCount() + 1,
-        false,
-      );
-      instance.value.blocks.insert(
-        'paragraph',
-        {},
-        {},
-        instance.value.blocks.getBlocksCount() + 1,
-        true,
-      );
+      instance.value.blocks.insert('fileset', { dropFiles }, {}, instance.value.blocks.getBlocksCount() + 1, false);
+      instance.value.blocks.insert('paragraph', {}, {}, instance.value.blocks.getBlocksCount() + 1, true);
       instance.value.caret.setToLastBlock('start', 0);
     }
   }
@@ -236,13 +219,7 @@ const toggleReadOnly = (mode: string) => {
     isEditing.value = !instance.value.readOnly.isEnabled;
     if (!instance.value.readOnly.isEnabled && props.keyId === 'editorjs') {
       const index = instance.value.blocks.getBlocksCount();
-      await instance.value.blocks.insert(
-        'paragraph',
-        { text: ' ' },
-        {},
-        index + 1,
-        true,
-      );
+      await instance.value.blocks.insert('paragraph', { text: ' ' }, {}, index + 1, true);
       setTimeout(() => {
         instance.value.focus(true);
         const block = instance.value.blocks.getBlockByIndex(index);
@@ -403,10 +380,7 @@ const blockToolsMap = {
         slides.forEach((slide) => {
           if (slide.url instanceof File) {
             formData.append('files', slide.url, slide.title);
-          } else if (
-            typeof slide.url === 'string' &&
-            slide.url.startsWith('data:')
-          ) {
+          } else if (typeof slide.url === 'string' && slide.url.startsWith('data:')) {
             const base64Data = slide.url.split(',')[1];
             const binaryString = window.atob(base64Data);
             const byteArray = new Uint8Array(binaryString.length);
@@ -535,6 +509,7 @@ defineExpose({
   }
   .ce-block__content {
     margin: 0;
+    flex: 1 1 0px;
     max-width: none;
   }
   &[is-editing='true'] {
