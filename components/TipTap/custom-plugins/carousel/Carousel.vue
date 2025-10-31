@@ -262,14 +262,22 @@ const captureVideoFrame = (file: File) => {
   });
 };
 
+function extractYoutubeId(url: string) {
+  const shortLinkMatch = url.match(/youtu\.be\/([^?&#]+)/);
+  if (shortLinkMatch?.[1]) return shortLinkMatch[1];
+
+  const embedMatch = url.match(/embed\/([^?&#]+)/);
+  if (embedMatch?.[1]) return embedMatch[1];
+
+  const paramMatch = url.match(/[?&]v=([^?&#]+)/);
+  if (paramMatch?.[1]) return paramMatch[1];
+
+  return '';
+}
+
 function getYoutubeThumbnail(url: string) {
-  const isEncurtedLink = url.match(/\b(\.be)\b/);
-  if (isEncurtedLink) {
-    return `https://img.youtube.com/vi/${
-      url.split('.be/')[1].split('?')[0]
-    }/0.jpg`;
-  }
-  return `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`;
+  const videoId = extractYoutubeId(url);
+  return videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : '';
 }
 
 function getVimeoThumbnail(url: string) {
