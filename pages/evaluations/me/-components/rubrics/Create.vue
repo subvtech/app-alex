@@ -1,10 +1,10 @@
 <template>
   <alex-custom-dialog
     v-model="open"
-    :title="props.editContent ? $t(`${i18Dir}.editRubric`) : $t(`${i18Dir}.createTitle`)"
-    :main-button-text="props.editContent ? $t(`${i18Dir}.edit`) : $t(`${i18Dir}.create`)"
+    :title="props.editContent && !props.editContent?.create ? $t(`${i18Dir}.editRubric`) : $t(`${i18Dir}.createTitle`)"
+    :main-button-text="props.editContent && !props.editContent?.create ? $t(`${i18Dir}.edit`) : $t(`${i18Dir}.create`)"
     :secondary-button-text="$t(`${i18Dir}.cancel`)"
-    :main-button-icon="props.editContent ? 'mdi-pencil' : 'mdi-plus'"
+    :main-button-icon="props.editContent && !props.editContent?.create ? 'mdi-pencil' : 'mdi-plus'"
     secondary-button-icon="mdi-close"
     body-classes="bg-white d-flex justify-center align-center flex-column py-6"
     :max-width="1500"
@@ -138,14 +138,24 @@ const saveRubric = () => {
     evaluation_criterias: criteria,
   };
 
-  if (!props.editContent || props?.editContent?.task_submission_evaluations?.length) {
+  const shouldCreate =
+    !props.editContent ||
+    !props.editContent.id ||
+    (props.editContent && props.editContent?.create) ||
+    Boolean(props.editContent.task_submission_evaluations?.length);
+
+  if (shouldCreate) {
     createRubric(evaluationGroup, content);
-  } else if (props.editContent) {
-    editRubric(evaluationGroup, content);
+    return;
   }
+
+  editRubric(evaluationGroup, content);
 };
 
 const createRubric = async (evaluationGroup, content) => {
+  console.log('Evaluation:', evaluationGroup);
+  console.log('Content:', content);
+  // return;
   isLoading.value = true;
   try {
     await strapiClient('/evaluation-groups/create-group', {
@@ -158,7 +168,7 @@ const createRubric = async (evaluationGroup, content) => {
 
     // Caso a rubrica já esteja associada a uma avaliação, será criada
     // uma nova e a original será marcada como desabilitada (disabled_at)
-    if (props.editContent) {
+    if (props.editContent?.id) {
       await update('evaluation-groups', props.editContent.id, {
         disabled_at: new Date(),
       });
