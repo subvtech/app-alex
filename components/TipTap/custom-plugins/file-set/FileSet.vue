@@ -66,16 +66,20 @@
         >
           <span class="text-body-2 text-uppercase">{{ file.extension }}</span>
         </div>
-        <div class="d-flex ga-3 w-100 pa-3">
-          <div class="d-flex flex-column">
-            <span class="text-body-2 text-gray-900 ellipsis lines-1 width-28">{{
-              file.title
-            }}</span>
-            <span class="text-body-5 text-gray-500">{{
-              formatFileSize(file.size)
-            }}</span>
+        <div class="file-content d-flex ga-3 pa-3">
+          <div class="file-text d-flex flex-column min-w-0">
+            <span class="text-body-2 text-gray-900 ellipsis lines-1">{{ file.title }}</span>
+            <span class="text-body-5 text-gray-500">{{ formatFileSize(file.size) }}</span>
           </div>
-          <div class="min-w-7 d-flex justify-center align-center">
+          <div class="file-actions d-flex justify-center align-center">
+            <v-btn
+              :loading="isDownloading.includes(file.id)"
+              variant="text"
+              size="small"
+              icon="mdi-cloud-download-outline"
+              @click="downloadFile(file.url, file.title, file.id)"
+            >
+            </v-btn>
             <v-btn
               v-if="!readOnly"
               color="error-0"
@@ -83,15 +87,6 @@
               icon="mdi-trash-can-outline"
               size="small"
               @click="() => deleteFile(file)"
-            >
-            </v-btn>
-            <v-btn
-              v-else
-              :loading="isDownloading.includes(file.id)"
-              variant="text"
-              size="small"
-              icon="mdi-cloud-download-outline"
-              @click="downloadFile(file.url, file.title, file.id)"
             >
             </v-btn>
           </div>
@@ -134,9 +129,7 @@ const props = defineProps({
 const readOnly = computed(() => props.extension.options.readOnly());
 
 const filesArray = ref<FileType[]>(
-  Array.isArray(props.node.attrs.files)
-    ? [...(props.node.attrs.files as FileType[])]
-    : [],
+  Array.isArray(props.node.attrs.files) ? [...(props.node.attrs.files as FileType[])] : [],
 );
 
 watch(
@@ -233,11 +226,7 @@ const downloadFile = (url: string, title: string, id: string) => {
       URL.revokeObjectURL(href);
     })
     .catch((_) => {
-      setMessage(
-        t('components.editorjs.fileSet.error.download'),
-        'error',
-        true,
-      );
+      setMessage(t('components.editorjs.fileSet.error.download'), 'error', true);
     })
     .finally(() => {
       isDownloading.value.splice(isDownloading.value.indexOf(id), 1);
@@ -317,6 +306,21 @@ const deleteFile = (file: FileType) => {
 
 .h-62 {
   height: 62px;
+}
+
+.file-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.file-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.file-actions {
+  flex-shrink: 0;
+  column-gap: 4px;
 }
 
 .drop-area {
