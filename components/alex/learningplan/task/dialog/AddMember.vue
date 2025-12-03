@@ -47,10 +47,8 @@
                   image: member.user?.avatar?.formats?.small?.url || member.user?.avatar?.url,
                 }"
                 no-chip
-                :is-selected-value="
-                  !!membersID.some((memberId) => memberId === member.id) ||
-                  !!selectedUsers.find((user) => user.id === member.id)
-                "
+                :selected="isExistingMember(member)"
+                :is-selected-value="isExistingMember(member) || isTempSelected(member)"
                 @click.stop="selectUser(member)"
               />
             </v-slide-y-transition>
@@ -74,29 +72,81 @@ type Emits = {
 const emit = defineEmits<Emits>();
 const search = ref('');
 const loadingAdd = ref(false);
-const strapi = useStrapiUtils();
-const membersID = computed(() => props.members.map((member) => member.learning_plan_member?.id));
-const getMembers = (learningplanId: number) =>
-  strapi.find<ClassSimple>('classes', {
-    populate: {
-      learning_plan_members: {
-        populate: {
-          user: {
-            populate: ['avatar'],
-          },
-          learning_class: {
-            fields: ['id'],
-          },
+const strapiUtils = useStrapiUtils();
+const membersID = ref<number[]>([]);
+const existingMembersSet = computed(() => new Set(membersID.value));
+const normalizeMemberId = (member?: { id?: number }) => (typeof member?.id === 'number' ? member.id : null);
+const isExistingMember = (member: { id?: number }) => {
+  const id = normalizeMemberId(member);
+  return id !== null && existingMembersSet.value.has(id);
+};
+const isTempSelected = (member: { id?: number }) => !!selectedUsers.value.find((u) => u.id === member.id);
+
+const fetchAllPages = async <T,>(contentType: string, params: any, pageSize = 100) => {
+  let page = 1;
+  let total = 0;
+  const data: T[] = [];
+
+  do {
+    const response = await strapiUtils.find<T>(contentType, {
+      ...params,
+      pagination: { page, pageSize },
+    });
+    data.push(...response.data);
+    total = response.meta?.pagination?.total ?? data.length;
+    page += 1;
+  } while (data.length < total);
+
+  return data;
+};
+
+const fetchClassMembers = (classId: number) =>
+  fetchAllPages<LearningPlanMemberSimple>(
+    'learning-plan-members',
+    {
+      filters: { learning_class: classId },
+      populate: {
+        user: {
+          populate: ['avatar'],
         },
-        // filters: {
-        //   id: {
-        //     $notIn: membersID.value,
-        //   },
-        // },
+        learning_class: {
+          fields: ['id'],
+        },
       },
     },
-    filters: { learningplan: learningplanId },
+    100,
+  );
+
+const getMembers = async (learningplanId: number) => {
+  const classes = await fetchAllPages<ClassSimple>(
+    'classes',
+    {
+      filters: { learningplan: learningplanId },
+    },
+    100,
+  );
+
+  const classesWithMembers = await Promise.all(
+    classes.map(async (classValue) => ({
+      ...classValue,
+      learning_plan_members: await fetchClassMembers(classValue.id),
+    })),
+  );
+
+  const allMembersId: number[] = [];
+  classesWithMembers.forEach((learningClass) => {
+    learningClass.learning_plan_members.forEach((member) => {
+      allMembersId.push(member.id);
+    });
   });
+
+  membersID.value = allMembersId;
+
+  return {
+    meta: { total: classesWithMembers.length },
+    data: classesWithMembers,
+  };
+};
 const {
   data: classes,
   execute,
@@ -123,6 +173,8 @@ const hasStudentsToAdd = computed(
   () => filteredClasses.value.filter((studentClass) => !!studentClass.learning_plan_members?.length).length > 0,
 );
 const selectUser = (user: LearningPlanMemberSimple) => {
+  if (existingMembersSet.value.has(user.id)) return;
+
   const alreadyUser = selectedUsers.value.find((already) => user.id === already.id);
   if (alreadyUser) {
     selectedUsers.value = selectedUsers.value.filter((user) => user.id !== alreadyUser.id);
@@ -138,7 +190,9 @@ const getSelectedUsersStatus = (
   selectedUsers: LearningPlanMemberSimple[],
 ) => {
   const users = getAllStudentsByClass(classID, classesArray);
-  const unSelectedUsers = users.filter((user) => !selectedUsers.find((selectedUser) => user.id === selectedUser.id));
+  const isSelected = (user: LearningPlanMemberSimple) =>
+    existingMembersSet.value.has(user.id) || selectedUsers.find((selectedUser) => user.id === selectedUser.id);
+  const unSelectedUsers = users.filter((user) => !isSelected(user));
   if (users.length === unSelectedUsers.length) {
     return 0; // No one selected
   }
@@ -149,14 +203,15 @@ const getSelectedUsersStatus = (
 };
 const selectAllUsers = (classID: number, classesArray: ClassSimple[]) => {
   const users = getAllStudentsByClass(classID, classesArray);
-  const unSelectedUsers = users.filter(
+  const eligibleUsers = users.filter((user) => !existingMembersSet.value.has(user.id));
+  const unSelectedUsers = eligibleUsers.filter(
     (user) => !selectedUsers.value.find((selectedUser) => user.id === selectedUser.id),
   );
   if (!unSelectedUsers.length) {
     selectedUsers.value = selectedUsers.value.filter((user) => user.learning_class?.id !== classID);
     return;
   }
-  selectedUsers.value = [...selectedUsers.value, ...users];
+  selectedUsers.value = [...selectedUsers.value, ...unSelectedUsers];
 };
 
 const handleSubmit = async () => {

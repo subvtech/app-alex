@@ -1,5 +1,11 @@
 <template>
-  <v-data-iterator :page="page" :items="filteredMembers" :items-per-page="itemsPerPage" class="members">
+  <v-data-iterator
+    :page="dataIteratorPage"
+    :items="displayedMembers"
+    :items-length="itemsLength"
+    :items-per-page="itemsPerPage"
+    class="members"
+  >
     <!-- Header -->
     <template v-if="!listGroupMembers" #header>
       <div class="header d-flex tw-align-center py-4 px-2">
@@ -145,20 +151,25 @@
       </div>
     </template>
 
-    <template #footer="{ pageCount, groupedItems }">
-      <div v-if="groupedItems.length && members.data.length > itemsPerPage" class="d-flex align-center ga-2 pa-6">
+    <template #footer="{ groupedItems }">
+      <div v-if="groupedItems.length && itemsLength > itemsPerPage" class="d-flex align-center ga-2 pa-6">
         <span class="flex-1-1">
-          {{ showingData(members.data, groupedItems as any[], search, pageCount) }}
+          {{ showingData(currentPagination) }}
         </span>
-        <alex-custom-pagination v-model="page" :length="pageCount" :total-visible="3" class="extra-mb" />
+        <alex-custom-pagination
+          v-model="page"
+          :length="currentPagination.pageCount || 1"
+          :total-visible="3"
+          class="extra-mb"
+        />
       </div>
     </template>
   </v-data-iterator>
 </template>
 
 <script setup lang="ts">
-import { MemberRoles } from '#imports';
 import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { MemberRoles } from '#imports';
 
 interface MembersProps {
   listGroupMembers?: boolean;
@@ -263,48 +274,68 @@ const normalizeText = (value?: string | null) =>
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
 
-const filteredMembers = computed(() => {
+const shouldFetchMembers = computed(() => props.kind !== 'project');
+
+const buildSearchFilters = (query: string) => {
+  if (!query) return undefined;
+  return {
+    $or: [
+      { learning_plan_member: { user: { fullname: { $containsi: query } } } },
+      { learning_plan_member: { learning_class: { name: { $containsi: query } } } },
+      { learning_plan_group: { title: { $containsi: query } } },
+      { learning_plan_group: { learning_class: { name: { $containsi: query } } } },
+      { learning_plan_group: { group_members: { student_member: { user: { fullname: { $containsi: query } } } } } },
+    ],
+  };
+};
+
+const projectFilteredMembers = computed(() => {
   const normalizedQuery = normalizeText(search.value).trim();
-  const baseMembers = props.kind === 'project' ? projectStudents.value : members.value?.data ?? [];
+  if (!normalizedQuery) return projectStudents.value;
 
-  if (!normalizedQuery) return baseMembers;
-
-  if (props.kind === 'project') {
-    return projectStudents.value.filter((member: any) => {
-      const name = normalizeText(
-        member?.learning_plan_member?.user?.fullname ?? member?.user?.fullname ?? member?.user?.name ?? '',
-      );
-      const className = normalizeText(
-        member?.learning_plan_member?.learning_class?.name ?? member?.learning_class?.name ?? '',
-      );
-
-      return name.includes(normalizedQuery) || className.includes(normalizedQuery);
-    });
-  }
-
-  return baseMembers.filter((member: any) => {
+  return projectStudents.value.filter((member: any) => {
     const name = normalizeText(
-      member?.learning_plan_member?.user?.fullname ??
-        member?.learning_plan_group?.title ??
-        member?.user?.fullname ??
-        member?.user?.name ??
-        '',
+      member?.learning_plan_member?.user?.fullname ?? member?.user?.fullname ?? member?.user?.name ?? '',
     );
-
     const className = normalizeText(
-      member?.learning_plan_member?.learning_class?.name ?? member?.learning_plan_group?.learning_class?.name ?? '',
+      member?.learning_plan_member?.learning_class?.name ?? member?.learning_class?.name ?? '',
     );
-
-    if (props.listGroupMembers && member?.learning_plan_group?.group_members?.length) {
-      const hitInGroup = member.learning_plan_group.group_members.some((groupMember: any) =>
-        normalizeText(groupMember?.student_member?.user?.fullname).includes(normalizedQuery),
-      );
-      return hitInGroup || name.includes(normalizedQuery) || className.includes(normalizedQuery);
-    }
 
     return name.includes(normalizedQuery) || className.includes(normalizedQuery);
   });
 });
+
+const displayedMembers = computed(() => {
+  if (props.kind === 'project') return projectFilteredMembers.value;
+  return members.value?.data ?? [];
+});
+
+const paginationMeta = computed(() => {
+  if (props.kind === 'project') {
+    const total = projectFilteredMembers.value.length;
+    const pageCount = Math.max(1, Math.ceil(total / itemsPerPage));
+    return {
+      page: Math.min(page.value, pageCount),
+      pageSize: itemsPerPage,
+      pageCount,
+      total,
+    };
+  }
+  return (
+    members.value?.meta?.pagination ?? {
+      page: page.value,
+      pageSize: itemsPerPage,
+      pageCount: 0,
+      total: 0,
+    }
+  );
+});
+
+const itemsLength = computed(() => paginationMeta.value.total ?? displayedMembers.value.length);
+
+const dataIteratorPage = computed(() => (props.kind === 'project' ? page.value : 1));
+
+const currentPagination = computed(() => paginationMeta.value);
 const handleAddGroup = () => {
   emit('change-members');
   refresh();
@@ -317,8 +348,9 @@ const checkHasFilledDates = () => {
   }
   return true;
 };
-const getMembers = (taskId: number) =>
-  strapiUtils.find<TaskMember>('task-members', {
+const getMembers = (taskId: number) => {
+  const searchQuery = search.value.trim();
+  return strapiUtils.find<TaskMember>('task-members', {
     populate: {
       task_submissions: {
         populate: ['justification'],
@@ -337,30 +369,38 @@ const getMembers = (taskId: number) =>
     },
     filters: {
       task: taskId,
+      ...(buildSearchFilters(searchQuery) || {}),
+    },
+    pagination: {
+      page: page.value,
+      pageSize: itemsPerPage,
     },
   });
-const showingData = (items: any[], pageItems: any[], search: string, pageCount: number) => {
-  const itemsPerPageCalc = search ? itemsPerPage : pageItems.length;
-  const range = pageItems.length < itemsPerPage ? 2 : 1;
-  const from = itemsPerPageCalc === 1 ? items.length : (page.value - 1) * itemsPerPageCalc + range;
-  const to = page.value === pageCount ? items.length : page.value * itemsPerPageCalc;
-  const total = items.length;
-  const message = t('pages.courses.showingData', {
+};
+const showingData = (pagination: { page: number; pageSize: number; total: number }) => {
+  const total = pagination.total || 0;
+  const from = total ? (pagination.page - 1) * pagination.pageSize + 1 : 0;
+  const to = total ? Math.min(pagination.page * pagination.pageSize, total) : 0;
+
+  return t('pages.courses.showingData', {
     from,
     to,
     total,
     entity: t('components.learningPlan.drawer.students'),
   });
-
-  return message;
 };
 
-const { data: members, refresh } = await useAsyncData('task-members', () => getMembers(props.taskId), {
-  default: () => ({
-    meta: { total: 0 },
-    data: [] as TaskMember[],
-  }),
-});
+const { data: members, refresh } = await useAsyncData(
+  'task-members',
+  () => (shouldFetchMembers.value ? getMembers(props.taskId) : { meta: { pagination: {} }, data: [] as TaskMember[] }),
+  {
+    default: () => ({
+      meta: { pagination: { total: 0, page: 1, pageSize: itemsPerPage, pageCount: 0 } },
+      data: [] as TaskMember[],
+    }),
+    watch: [page, search, () => props.taskId, shouldFetchMembers],
+  },
+);
 
 const addMember = async (members: LearningPlanMemberSimple[]) => {
   if (!props.type) {
@@ -473,13 +513,23 @@ const { data: classes } = await useAsyncData('classes-member-invite', () => getG
 watch(
   () => props.taskId,
   () => {
-    refresh();
+    if (shouldFetchMembers.value) {
+      refresh();
+    }
   },
 );
 
 watch(addGroupDialog, (value) => {
-  if (!value) {
+  if (!value && shouldFetchMembers.value) {
     refresh();
+  }
+});
+
+watch(projectFilteredMembers, () => {
+  if (props.kind !== 'project') return;
+  const maxPage = paginationMeta.value.pageCount || 1;
+  if (page.value > maxPage) {
+    page.value = maxPage;
   }
 });
 </script>
