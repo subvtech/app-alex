@@ -32,7 +32,11 @@ ENV TIPTAP_KEY=$tiptap_key
 RUN npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
 RUN npm config set //registry.tiptap.dev/:_authToken $tiptap_key
 
-RUN yarn --ignore-scripts
+RUN yarn config set network-timeout 600000 -g \
+ && yarn config set network-concurrency 1 -g \
+ && yarn config set registry https://registry.npmjs.org -g
+
+RUN yarn install --frozen-lockfile --non-interactive --ignore-scripts
 
 ADD --chown=alex:alex . .
 
@@ -43,6 +47,3 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 CMD node .output/server/index.mjs
-
-
-
