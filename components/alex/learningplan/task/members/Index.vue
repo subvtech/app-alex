@@ -23,6 +23,7 @@
           v-if="type === 'individual' && kind === 'task'"
           v-model="addMemberDialog"
           :learningplan-id="props.learningplanId"
+          :task-id="props.taskId"
           :members="members.data"
           @add-click="addMember"
         />
@@ -271,7 +272,7 @@ watch(search, () => {
 const normalizeText = (value?: string | null) =>
   (value ?? '')
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u0300-\u036F]/g, '')
     .toLowerCase();
 
 const shouldFetchMembers = computed(() => props.kind !== 'project');
@@ -390,8 +391,9 @@ const showingData = (pagination: { page: number; pageSize: number; total: number
   });
 };
 
+const taskMembersAsyncKey = 'task-members-index';
 const { data: members, refresh } = await useAsyncData(
-  'task-members',
+  taskMembersAsyncKey,
   () => (shouldFetchMembers.value ? getMembers(props.taskId) : { meta: { pagination: {} }, data: [] as TaskMember[] }),
   {
     default: () => ({
@@ -506,14 +508,21 @@ const getGroups = (learningplanId: number) =>
       learningplan: learningplanId,
     },
   });
-const { data: classes } = await useAsyncData('classes-member-invite', () => getGroups(props.learningplanId), {
+const classesMemberInviteKey = 'classes-member-invite-members-index';
+const { data: classes } = await useAsyncData(classesMemberInviteKey, () => getGroups(props.learningplanId), {
   default: () => ({ meta: 0, data: [] as ClassSimple[] }),
 });
 
 watch(
   () => props.taskId,
-  () => {
+  async () => {
+    page.value = 1;
+    search.value = '';
+    addMemberDialog.value = false;
+    addGroupDialog.value = false;
+    groupDialog.value = false;
     if (shouldFetchMembers.value) {
+      await nextTick();
       refresh();
     }
   },
