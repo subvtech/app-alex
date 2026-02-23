@@ -62,6 +62,7 @@
 <script setup lang="ts">
 interface AddStudent {
   learningplanId: number;
+  taskId: number;
   members: TaskMember[];
 }
 const model = defineModel<boolean>({ required: true });
@@ -73,8 +74,25 @@ const emit = defineEmits<Emits>();
 const search = ref('');
 const loadingAdd = ref(false);
 const strapiUtils = useStrapiUtils();
-const membersID = ref<number[]>([]);
-const existingMembersSet = computed(() => new Set(membersID.value));
+const existingTaskMemberIds = ref<number[]>([]);
+const syncedTaskId = ref<number | null>(null);
+let syncRequestId = 0;
+const getMemberIdsFromTaskMembers = (taskMembers: TaskMember[] = []) =>
+  taskMembers.flatMap((taskMember) => {
+    if (taskMember.learning_plan_member?.id) {
+      return [taskMember.learning_plan_member.id];
+    }
+    if (taskMember.learning_plan_group?.group_members?.length) {
+      return taskMember.learning_plan_group.group_members.map((groupMember) => groupMember.student_member.id);
+    }
+    return [];
+  });
+const existingMembersSet = computed(() => {
+  if (syncedTaskId.value === props.taskId) {
+    return new Set(existingTaskMemberIds.value);
+  }
+  return new Set(getMemberIdsFromTaskMembers(props.members));
+});
 const normalizeMemberId = (member?: { id?: number }) => (typeof member?.id === 'number' ? member.id : null);
 const isExistingMember = (member: { id?: number }) => {
   const id = normalizeMemberId(member);
@@ -117,6 +135,46 @@ const fetchClassMembers = (classId: number) =>
     100,
   );
 
+const fetchTaskMembers = (taskId: number) =>
+  fetchAllPages<TaskMember>(
+    'task-members',
+    {
+      filters: { task: taskId },
+      populate: {
+        learning_plan_member: {
+          fields: ['id'],
+        },
+        learning_plan_group: {
+          populate: {
+            group_members: {
+              populate: {
+                student_member: {
+                  fields: ['id'],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    100,
+  );
+
+const syncExistingTaskMembers = async () => {
+  if (!props.taskId) {
+    existingTaskMemberIds.value = [];
+    syncedTaskId.value = null;
+    return;
+  }
+  const currentRequestId = ++syncRequestId;
+  const taskMembers = await fetchTaskMembers(props.taskId);
+  if (currentRequestId !== syncRequestId) {
+    return;
+  }
+  existingTaskMemberIds.value = getMemberIdsFromTaskMembers(taskMembers);
+  syncedTaskId.value = props.taskId;
+};
+
 const getMembers = async (learningplanId: number) => {
   const classes = await fetchAllPages<ClassSimple>(
     'classes',
@@ -133,15 +191,6 @@ const getMembers = async (learningplanId: number) => {
     })),
   );
 
-  const allMembersId: number[] = [];
-  classesWithMembers.forEach((learningClass) => {
-    learningClass.learning_plan_members.forEach((member) => {
-      allMembersId.push(member.id);
-    });
-  });
-
-  membersID.value = allMembersId;
-
   return {
     meta: { total: classesWithMembers.length },
     data: classesWithMembers,
@@ -151,7 +200,7 @@ const {
   data: classes,
   execute,
   refresh,
-} = await useAsyncData('classes-member-invite', () => getMembers(props.learningplanId), {
+} = await useAsyncData('classes-member-invite-modal-add-member-dialog', () => getMembers(props.learningplanId), {
   default: () => ({ meta: 0, data: [] as ClassSimple[] }),
   lazy: true,
 });
@@ -228,8 +277,21 @@ watch(model, (value) => {
   if (value) {
     selectedUsers.value = [];
     execute();
+    syncExistingTaskMembers();
   }
 });
+
+watch(
+  () => props.taskId,
+  () => {
+    existingTaskMemberIds.value = [];
+    syncedTaskId.value = null;
+    selectedUsers.value = [];
+    if (model.value) {
+      syncExistingTaskMembers();
+    }
+  },
+);
 </script>
 
 <style lang="scss">
