@@ -69,7 +69,12 @@ const learningPlanId = computed(() => Number.parseInt(route.params?.id.toString(
 const headerStore = usePageHeaderStore();
 const selectedOption = ref<number | null>(null);
 const fetchData = async () => {
-  await useAsyncData('learningPlanDetails', () => learningPlanStore.loadLearningPlan(learningPlanId.value));
+  const requestedLearningPlanId = learningPlanId.value;
+  await learningPlanStore.loadLearningPlan(requestedLearningPlanId);
+
+  if (learningPlanStore.loading || learningPlanId.value !== requestedLearningPlanId) {
+    return;
+  }
 
   headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
