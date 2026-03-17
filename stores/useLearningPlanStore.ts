@@ -1,9 +1,8 @@
+import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
+import { LearningPlanMemberSimple, MemberStatus, MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
+import { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-
-import { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
-import { LearningPlanMemberSimple, MemberStatus, MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
-import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
 
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
@@ -13,6 +12,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const i18n = useI18n();
   const learningPlan = ref<LearningPlanSimple>();
   const loading = ref(true);
+  const latestRequestId = ref(0);
   const populate = {
     cover_image: true,
     media: true,
@@ -75,19 +75,35 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   };
 
   async function loadLearningPlan(id: number, showMessageIfNotFound = true) {
+    const requestId = ++latestRequestId.value;
+    const isDifferentLearningPlan = learningPlan.value?.id !== id;
+
     try {
       loading.value = true;
+      if (isDifferentLearningPlan) {
+        learningPlan.value = undefined;
+      }
       const result = await findOne<LearningPlanSimple>('learningplans', id, {
         populate,
       });
 
+      if (requestId !== latestRequestId.value) {
+        return;
+      }
+
       learningPlan.value = result.data;
-      loading.value = false;
       return result;
     } catch (e: any) {
-      loading.value = false;
+      if (requestId !== latestRequestId.value) {
+        return;
+      }
+
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
         setMessage(i18n.t('pages.courses.notfound'), 'red', true);
+      }
+    } finally {
+      if (requestId === latestRequestId.value) {
+        loading.value = false;
       }
     }
   }
@@ -96,11 +112,12 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     return learningPlan.value?.members.find((m: LearningPlanMemberSimple) => m.role === MemberRoles.FACILITATOR);
   });
 
+  const userLearningMember = computed(
+    () => learningPlan.value?.members.find((member) => member.user.id === user.value?.id),
+  );
+
   const userIsFacilitator = computed(() => {
-    return learningPlan.value?.members.some(
-      (m: LearningPlanMemberSimple) =>
-        (m?.role === MemberRoles.FACILITATOR || m?.role === MemberRoles.COLLABORATOR) && m?.user?.id === user.value?.id,
-    );
+    return [MemberRoles.FACILITATOR, MemberRoles.COLLABORATOR].includes(userLearningMember.value?.role as MemberRoles);
   });
 
   const startDateFormated = computed(() => {
@@ -200,10 +217,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
   const generalTags = computed(() => learningPlan.value?.tags?.filter((tag) => tag.isGeneral));
   const technicalTags = computed(() => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral));
-  const userLearningMember = computed(
-    () => learningPlan.value?.members.find((member) => member.user.id === user.value?.id),
-  );
-
   return {
     learningPlan,
     loadLearningPlan,
