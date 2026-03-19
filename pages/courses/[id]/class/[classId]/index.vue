@@ -20,7 +20,7 @@
       action-icon="mdi-email-outline"
       :dialog-title="$t('pages.classes.courseInvites')"
       :filter-keys="['user.fullname', 'email']"
-      :show-action="classStore.userCanEdit"
+      :hide-action="!userIsCourseFacilitator"
       :dialog-action-text="$t('pages.classes.sendInvites')"
       :dialog-action-loading="sendingInvites"
       :dialog-action-disabled="!usersToInvite.length"
@@ -89,7 +89,7 @@
       :dialog-action-text="dialogGroupActionText"
       :dialog-title="dialogGroupTitle"
       :filter-keys="['title']"
-      :show-action="classStore.userCanEdit"
+      :hide-action="!userIsCourseFacilitator"
       :dialog-action-loading="creatingGroup"
       :dialog-action-disabled="!formAddGroup.meta.value.valid"
       empty-state-object-name="pages.classes.participant"
@@ -249,6 +249,7 @@ const classStore = useClassStore();
 
 const route = useRoute();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const userIsCourseFacilitator = computed(() => learningPlanStore.userLearningMember?.role === 'facilitator');
 const sendingInvites = ref(false);
 const creatingGroup = ref(false);
 // Remove
@@ -283,6 +284,11 @@ function removeSelectedGroupMember(id: number) {
 }
 
 async function onClickSendInvites() {
+  if (!userIsCourseFacilitator.value) {
+    setMessage('Apenas facilitadores do curso podem convidar participantes para a turma.', 'red', true);
+    return;
+  }
+
   if (!usersToInvite.value.length) {
     return;
   }
@@ -307,6 +313,11 @@ async function onClickSendInvites() {
 }
 
 async function onCreateGroup() {
+  if (!userIsCourseFacilitator.value) {
+    setMessage('Apenas facilitadores do curso podem criar grupos na turma.', 'red', true);
+    return;
+  }
+
   const { valid } = await formAddGroup.validate();
   if (!valid) {
     return;

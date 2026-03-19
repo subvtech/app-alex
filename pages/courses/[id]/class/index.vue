@@ -16,7 +16,7 @@
       :action-text="$t('pages.classes.createClass')"
       action-icon="mdi-account-multiple-plus-outline"
       :filter-keys="['name']"
-      :hide-action="!learningPlanStore.userIsFacilitator"
+      :hide-action="!userIsCourseFacilitator"
       empty-state-object-name="pages.classes.participant"
       entity="class"
       hide-secondary-action
@@ -86,6 +86,7 @@ const strapi = useStrapi();
 const formAddGroup = useForm();
 
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const userIsCourseFacilitator = computed(() => learningPlanStore.userLearningMember?.role === 'facilitator');
 const dialogConfirmDeleteClass = ref(false);
 const searchClasses = ref('');
 const removingClassId = ref(0);
@@ -167,6 +168,11 @@ async function onUpdateClass(data) {
 }
 
 async function onCreateClass(data) {
+  if (!userIsCourseFacilitator.value) {
+    setMessage('Apenas facilitadores do curso podem criar turmas.', 'red', true);
+    return;
+  }
+
   try {
     isSubmitingForm.value = true;
 
