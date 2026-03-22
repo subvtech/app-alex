@@ -11,21 +11,12 @@
         class="tw-w-full"
         density="comfortable"
       />
-      <alex-custom-button
-        size="large"
-        variant="secondary"
-        prepend-icon="mdi-plus"
-        @click="handleOpenCreateGroup()"
-        >{{
-          $t('components.learningPlan.drawer.task.dialog.newGroup')
-        }}</alex-custom-button
-      >
+      <alex-custom-button size="large" variant="secondary" prepend-icon="mdi-plus" @click="handleOpenCreateGroup()">{{
+        $t('components.learningPlan.drawer.task.dialog.newGroup')
+      }}</alex-custom-button>
     </div>
     <v-expansion-panels class="task-student-card group" multiple>
-      <v-expansion-panel
-        v-for="classValue in filteredClasses"
-        :key="classValue.id"
-      >
+      <v-expansion-panel v-for="classValue in filteredClasses" :key="classValue.id">
         <v-expansion-panel-title>
           <p class="text-body-2 w-full text-gray-900">
             {{ classValue.name }}
@@ -39,10 +30,7 @@
             :unavailable="isUnvailable(group)"
             @add-members="(member) => openDialog(member)"
           />
-          <p
-            v-if="!classValue.learning_plan_groups?.length"
-            class="text-gray-500"
-          >
+          <p v-if="!classValue.learning_plan_groups?.length" class="text-gray-500">
             {{ $t('components.learningPlan.drawer.missing.groups') }}
           </p>
         </v-expansion-panel-text>
@@ -148,9 +136,10 @@ function handleOpenCreateGroup() {
   groupInfo.value = undefined;
 }
 
-function handleAddGroup() {
+async function handleAddGroup() {
   emit('add-group', 0);
   execute();
+  await loadAllTaskGroups();
 }
 
 const getGroups = (learningplanId: number) =>
@@ -167,13 +156,9 @@ const getGroups = (learningplanId: number) =>
     ],
     filters: { learningplan: learningplanId },
   });
-const { data: classes, execute } = await useAsyncData(
-  'classes-member-invite',
-  () => getGroups(props.learningplanId),
-  {
-    default: () => ({ meta: 0, data: [] as ClassSimple[] }),
-  },
-);
+const { data: classes, execute } = await useAsyncData('classes-member-invite', () => getGroups(props.learningplanId), {
+  default: () => ({ meta: 0, data: [] as ClassSimple[] }),
+});
 function openDialog(group: LearningPlanGroupSimple | undefined) {
   // const taskMember = group?.task_members;
 
@@ -188,9 +173,53 @@ function openDialog(group: LearningPlanGroupSimple | undefined) {
 
   groupDialog.value = true;
   groupInfo.value = group;
-  allGroups.value = props.taskMembers.flatMap((taskMember) =>
-    taskMember.learning_plan_group ? [taskMember.learning_plan_group] : [],
-  );
+}
+
+const ALL_TASK_GROUPS_PAGE_SIZE = 999;
+
+async function loadAllTaskGroups() {
+  if (!props.taskId) {
+    allGroups.value = [];
+    return;
+  }
+
+  try {
+    const { data } = await strapi.find<TaskMember>('task-members', {
+      populate: {
+        learning_plan_group: {
+          populate: {
+            group_members: {
+              populate: {
+                student_member: {
+                  populate: ['user'],
+                },
+              },
+            },
+          },
+        },
+      },
+      filters: {
+        task: props.taskId,
+      },
+      pagination: {
+        page: 1,
+        pageSize: ALL_TASK_GROUPS_PAGE_SIZE,
+      },
+      sort: ['id:asc'],
+    });
+
+    const uniqueGroups = new Map<number, LearningPlanGroupSimple>();
+    data.forEach((member) => {
+      const group = member.learning_plan_group;
+      if (group && !uniqueGroups.has(group.id)) {
+        uniqueGroups.set(group.id, group);
+      }
+    });
+
+    allGroups.value = Array.from(uniqueGroups.values());
+  } catch (error) {
+    allGroups.value = [];
+  }
 }
 
 const filteredClasses = computed(() => {
@@ -208,19 +237,15 @@ const filteredClasses = computed(() => {
 watch(model, (value) => {
   if (value) {
     execute();
-
-    allGroups.value = props.taskMembers.flatMap((taskMember) =>
-      taskMember.learning_plan_group ? [taskMember.learning_plan_group] : [],
-    );
+    loadAllTaskGroups();
   }
 });
 
 watch(
   () => props.taskMembers,
-  (members) => {
-    allGroups.value = members.flatMap((taskMember) =>
-      taskMember.learning_plan_group ? [taskMember.learning_plan_group] : [],
-    );
+  () => {
+    if (!model.value) return;
+    loadAllTaskGroups();
   },
 );
 </script>
