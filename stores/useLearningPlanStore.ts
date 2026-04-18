@@ -13,6 +13,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const learningPlan = ref<LearningPlanSimple>();
   const loading = ref(true);
   const latestRequestId = ref(0);
+  let pendingLearningPlanId: number | undefined;
+  let pendingLearningPlanRequest: Promise<any> | undefined;
+  let pendingLearningPlanRequestToken: symbol | undefined;
   const populate = {
     cover_image: true,
     media: true,
@@ -74,38 +77,55 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     },
   };
 
-  async function loadLearningPlan(id: number, showMessageIfNotFound = true) {
+  function loadLearningPlan(id: number, showMessageIfNotFound = true) {
+    if (pendingLearningPlanId === id && pendingLearningPlanRequest) {
+      return pendingLearningPlanRequest;
+    }
+
     const requestId = ++latestRequestId.value;
     const isDifferentLearningPlan = learningPlan.value?.id !== id;
+    const requestToken = Symbol('load-learning-plan');
+    pendingLearningPlanId = id;
+    pendingLearningPlanRequestToken = requestToken;
 
-    try {
-      loading.value = true;
-      if (isDifferentLearningPlan) {
-        learningPlan.value = undefined;
-      }
-      const result = await findOne<LearningPlanSimple>('learningplans', id, {
-        populate,
-      });
+    pendingLearningPlanRequest = (async () => {
+      try {
+        loading.value = true;
+        if (isDifferentLearningPlan) {
+          learningPlan.value = undefined;
+        }
+        const result = await findOne<LearningPlanSimple>('learningplans', id, {
+          populate,
+        });
 
-      if (requestId !== latestRequestId.value) {
-        return;
-      }
+        if (requestId !== latestRequestId.value) {
+          return;
+        }
 
-      learningPlan.value = result.data;
-      return result;
-    } catch (e: any) {
-      if (requestId !== latestRequestId.value) {
-        return;
-      }
+        learningPlan.value = result.data;
+        return result;
+      } catch (e: any) {
+        if (requestId !== latestRequestId.value) {
+          return;
+        }
 
-      if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
-        setMessage(i18n.t('pages.courses.notfound'), 'red', true);
+        if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
+          setMessage(i18n.t('pages.courses.notfound'), 'red', true);
+        }
+      } finally {
+        if (requestId === latestRequestId.value) {
+          loading.value = false;
+        }
+
+        if (pendingLearningPlanRequestToken === requestToken) {
+          pendingLearningPlanId = undefined;
+          pendingLearningPlanRequest = undefined;
+          pendingLearningPlanRequestToken = undefined;
+        }
       }
-    } finally {
-      if (requestId === latestRequestId.value) {
-        loading.value = false;
-      }
-    }
+    })();
+
+    return pendingLearningPlanRequest;
   }
 
   const facilitator = computed<LearningPlanMemberSimple | undefined>(() => {
