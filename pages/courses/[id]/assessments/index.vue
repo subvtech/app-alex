@@ -42,8 +42,6 @@ const { getLearningPlanGrades, createGradeMutation, deleteGradeMutation, getLear
   user,
 );
 
-console.log('Facilitator:', learningPlanStore.userIsFacilitator);
-
 const { data: learningPlanGrades } = getLearningPlanGrades();
 const { data: tasks } = getLearningPlanTasks();
 
@@ -67,16 +65,6 @@ const { mutate: deleteGrade } = deleteGradeMutation();
 const createAssessment = () => {
   createGradeAssessment({ learningplan: learningPlanId.value });
 };
-
-// Is facilitaror
-console.log('Facilitator:', learningPlanStore.userIsFacilitator);
-
-watch(
-  () => learningPlanStore.userIsFacilitator,
-  (val) => {
-    console.log('Facilitator:', val);
-  },
-);
 
 const assessments = computed<assessment[]>(() => {
   return learningPlanGrades.value?.map((grade) => {

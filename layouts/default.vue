@@ -32,9 +32,11 @@
 <script setup lang="ts">
 import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 import useNavigationDrawer from '~/composables/useNavigationDrawer';
+import { MemberRoles, MemberStatus } from '~/models/simple/learningPlanMemberSimple.model';
 const i18n = useI18n();
 const config = useRuntimeConfig();
 const router = useRouter();
+const { find } = useStrapiUtils();
 
 router.beforeEach(() => {
   headerStore.showHeader = false;
@@ -45,16 +47,62 @@ router.beforeEach(() => {
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 const { clipped, drawer, closeDrawable, isPermanent } = useNavigationDrawer();
+const hasEvaluationMemberAccess = ref(false);
 
 const headerStore = usePageHeaderStore();
 
 const { profileMenuItems } = useMainHorizontalBar();
 
-onBeforeMount(() => {
+const userHasProfessorRole = computed(() => {
+  return user.value?.role?.name === 'Professor' || user.value?.role?.type === 'professor';
+});
+
+const userCanAccessEvaluations = computed(() => {
+  return userHasProfessorRole.value || hasEvaluationMemberAccess.value;
+});
+
+const loadEvaluationMemberAccess = async () => {
+  if (!user.value?.id || userHasProfessorRole.value) {
+    hasEvaluationMemberAccess.value = false;
+    return;
+  }
+
+  try {
+    const response = await find<LearningPlanMemberSimple>('learning-plan-members', {
+      filters: {
+        user: {
+          id: user.value.id,
+        },
+        status: MemberStatus.JOINED,
+        role: {
+          $in: [MemberRoles.FACILITATOR, MemberRoles.COLLABORATOR],
+        },
+        learningplan: {
+          archived_at: {
+            $null: true,
+          },
+        },
+      },
+      fields: ['id'],
+      pagination: {
+        pageSize: 1,
+      },
+    });
+
+    hasEvaluationMemberAccess.value = Boolean(response.data.length);
+  } catch {
+    hasEvaluationMemberAccess.value = false;
+  }
+};
+
+onBeforeMount(async () => {
+  await loadEvaluationMemberAccess();
   if (!userStore.user) return;
   userStore.user.avatar = user.value?.avatar;
   userStore.user.fullname = user.value?.fullname;
 });
+
+watch(() => user.value?.id, loadEvaluationMemberAccess);
 
 // const steps = [
 //   {
@@ -179,7 +227,7 @@ interface Menu {
     to: string;
   }[];
 }
-const defaultMenus: Menu[] = [
+const defaultMenus = computed<Menu[]>(() => [
   {
     title: i18n.t('layouts.default.userArea'),
     items: [
@@ -198,7 +246,7 @@ const defaultMenus: Menu[] = [
         title: i18n.t('layouts.default.myProjects'),
         to: '/projects/me',
       },
-      ...(user.value?.role?.name === 'Professor'
+      ...(userCanAccessEvaluations.value
         ? [
             {
               icon: 'alex:FactCheck',
@@ -263,7 +311,7 @@ const defaultMenus: Menu[] = [
   //     },
   //   ],
   // },
-];
+]);
 
 const componentsMenu: Menu[] = [
   {
@@ -293,7 +341,7 @@ const adminMenus = [
 ];
 
 const menus = computed(() => {
-  const newMenus = user.value?.role?.name === 'ADMIN' ? defaultMenus.concat(adminMenus) : defaultMenus;
+  const newMenus = user.value?.role?.name === 'ADMIN' ? defaultMenus.value.concat(adminMenus) : defaultMenus.value;
 
   return config.public.showComponentsPage ? newMenus.concat(componentsMenu) : newMenus;
 });
