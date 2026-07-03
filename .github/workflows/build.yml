@@ -67,6 +67,10 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
+    env:
+      TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
+      TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -84,6 +88,7 @@ jobs:
           yarn install
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
+          TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
 
       - name: Install Vercel CLI
         run: npm install --global vercel
