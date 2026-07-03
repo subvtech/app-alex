@@ -38,7 +38,7 @@ Via HTTPS
 
 ```bash
 ## Clone o projeto
-git clone http://gitlab.profbrenojac.com.br/projeto-alex/app-alex.git
+git clone https://github.com/subvtech/APP-ALEX.git
 
 ## Instale as dependências
 yarn ou yarn install
@@ -57,46 +57,54 @@ STRAPI_URL=https://api-test.projetoalex.cc/
 
 ## Fluxo de merge request
 
-
 ### Cenário: Desenvolvimento da task
 
 ### Task criada
+
 Passo 1
-  - Crie sua branch a partir da 'develop'
-  - No Taiga mova sua task para 'Em andamento'
-  - Lembre-se sempre que antes de criar sua branch a 'develop' deve ser atualizada ( git pull )
+
+- Crie sua branch a partir da 'develop'
+- No Taiga mova sua task para 'Em andamento'
+- Lembre-se sempre que antes de criar sua branch a 'develop' deve ser atualizada ( git pull )
 
 ### Task finalizada
+
 Passo 2
-  - Crie um 'Merge request' apontado para 'develop'
-  - No Taiga mova sua task para 'Team review'
-  - No Discord acesse o canal 'Merge request' envie o link e marque com @desenvolvimento
-  - Sua task precisa ter no mínimo duas aprovações para que siga para o próximo passo
+
+- Crie um 'Merge request' apontado para 'develop'
+- No Taiga mova sua task para 'Team review'
+- No Discord acesse o canal 'Merge request' envie o link e marque com @desenvolvimento
+- Sua task precisa ter no mínimo duas aprovações para que siga para o próximo passo
 
 ### Merge Request aprovado
-Passo 3
-  - Crie um merge request para branch 'test'
-  - Faça o merge request para a branch 'test'
-  - No Taiga mova sua task para 'Pronto para teste'
-  - Notifique que foi feito o merge request da sua branch para que seja testado
 
+Passo 3
+
+- Crie um merge request para branch 'test'
+- Faça o merge request para a branch 'test'
+- No Taiga mova sua task para 'Pronto para teste'
+- Notifique que foi feito o merge request da sua branch para que seja testado
 
 ### Cenário: PR 'mergeado' no ambiente de teste
 
 ### Todos devem
 
-  - Testar as modificações feitas no ambiente de teste e caso identifique algum bug comente no MR apontado para 'develop'. Caso necessite o link do ambiente de teste está em links úteis
-  - No Taiga dentro da task comente o que você testou - Responsividade, comportamento etc
-  - Caso identifique algum bug não reportado anteriormente em 'issue' ou não relacionado a task já criada, crie uma 'issue' e adicione prints, texto, o que for necessário para ficar claro referente ao erro ocorrido
+- Testar as modificações feitas no ambiente de teste e caso identifique algum bug comente no MR apontado para 'develop'. Caso necessite o link do ambiente de teste está em links úteis
+- No Taiga dentro da task comente o que você testou - Responsividade, comportamento etc
+- Caso identifique algum bug não reportado anteriormente em 'issue' ou não relacionado a task já criada, crie uma 'issue' e adicione prints, texto, o que for necessário para ficar claro referente ao erro ocorrido
 
 ### Componente/função foi TESTADO
+
 Passo 5
-  - Aguarde decisão para subir para develop
-  - Após análise, se for aprovado, o merge request apontado para 'develop' será feito
+
+- Aguarde decisão para subir para develop
+- Após análise, se for aprovado, o merge request apontado para 'develop' será feito
 
 ### Componente/função foi REPROVADO
+
 Passo 6
-  - Faça a correção/melhoria na sua branch originalmente, e volte para o Passo 3
+
+- Faça a correção/melhoria na sua branch originalmente, e volte para o Passo 3
 
 ## Tecnologias
 
@@ -122,4 +130,3 @@ Passo 6
 [Landing page](https://www.figma.com/file/h4R6uVqSLqUIK0hUE5HW41/ALEX---Style-Guide?type=design&node-id=0-1&mode=design&t=5vlQMej8oYkDZrQP-0)
 
 [Plataforma](https://www.figma.com/file/E3PKAjADQAMaDQin8XiaHR/ALEX---Interfaces?type=design&node-id=0-1&mode=design&t=f0MiSZ8TSaDwnBUv-0)
-
