@@ -40,6 +40,8 @@ RUN yarn install --frozen-lockfile --non-interactive --ignore-scripts
 
 ADD --chown=alex:alex . .
 
+ENV NODE_OPTIONS="--max_old_space_size=4096"
+
 RUN yarn build
 
 ENV NODE_ENV=production
