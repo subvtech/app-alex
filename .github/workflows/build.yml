@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: davidsonaguiar/alex-app
+  DOCKER_IMAGE: projetoalex/alex-app
 
 jobs:
   docker-build:
