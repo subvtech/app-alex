@@ -1,0 +1,103 @@
+name: Build and Deploy Frontend
+
+on:
+  push:
+    branches:
+      - master
+      - test
+  pull_request:
+    branches:
+      - master
+      - test
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: projetoalex/alex-app
+
+jobs:
+  docker-build:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set environment variables by branch
+        id: vars
+        shell: bash
+        run: |
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            echo "tag=prod" >> "$GITHUB_OUTPUT"
+            echo "components_page=off" >> "$GITHUB_OUTPUT"
+            echo "strapi_url=${{ secrets.STRAPI_URL }}" >> "$GITHUB_OUTPUT"
+            echo "open_ai_key=${{ secrets.OPEN_AI_KEY }}" >> "$GITHUB_OUTPUT"
+            echo "matomo_app_id=${{ secrets.MATOMO_APP_ID }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=test" >> "$GITHUB_OUTPUT"
+            echo "components_page=on" >> "$GITHUB_OUTPUT"
+            echo "strapi_url=${{ secrets.STRAPI_TEST_URL }}" >> "$GITHUB_OUTPUT"
+            echo "open_ai_key=${{ secrets.OPEN_AI_KEY_TEST }}" >> "$GITHUB_OUTPUT"
+            echo "matomo_app_id=${{ secrets.MATOMO_APP_ID_TEST }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.DOCKER_IMAGE }}:v2-${{ steps.vars.outputs.tag }}
+          build-args: |
+            matomo_url=${{ secrets.MATOMO_URL }}
+            matomo_app_id=${{ steps.vars.outputs.matomo_app_id }}
+            strapi_url=${{ steps.vars.outputs.strapi_url }}
+            components_page=${{ steps.vars.outputs.components_page }}
+            open_ai_key=${{ steps.vars.outputs.open_ai_key }}
+            tiptap_app_id=${{ secrets.TIPTAP_APP_ID }}
+            tiptap_key=${{ secrets.TIPTAP_KEY }}
+  vercel-preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    env:
+      TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
+      TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: |
+          yarn config set registry https://registry.npmjs.org
+          yarn config set network-timeout 600000
+          yarn install
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
+          TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: NITRO_PRESET=vercel vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
