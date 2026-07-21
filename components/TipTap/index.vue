@@ -1,30 +1,17 @@
 <template>
   <client-only>
     <TipTap-loader v-if="isLoading" />
-    <div
-      ref="container"
-      class="rounded-lg w-100 tw-transition-opacity"
-      :class="{ 'tw-opacity-0': isLoading }"
-    >
-      <div
-        v-if="showMenuBar && edit"
-        :class="!fixedMenu ? 'bubble-menu-wrapper' : ''"
-      >
-        <tip-tap-menus-bubble
-          :editor="editor"
-          :fixed-menu-bar="fixedMenu"
-          @click.stop.prevent
-        />
+    <div ref="container" class="rounded-lg w-100 tw-transition-opacity" :class="{ 'tw-opacity-0': isLoading }">
+      <div v-show="showMenuBar && edit" ref="bubbleMenuRef" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
+        <tip-tap-menus-bubble :editor="editor" :fixed-menu-bar="fixedMenu" @click.stop.prevent />
       </div>
-      <editor-content
-        :class="!props.edit || props.noPadding ? 'no-padding' : ''"
-        :editor="editor"
-      />
+      <editor-content :class="!props.edit || props.noPadding ? 'no-padding' : ''" :editor="editor" />
     </div>
   </client-only>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, onBeforeUnmount, watch, PropType } from 'vue';
 import { Editor, EditorContent, AnyExtension } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/extension-bubble-menu';
 import { Collaboration } from '@tiptap/extension-collaboration';
@@ -57,7 +44,6 @@ import { Dropcursor } from '@tiptap/extension-dropcursor';
 import { Paragraph } from '@tiptap/extension-paragraph';
 
 import { common, createLowlight } from 'lowlight';
-
 import * as Y from 'yjs';
 
 import CustomMention from './custom-plugins/mentions/Extension';
@@ -70,6 +56,8 @@ import MediaUpload from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
 import { isTextSelected } from './menus/bubble/isTextSelected';
 import mentionSuggestion from './custom-plugins/mentions/Suggestions';
+
+const bubbleMenuRef = ref<HTMLElement | null>(null);
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
@@ -88,8 +76,8 @@ export type MentionUserPropsArray = MentionUserProps[];
 
 const props = defineProps({
   modelValue: {
-    type: String,
-    default: '',
+    type: [String, Object],
+    default: () => ({ type: 'doc', content: [{ type: 'paragraph' }] }),
   },
   edit: {
     type: Boolean,
@@ -132,12 +120,9 @@ const defaultBlock = computed(() => {
 });
 
 const showMenuBar = computed(() => {
-  return (
-    isEditable.value &&
-    (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'))
-  );
+  return isEditable.value && (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'));
 });
-// const mediaToDelete = ref<number[]>([]);
+
 const temporaryMedia = ref<number[]>([]);
 
 const editor = ref();
@@ -177,17 +162,9 @@ const getTipTapToken = async (userID: number | undefined) => {
   } catch (error) {
     const typedError = error as { error: { status: number } };
     if (typedError.error.status === 400) {
-      setMessage(
-        t('components.tiptap.messages.error.userNotLoggedIn'),
-        'error',
-        true,
-      );
+      setMessage(t('components.tiptap.messages.error.userNotLoggedIn'), 'error', true);
     } else {
-      setMessage(
-        t('components.tiptap.messages.error.gettingToken'),
-        'error',
-        true,
-      );
+      setMessage(t('components.tiptap.messages.error.gettingToken'), 'error', true);
     }
     return '';
   }
@@ -201,11 +178,10 @@ onMounted(async () => {
     const TipTapToken = await getTipTapToken(user.value?.id);
     setAvailableBlocks(props.allowedBlocks);
     provider = new TiptapCollabProvider({
-      name: props.docName, // Unique document identifier for syncing. This is your document name.
-      appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
-      token: TipTapToken, // Your JWT token
+      name: props.docName,
+      appId: app.$config.public.tipTapAppId,
+      token: TipTapToken,
       document: doc,
-      // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
       onSynced() {
         if (!doc.getMap('config').get('initialContentLoaded') && editor) {
           doc.getMap('config').set('initialContentLoaded', true);
@@ -223,9 +199,7 @@ onMounted(async () => {
             provider,
             user: {
               name: user.value ? user.value.username : 'Usuário Anônimo',
-              color: generateUserColor(
-                user.value?.username ? user.value.username : 'Anonymous',
-              ),
+              color: generateUserColor(user.value?.username ? user.value.username : 'Anonymous'),
             },
           }),
         ]
@@ -274,11 +248,10 @@ onMounted(async () => {
     extensions: [
       Document,
       Text,
+      Paragraph,
       Dropcursor,
       BubbleMenu.configure({
-        element: document.querySelector(
-          '.bubble-menu-wrapper',
-        ) as HTMLElement | null,
+        element: bubbleMenuRef.value as HTMLElement | null,
         tippyOptions: {
           duration: 100,
           theme: 'transparent',
@@ -350,11 +323,7 @@ onMounted(async () => {
       disableCollaboration();
       const emitUpdate = false;
       editor.setEditable(false, emitUpdate);
-      setMessage(
-        t('components.tiptap.messages.error.contentError'),
-        'error',
-        true,
-      );
+      setMessage(t('components.tiptap.messages.error.contentError'), 'error', true);
     },
   });
 
@@ -362,10 +331,16 @@ onMounted(async () => {
     emitHeight();
   }, 300);
 });
+
 const blockToolsMap = {
   starterKit: StarterKit.configure({
     history: false,
     codeBlock: false,
+    document: false,
+    text: false,
+    paragraph: false,
+    dropcursor: false,
+    listItem: false,
   }),
   CustomMention: CustomMention.configure({
     suggestion: {
@@ -381,7 +356,7 @@ const blockToolsMap = {
         formData.append('files', file, file.name);
       });
       try {
-        const res = await strapiClient<Upload[]>('/upload', {
+        const res = await strapiClient<any[]>('/upload', {
           method: 'POST',
           body: formData,
         });
@@ -391,8 +366,7 @@ const blockToolsMap = {
           files: res.map((file) => {
             temporaryMedia.value.push(file.id);
             return {
-              title:
-                file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
+              title: file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
               extension: file.ext?.slice(1) || 'file',
               size: file.size || 0,
               id: file.id,
@@ -434,17 +408,13 @@ const blockToolsMap = {
   Typography,
   Superscript,
   Subscript,
-  Paragraph,
   Carousel: Carousel.configure({
     handleFileSelected: async (slides) => {
       const formData = new FormData();
       slides.forEach((slide) => {
         if (slide.url instanceof File) {
           formData.append('files', slide.url, slide.title);
-        } else if (
-          typeof slide.url === 'string' &&
-          slide.url.startsWith('data:')
-        ) {
+        } else if (typeof slide.url === 'string' && slide.url.startsWith('data:')) {
           const base64Data = slide.url.split(',')[1];
           const binaryString = window.atob(base64Data);
           const byteArray = new Uint8Array(binaryString.length);
@@ -465,7 +435,7 @@ const blockToolsMap = {
           formData.append('files', imageFile, imageFile.name);
         }
       });
-      const res = await strapiClient<Upload[]>('/upload', {
+      const res = await strapiClient<any[]>('/upload', {
         method: 'POST',
         body: formData,
       });
@@ -484,9 +454,6 @@ const blockToolsMap = {
       }
     },
     handleDeletedFiles: (id: string) => {
-      // Para editores com botão de salvar, temos que guardar o ID dos arquivos e apenas deletar com a confirmação do usuário
-      // if (file.videoId) mediaToDelete.value.push(file.videoId);
-      // if (file.imgId) mediaToDelete.value.push(file.imgId);
       strapiClient(`/upload/files/${id}`, {
         method: 'DELETE',
       });
@@ -500,7 +467,7 @@ const blockToolsMap = {
       const formData = new FormData();
       formData.append('files', file, file.name);
       try {
-        const res = await strapiClient<Upload[]>('/upload', {
+        const res = await strapiClient<any[]>('/upload', {
           method: 'POST',
           body: formData,
         });
@@ -519,7 +486,6 @@ const blockToolsMap = {
       }
     },
     deleteMedia: (id: string) => {
-      // mediaToDelete.value.push(id);
       strapiClient(`/upload/files/${id}`, {
         method: 'DELETE',
       });
@@ -579,9 +545,6 @@ const setAvailableBlocks = (blocks: string[]) => {
         break;
     }
   });
-  if (blocks.length > 1 && !availableBlocks.includes('starterKit')) {
-    availableBlocks.push('Paragraph');
-  }
   return availableBlocks;
 };
 
@@ -636,7 +599,7 @@ const emitHeight = () => {
   emits('change:height', container.value?.clientHeight);
 };
 
-const setContent = (content) => {
+const setContent = (content: any) => {
   if (editor.value) {
     editor.value.commands.setContent(content, false);
   }
@@ -661,12 +624,7 @@ watch(
     if (!editor.value) {
       return;
     }
-    // HTML
-    // const isSame = editor.value.getHTML() === value;
-
-    // JSON
-    const isSame =
-      JSON.stringify(editor.value.getJSON()) === JSON.stringify(value);
+    const isSame = JSON.stringify(editor.value.getJSON()) === JSON.stringify(value);
 
     if (!isSame) {
       editor.value.commands.setContent(value, false);
@@ -788,7 +746,6 @@ watch(
     }
   }
 
-  /* Code and preformatted text styles */
   code {
     background-color: #212121;
     border-radius: 0.4rem;
@@ -881,7 +838,6 @@ watch(
   padding: 18px;
   border-radius: 8px;
 
-  /* Table-specific styling */
   table {
     border-collapse: collapse;
     margin: 0;
@@ -953,7 +909,6 @@ watch(
   word-break: normal;
 }
 
-/* Render the username above the caret */
 .collaboration-cursor__label {
   border-radius: 3px 3px 3px 0;
   color: #0d0d0d;
