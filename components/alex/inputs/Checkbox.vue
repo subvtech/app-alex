@@ -61,24 +61,28 @@ const hasCustomIndeterminateColor = computed(
 <style scoped>
 div {
   font-family: Sen !important;
-  display: flex;
-  align-items: flex-start;
 }
 
 .container {
-  display: flex;
-  align-items: flex-end;
+  display: inline-flex;
+  align-items: center;
   width: fit-content;
-  height: 47px;
+  min-height: 49px;
   border: none;
-  gap: 0px !important;
+  gap: 15px !important;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .text-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: center;
   max-width: 100%;
 }
 
@@ -88,12 +92,11 @@ div {
   line-height: 21.6px;
   color: #454d54;
   display: flex;
-  align-items: flex-start;
-  padding-bottom: 4px;
+  align-items: center;
 }
 
 .input-checkbox {
-  margin-bottom: 3px !important;
+  margin-bottom: 0 !important;
 }
 
 .gray-400 {
