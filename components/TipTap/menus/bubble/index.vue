@@ -4,11 +4,7 @@
     :class="fixedMenuBar ? 'fixed-menu-bar' : 'float-bubble-menu'"
   >
     <menubar :editor="editor" />
-    <v-divider
-      :class="dividerClass"
-      class="divider"
-      :vertical="isVerticalDivider"
-    ></v-divider>
+    <v-divider :class="dividerClass" class="divider" :vertical="isVerticalDivider"></v-divider>
     <toggleGroup :editor="editor" :fixed-menu-bar="fixedMenuBar" />
   </div>
 </template>
@@ -30,11 +26,11 @@ const props = defineProps({
   },
 });
 
+console.log('props.fixedMenuBar', props.fixedMenuBar);
+
 const { width } = useWindowSize();
 
-const isVerticalDivider = computed(
-  () => width.value > 850 || (props.fixedMenuBar && width.value > 560),
-);
+const isVerticalDivider = computed(() => width.value > 850 || (props.fixedMenuBar && width.value > 560));
 
 const dividerClass = computed(() => ({
   'vertical-divider mx-1': isVerticalDivider.value,

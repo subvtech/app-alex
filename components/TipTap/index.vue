@@ -1,25 +1,11 @@
 <template>
   <client-only>
     <TipTap-loader v-if="isLoading" />
-    <div
-      ref="container"
-      class="rounded-lg w-100 tw-transition-opacity"
-      :class="{ 'tw-opacity-0': isLoading }"
-    >
-      <div
-        v-if="showMenuBar && edit"
-        :class="!fixedMenu ? 'bubble-menu-wrapper' : ''"
-      >
-        <tip-tap-menus-bubble
-          :editor="editor"
-          :fixed-menu-bar="fixedMenu"
-          @click.stop.prevent
-        />
+    <div ref="container" class="rounded-lg w-100 tw-transition-opacity" :class="{ 'tw-opacity-0': isLoading }">
+      <div ref="bubbleMenuWrapper" v-show="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
+        <tip-tap-menus-bubble v-if="editor" :editor="editor" :fixed-menu-bar="fixedMenu" @click.stop.prevent />
       </div>
-      <editor-content
-        :class="!props.edit || props.noPadding ? 'no-padding' : ''"
-        :editor="editor"
-      />
+      <editor-content :class="!props.edit || props.noPadding ? 'no-padding' : ''" :editor="editor" />
     </div>
   </client-only>
 </template>
@@ -132,10 +118,7 @@ const defaultBlock = computed(() => {
 });
 
 const showMenuBar = computed(() => {
-  return (
-    isEditable.value &&
-    (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'))
-  );
+  return isEditable.value && (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'));
 });
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
@@ -144,6 +127,10 @@ const editor = ref();
 const isEditable = ref(props.edit);
 
 const container = ref<HTMLDivElement | null>(null);
+// ref escopado à instância, sempre montado no DOM (ver v-show no template),
+// para garantir que já esteja disponível quando o Editor for criado no onMounted,
+// independentemente do valor inicial de `edit`
+const bubbleMenuWrapper = ref<HTMLDivElement | null>(null);
 
 const generateUserColor = (username: string): string => {
   let hash = 0;
@@ -177,17 +164,9 @@ const getTipTapToken = async (userID: number | undefined) => {
   } catch (error) {
     const typedError = error as { error: { status: number } };
     if (typedError.error.status === 400) {
-      setMessage(
-        t('components.tiptap.messages.error.userNotLoggedIn'),
-        'error',
-        true,
-      );
+      setMessage(t('components.tiptap.messages.error.userNotLoggedIn'), 'error', true);
     } else {
-      setMessage(
-        t('components.tiptap.messages.error.gettingToken'),
-        'error',
-        true,
-      );
+      setMessage(t('components.tiptap.messages.error.gettingToken'), 'error', true);
     }
     return '';
   }
@@ -215,6 +194,11 @@ onMounted(async () => {
     });
   }
 
+  // Garante que o DOM dentro do <client-only> já foi montado antes de criar o Editor.
+  // Como o wrapper agora usa v-show (não v-if), ele já existe no DOM independentemente
+  // do valor inicial de `edit`/`showMenuBar`.
+  await nextTick();
+
   const setCollaborationExtensions = (): AnyExtension[] => [
     ...(props.collaboration
       ? [
@@ -223,9 +207,7 @@ onMounted(async () => {
             provider,
             user: {
               name: user.value ? user.value.username : 'Usuário Anônimo',
-              color: generateUserColor(
-                user.value?.username ? user.value.username : 'Anonymous',
-              ),
+              color: generateUserColor(user.value?.username ? user.value.username : 'Anonymous'),
             },
           }),
         ]
@@ -276,9 +258,7 @@ onMounted(async () => {
       Text,
       Dropcursor,
       BubbleMenu.configure({
-        element: document.querySelector(
-          '.bubble-menu-wrapper',
-        ) as HTMLElement | null,
+        element: bubbleMenuWrapper.value,
         tippyOptions: {
           duration: 100,
           theme: 'transparent',
@@ -287,7 +267,7 @@ onMounted(async () => {
         },
         updateDelay: 100,
         shouldShow: ({ view }) => {
-          if (!view) {
+          if (!view || !editor.value?.isEditable) {
             return false;
           }
           return isTextSelected({ editor: editor.value });
@@ -350,11 +330,7 @@ onMounted(async () => {
       disableCollaboration();
       const emitUpdate = false;
       editor.setEditable(false, emitUpdate);
-      setMessage(
-        t('components.tiptap.messages.error.contentError'),
-        'error',
-        true,
-      );
+      setMessage(t('components.tiptap.messages.error.contentError'), 'error', true);
     },
   });
 
@@ -391,8 +367,7 @@ const blockToolsMap = {
           files: res.map((file) => {
             temporaryMedia.value.push(file.id);
             return {
-              title:
-                file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
+              title: file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
               extension: file.ext?.slice(1) || 'file',
               size: file.size || 0,
               id: file.id,
@@ -441,10 +416,7 @@ const blockToolsMap = {
       slides.forEach((slide) => {
         if (slide.url instanceof File) {
           formData.append('files', slide.url, slide.title);
-        } else if (
-          typeof slide.url === 'string' &&
-          slide.url.startsWith('data:')
-        ) {
+        } else if (typeof slide.url === 'string' && slide.url.startsWith('data:')) {
           const base64Data = slide.url.split(',')[1];
           const binaryString = window.atob(base64Data);
           const byteArray = new Uint8Array(binaryString.length);
@@ -665,8 +637,7 @@ watch(
     // const isSame = editor.value.getHTML() === value;
 
     // JSON
-    const isSame =
-      JSON.stringify(editor.value.getJSON()) === JSON.stringify(value);
+    const isSame = JSON.stringify(editor.value.getJSON()) === JSON.stringify(value);
 
     if (!isSame) {
       editor.value.commands.setContent(value, false);
