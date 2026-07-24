@@ -2,8 +2,8 @@
   <client-only>
     <TipTap-loader v-if="isLoading" />
     <div ref="container" class="rounded-lg w-100 tw-transition-opacity" :class="{ 'tw-opacity-0': isLoading }">
-      <div v-show="showMenuBar && edit" ref="bubbleMenuRef" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
-        <tip-tap-menus-bubble :editor="editor" :fixed-menu-bar="fixedMenu" @click.stop.prevent />
+      <div ref="bubbleMenuWrapper" v-show="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
+        <tip-tap-menus-bubble v-if="editor" :editor="editor" :fixed-menu-bar="fixedMenu" @click.stop.prevent />
       </div>
       <editor-content :class="!props.edit || props.noPadding ? 'no-padding' : ''" :editor="editor" />
     </div>
@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch, PropType } from 'vue';
 import { Editor, EditorContent, AnyExtension } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/extension-bubble-menu';
 import { Collaboration } from '@tiptap/extension-collaboration';
@@ -44,6 +43,7 @@ import { Dropcursor } from '@tiptap/extension-dropcursor';
 import { Paragraph } from '@tiptap/extension-paragraph';
 
 import { common, createLowlight } from 'lowlight';
+
 import * as Y from 'yjs';
 
 import CustomMention from './custom-plugins/mentions/Extension';
@@ -56,8 +56,6 @@ import MediaUpload from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
 import { isTextSelected } from './menus/bubble/isTextSelected';
 import mentionSuggestion from './custom-plugins/mentions/Suggestions';
-
-const bubbleMenuRef = ref<HTMLElement | null>(null);
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
@@ -76,8 +74,8 @@ export type MentionUserPropsArray = MentionUserProps[];
 
 const props = defineProps({
   modelValue: {
-    type: [String, Object],
-    default: () => ({ type: 'doc', content: [{ type: 'paragraph' }] }),
+    type: String,
+    default: '',
   },
   edit: {
     type: Boolean,
@@ -122,13 +120,17 @@ const defaultBlock = computed(() => {
 const showMenuBar = computed(() => {
   return isEditable.value && (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'));
 });
-
+// const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
 
 const editor = ref();
 const isEditable = ref(props.edit);
 
 const container = ref<HTMLDivElement | null>(null);
+// ref escopado à instância, sempre montado no DOM (ver v-show no template),
+// para garantir que já esteja disponível quando o Editor for criado no onMounted,
+// independentemente do valor inicial de `edit`
+const bubbleMenuWrapper = ref<HTMLDivElement | null>(null);
 
 const generateUserColor = (username: string): string => {
   let hash = 0;
@@ -178,10 +180,11 @@ onMounted(async () => {
     const TipTapToken = await getTipTapToken(user.value?.id);
     setAvailableBlocks(props.allowedBlocks);
     provider = new TiptapCollabProvider({
-      name: props.docName,
-      appId: app.$config.public.tipTapAppId,
-      token: TipTapToken,
+      name: props.docName, // Unique document identifier for syncing. This is your document name.
+      appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
+      token: TipTapToken, // Your JWT token
       document: doc,
+      // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
       onSynced() {
         if (!doc.getMap('config').get('initialContentLoaded') && editor) {
           doc.getMap('config').set('initialContentLoaded', true);
@@ -190,6 +193,11 @@ onMounted(async () => {
       },
     });
   }
+
+  // Garante que o DOM dentro do <client-only> já foi montado antes de criar o Editor.
+  // Como o wrapper agora usa v-show (não v-if), ele já existe no DOM independentemente
+  // do valor inicial de `edit`/`showMenuBar`.
+  await nextTick();
 
   const setCollaborationExtensions = (): AnyExtension[] => [
     ...(props.collaboration
@@ -248,10 +256,9 @@ onMounted(async () => {
     extensions: [
       Document,
       Text,
-      Paragraph,
       Dropcursor,
       BubbleMenu.configure({
-        element: bubbleMenuRef.value as HTMLElement | null,
+        element: bubbleMenuWrapper.value,
         tippyOptions: {
           duration: 100,
           theme: 'transparent',
@@ -260,7 +267,7 @@ onMounted(async () => {
         },
         updateDelay: 100,
         shouldShow: ({ view }) => {
-          if (!view) {
+          if (!view || !editor.value?.isEditable) {
             return false;
           }
           return isTextSelected({ editor: editor.value });
@@ -331,16 +338,10 @@ onMounted(async () => {
     emitHeight();
   }, 300);
 });
-
 const blockToolsMap = {
   starterKit: StarterKit.configure({
     history: false,
     codeBlock: false,
-    document: false,
-    text: false,
-    paragraph: false,
-    dropcursor: false,
-    listItem: false,
   }),
   CustomMention: CustomMention.configure({
     suggestion: {
@@ -356,7 +357,7 @@ const blockToolsMap = {
         formData.append('files', file, file.name);
       });
       try {
-        const res = await strapiClient<any[]>('/upload', {
+        const res = await strapiClient<Upload[]>('/upload', {
           method: 'POST',
           body: formData,
         });
@@ -408,6 +409,7 @@ const blockToolsMap = {
   Typography,
   Superscript,
   Subscript,
+  Paragraph,
   Carousel: Carousel.configure({
     handleFileSelected: async (slides) => {
       const formData = new FormData();
@@ -435,7 +437,7 @@ const blockToolsMap = {
           formData.append('files', imageFile, imageFile.name);
         }
       });
-      const res = await strapiClient<any[]>('/upload', {
+      const res = await strapiClient<Upload[]>('/upload', {
         method: 'POST',
         body: formData,
       });
@@ -454,6 +456,9 @@ const blockToolsMap = {
       }
     },
     handleDeletedFiles: (id: string) => {
+      // Para editores com botão de salvar, temos que guardar o ID dos arquivos e apenas deletar com a confirmação do usuário
+      // if (file.videoId) mediaToDelete.value.push(file.videoId);
+      // if (file.imgId) mediaToDelete.value.push(file.imgId);
       strapiClient(`/upload/files/${id}`, {
         method: 'DELETE',
       });
@@ -467,7 +472,7 @@ const blockToolsMap = {
       const formData = new FormData();
       formData.append('files', file, file.name);
       try {
-        const res = await strapiClient<any[]>('/upload', {
+        const res = await strapiClient<Upload[]>('/upload', {
           method: 'POST',
           body: formData,
         });
@@ -486,6 +491,7 @@ const blockToolsMap = {
       }
     },
     deleteMedia: (id: string) => {
+      // mediaToDelete.value.push(id);
       strapiClient(`/upload/files/${id}`, {
         method: 'DELETE',
       });
@@ -545,6 +551,9 @@ const setAvailableBlocks = (blocks: string[]) => {
         break;
     }
   });
+  if (blocks.length > 1 && !availableBlocks.includes('starterKit')) {
+    availableBlocks.push('Paragraph');
+  }
   return availableBlocks;
 };
 
@@ -599,7 +608,7 @@ const emitHeight = () => {
   emits('change:height', container.value?.clientHeight);
 };
 
-const setContent = (content: any) => {
+const setContent = (content) => {
   if (editor.value) {
     editor.value.commands.setContent(content, false);
   }
@@ -624,6 +633,10 @@ watch(
     if (!editor.value) {
       return;
     }
+    // HTML
+    // const isSame = editor.value.getHTML() === value;
+
+    // JSON
     const isSame = JSON.stringify(editor.value.getJSON()) === JSON.stringify(value);
 
     if (!isSame) {
@@ -746,6 +759,7 @@ watch(
     }
   }
 
+  /* Code and preformatted text styles */
   code {
     background-color: #212121;
     border-radius: 0.4rem;
@@ -838,6 +852,7 @@ watch(
   padding: 18px;
   border-radius: 8px;
 
+  /* Table-specific styling */
   table {
     border-collapse: collapse;
     margin: 0;
@@ -909,6 +924,7 @@ watch(
   word-break: normal;
 }
 
+/* Render the username above the caret */
 .collaboration-cursor__label {
   border-radius: 3px 3px 3px 0;
   color: #0d0d0d;

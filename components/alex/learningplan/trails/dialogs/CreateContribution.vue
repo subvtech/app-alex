@@ -44,9 +44,10 @@
       ></v-progress-circular>
 
       <Tiptap
-        ref="editor"
+        :doc-name="`contribution-project-${props.trailId}`"
         :model-value="tiptapContent"
         @update:model-value="(val) => (tiptapContent = val)"
+        :fixed-menu="false"
         :edit="!dialogItens.isReadonly"
         :collaboration="false"
       />
@@ -83,7 +84,6 @@ const dialog = ref(false);
 const contribution = ref<contributionType>();
 const user = useStrapiUser<User>();
 const title = ref('');
-const editor = ref();
 const mode = ref('create');
 const isLoading = ref(false);
 const isSaving = ref(false);
@@ -108,13 +108,21 @@ const getValidTiptapContent = (content: any) => {
     try {
       const parsed = JSON.parse(content);
       if (parsed.type === 'doc') return parsed;
+      if (parsed.blocks && parsed.blocks.type === 'doc') return parsed.blocks;
     } catch {
-      return content;
+      return { type: 'doc', content: [{ type: 'paragraph' }] };
     }
   }
 
   if (content.blocks && content.blocks.type === 'doc') {
     return content.blocks;
+  }
+
+  if (Array.isArray(content.content)) {
+    return {
+      type: 'doc',
+      content: content.content,
+    };
   }
 
   if (content.type === 'doc') {
@@ -193,12 +201,7 @@ const openDialog = (editMode: string, contributionData?: contributionType) => {
   } else if (contributionData) {
     contribution.value = contributionData;
     title.value = contributionData.title;
-
-    const rawContent = contributionData.contribution?.blocks
-      ? contributionData.contribution.blocks
-      : contributionData.contribution;
-
-    tiptapContent.value = getValidTiptapContent(rawContent);
+    tiptapContent.value = getValidTiptapContent(contributionData.contribution);
   }
 
   dialog.value = true;
