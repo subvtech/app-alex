@@ -9,7 +9,7 @@
         v-model="model"
         :mention-users="mentionUsers"
         :edit="edit"
-        :allowed-blocks="['text']"
+        :allowed-blocks="['text', 'image']"
         :collaboration="false"
         :fixed-menu="edit"
       />
