@@ -24,9 +24,9 @@ export default Node.create({
     };
   },
 
-  addOptions() {
+  addOptions(readOnly: boolean = false) {
     return {
-      readOnly: () => false,
+      readOnly: () => readOnly,
       endpoint: '',
     };
   },

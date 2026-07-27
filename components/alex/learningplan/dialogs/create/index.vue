@@ -68,6 +68,11 @@
           :allowed-dates="disablePastDates"
         />
       </div>
+      <alex-inputs-checkbox
+        v-model="isPrimaryFacilitator"
+        label="Definir como facilitador principal"
+        hint="Esse professor será o facilitador principal do curso."
+      />
     </template>
     <template #step2>
       <alex-custom-carousel ref="carousel" v-model="slides"
@@ -220,6 +225,7 @@ const classModal = ref(false);
 const title = ref('');
 const description = ref('');
 const slug = ref('');
+const isPrimaryFacilitator = ref(false);
 const scheduleData = ref<(MeetingPropsType & { className: string }) | null>(
   null,
 );
@@ -246,6 +252,7 @@ const cleanFields = () => {
   title.value = '';
   description.value = '';
   slug.value = '';
+  isPrimaryFacilitator.value = false;
   startDate.value = undefined;
   endDate.value = undefined;
   carousel?.value?.clearSlides();
@@ -268,6 +275,9 @@ const createCourse = async () => {
       invitation_duration: 3600,
       class_name: slug.value,
       classes: justIdInChargeMember,
+      facilitator_member: {
+        isPimaryFacilitator: isPrimaryFacilitator.value,
+      },
     });
     slides.value.map((item) =>
       // @ts-ignore

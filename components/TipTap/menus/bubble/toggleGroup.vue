@@ -1,10 +1,5 @@
 <template>
-  <ToggleGroup
-    v-if="props.editor"
-    type="multiple"
-    class="d-flex flex-wrap justify-center"
-    size="sm"
-  >
+  <ToggleGroup v-if="props.editor" type="multiple" class="d-flex flex-wrap justify-center" size="sm">
     <template v-for="option in toggleItens" :key="option.value">
       <v-tooltip
         v-if="!option.disabled"
@@ -32,18 +27,11 @@
             >
               <component :is="option.icon" class="tw-h-4 tw-w-4" />
             </PopoverTrigger>
-            <PopoverContent
-              class="pa-2"
-              :class="option.popover !== 'link' ? 'max-w-55 ' : 'width-65'"
-            >
+            <PopoverContent class="pa-2" :class="option.popover !== 'link' ? 'max-w-55 ' : 'width-65'">
               <colorSelector
-                v-if="
-                  option.popover === 'color' || option.popover === 'highlight'
-                "
+                v-if="option.popover === 'color' || option.popover === 'highlight'"
                 :type="option.popover"
-                :active-color="
-                  option.popover === 'color' ? currentColor : currentHighLight
-                "
+                :active-color="option.popover === 'color' ? currentColor : currentHighLight"
                 @set-text-color="setColor"
                 @set-highlight-color="setHighlight"
               />
@@ -89,10 +77,11 @@ const props = defineProps({
   },
 });
 
+console.log('props.fixedMenuBar', props.fixedMenuBar);
+
 const { t } = useI18n();
 
-const getTranslation = (key: string) =>
-  t(`components.tiptap.menus.bubbleMenu.tooltip.${key}`);
+const getTranslation = (key: string) => t(`components.tiptap.menus.bubbleMenu.tooltip.${key}`);
 
 const toggleItens = [
   {
@@ -142,16 +131,14 @@ const toggleItens = [
     icon: Highlighter,
     ariaLabel: getTranslation('highlightColor'),
     popover: 'highlight',
-    isActive: () =>
-      currentHighLight.value !== undefined && currentHighLight.value !== '#fff',
+    isActive: () => currentHighLight.value !== undefined && currentHighLight.value !== '#fff',
   },
   {
     value: 'palette',
     icon: Palette,
     ariaLabel: getTranslation('textColor'),
     popover: 'color',
-    isActive: () =>
-      currentColor.value !== undefined && currentColor.value !== '#000',
+    isActive: () => currentColor.value !== undefined && currentColor.value !== '#000',
   },
   {
     value: 'superscript',
@@ -171,9 +158,7 @@ const toggleItens = [
   },
 ];
 
-const currentColor = computed(
-  () => props.editor.getAttributes('textStyle')?.color || undefined,
-);
+const currentColor = computed(() => props.editor.getAttributes('textStyle')?.color || undefined);
 
 const setColor = (color: string) => {
   props.editor.chain().focus().setColor(color).run();
@@ -183,9 +168,7 @@ const setHighlight = (color: string) => {
   props.editor.chain().focus().setHighlight({ color }).run();
 };
 
-const currentHighLight = computed(
-  () => props.editor.getAttributes('highlight')?.color || undefined,
-);
+const currentHighLight = computed(() => props.editor.getAttributes('highlight')?.color || undefined);
 
 const getCurrentLink = () => {
   return props.editor?.getAttributes('link')?.href || '';
@@ -193,12 +176,7 @@ const getCurrentLink = () => {
 
 const setLink = (link: string) => {
   if (link) {
-    props.editor
-      .chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({ href: link, target: '_blank' })
-      .run();
+    props.editor.chain().focus().extendMarkRange('link').setLink({ href: link, target: '_blank' }).run();
   } else {
     props.editor.chain().focus().extendMarkRange('link').unsetLink().run();
   }

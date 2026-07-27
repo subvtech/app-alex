@@ -105,7 +105,7 @@
 interface editorData {
   time: number;
   version: string;
-  blocks: JSON[];
+  blocks: any;
 }
 
 export interface contributionType {
@@ -113,7 +113,7 @@ export interface contributionType {
   title: string;
   highlighted: boolean;
   blocked: boolean;
-  contribution: editorData;
+  contribution: editorData | Record<string, any> | string;
   highlighted_order?: number;
 }
 
@@ -142,7 +142,8 @@ const expanded = ref();
 const isLoading = computed(() => trailStore.loading || learningPlanStore.loading);
 
 const canEdit = computed<boolean>(() => {
-  const isAuthor = trailStore.trail?.learning_structure?.author_member?.user?.id === (user.value?.id ?? null);
+  const learningStructure = trailStore.trail?.learning_structure as any;
+  const isAuthor = learningStructure?.author_member?.user?.id === (user.value?.id ?? null);
 
   if (isAuthor) {
     return true;
@@ -166,10 +167,10 @@ const contributions = computed(() => {
   const trailId = trailStore.trail?.id;
   const userId = canEdit.value
     ? -1
-    : learningPlanStore.activeMembers.find((member) => member?.user?.id ?? null === user?.value?.id ?? 0)?.id;
+    : learningPlanStore.activeMembers.find((member) => (member?.user?.id ?? null) === (user?.value?.id ?? 0))?.id;
   contributions?.forEach((contribution) => {
     const student = contribution.student_member;
-    if (contribution.student_member?.user?.id ?? null === user?.value?.id ?? 0) {
+    if ((contribution.student_member?.user?.id ?? null) === (user?.value?.id ?? 0)) {
       myContributions.push(contribution);
     } else {
       const studentIndex = otherContributions.findIndex(

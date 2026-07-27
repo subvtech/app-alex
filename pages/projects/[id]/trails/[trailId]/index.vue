@@ -95,7 +95,13 @@
             {{ $t('pages.trailId.overview.lastUpdated') }}
             {{ timeStampToDate(editorData.time) }}
           </p>
-          <AppEditor ref="editor" key-id="editorjs" />
+          <Tiptap
+            ref="editor"
+            @update:model-value="onTiptapUpdate"
+            :edit="!readOnly"
+            :doc-name="`trail-${trailId}`"
+            :collaboration="true"
+          />
           <div v-if="readOnly">
             <div
               v-for="contribution in highlightedContributions"
@@ -132,12 +138,7 @@
                 {{ contribution.title }}
               </h3>
               <div>
-                <AppEditor
-                  :ref="`contribution-${contribution.id}`"
-                  :key-id="`contribution-${contribution.id}`"
-                  :data="contribution.contribution"
-                  :read-only="readOnly"
-                />
+                <Tiptap :ref="(el) => setContributionRef(el, contribution.id)" :edit="false" :collaboration="false" />
               </div>
             </div>
             <div v-if="!canEdit" class="w-100 pt-12 d-flex justify-center align-center contributions-container">
@@ -189,54 +190,97 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+import { ref, onMounted, computed } from 'vue';
+import { contributionType } from '~/pages/projects/[id]/trails/[trailId]/contributions.vue';
+import Tiptap from '~/components/TipTap/index.vue';
+
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-const { update, create } = useStrapi();
-const user = useStrapiUser();
-const route = useRoute();
-const { setMessage } = useMessageStore();
-const trailStore = useTrailStore();
-const trailId = computed(() => parseInt(route.params?.trailId.toString()));
 useHeaderTrails('', '', true);
+
+const { update, create } = useStrapi();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
+const route = useRoute();
+const trailStore = useTrailStore();
+const user = useStrapiUser();
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-
-definePageMeta({
-  hideLearningPlanBanner: true,
-});
-
 const saveLoading = ref(false);
-const readOnly = ref(true);
 const editor = ref();
 const isLoading = ref(false);
 const sidebar = ref(false);
+const backUpEditorData = ref({});
+const tiptapContent = ref<Record<string, any>>({});
+const contributionRefs = ref<Record<string, any>>({});
+const readOnly = ref(true);
 
-const backUpEditorData = ref({ blocks: [] });
-const showEditor = computed(() => {
-  return !trailStore.loading && (editorData.value.blocks.length || !readOnly.value);
+const setContributionRef = (el: any, id: number) => {
+  if (el) {
+    contributionRefs.value[`contribution-${id}`] = el;
+  }
+};
+
+const defaultTipTapDocument = () => ({
+  type: 'doc',
+  content: [{ type: 'paragraph' }],
 });
-const { t } = useI18n();
+
+const parseMaybeJson = (value: any) => {
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+};
+
+const getValidTiptapContent = (value: any) => {
+  const parsed = parseMaybeJson(value);
+
+  if (parsed && typeof parsed === 'object' && parsed.type === 'doc' && Array.isArray(parsed.content)) {
+    return parsed;
+  }
+
+  const nestedBlocks = parseMaybeJson(parsed?.blocks);
+  if (
+    nestedBlocks &&
+    typeof nestedBlocks === 'object' &&
+    nestedBlocks.type === 'doc' &&
+    Array.isArray(nestedBlocks.content)
+  ) {
+    return nestedBlocks;
+  }
+
+  return defaultTipTapDocument();
+};
+
+const onTiptapUpdate = (val: Record<string, any>) => {
+  tiptapContent.value = val;
+};
+
 const editorData = computed(() => {
   const data = trailStore.trail?.structures[trailStore.trail?.structures.length - 1];
   return {
     time: data && data.time ? parseInt(data.time.toString()) : 0,
     version: data?.version || '',
-    blocks:
-      data?.blocks.map((block: any) => {
-        return {
-          type: block.type,
-          data: block.data,
-          tunes: block.tunes || {},
-          id: block.id || '',
-        };
-      }) || [],
+    blocks: getValidTiptapContent(data?.blocks),
   };
 });
+
+const showEditor = computed(() => {
+  const currentBlocks = editorData.value.blocks as any;
+  const currentContent = tiptapContent.value as any;
+  return (
+    !trailStore.loading && (!!currentBlocks?.content?.length || !!currentContent?.content?.length || !readOnly.value)
+  );
+});
+
 const canEdit = computed<boolean>(() => {
-  const isAuthor = trailStore.trail?.learning_structure?.author_member?.user?.id === (user.value?.id ?? null);
+  const learningStructure = trailStore.trail?.learning_structure as any;
+  const isAuthor = learningStructure?.author_member?.user?.id === (user.value?.id ?? null);
 
   if (isAuthor) {
     return true;
@@ -252,11 +296,12 @@ const highlightedContributions = computed(() => {
     .filter((contribution) => contribution.highlighted)
     .sort((a, b) => (a.highlighted_order > b.highlighted_order ? 1 : -1))
     .map((contribution) => {
+      const contributionContent = getValidTiptapContent(contribution.contribution?.blocks ?? contribution.contribution);
       return {
         id: contribution.id,
         title: contribution.title,
-        contribution: contribution.contribution,
-        time: contribution.contribution.time,
+        contribution: contributionContent,
+        time: contribution.contribution?.time || 0,
         student: {
           id: contribution.student_member.user.id,
           name: contribution.student_member.user.fullname,
@@ -275,7 +320,7 @@ const highlightedContributionsSimple = computed(() => {
       id: contribution.id,
       title: contribution.title,
       contribution: contribution.contribution,
-      time: contribution.contribution.time,
+      time: contribution.time,
     };
   });
 });
@@ -292,15 +337,8 @@ onMounted(async () => {
   while (trailStore.loading) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  if (editorData.value.blocks.length) {
-    if (await checkEditorReady()) {
-      readOnly.value = false;
-
-      await loadEditor();
-      toggleReadOnly('save');
-    } else {
-      setMessage(t('pages.trailId.overview.loadError'), 'red', true);
-    }
+  if (editorData.value.blocks) {
+    loadEditor();
   }
   isLoading.value = false;
 });
@@ -324,21 +362,44 @@ const isAvailableTooltip = (title: string) => {
   return false;
 };
 
-const toggleReadOnly = async (mode: string | '') => {
+const toggleReadOnly = () => {
   readOnly.value = !readOnly.value;
-  if (editor.value && editorData.value.blocks.length) {
-    await editor.value.toggleReadOnly(mode);
-  }
 
   if (!readOnly.value) {
-    backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
-    observer.disconnect();
+    backUpEditorData.value = JSON.parse(JSON.stringify(tiptapContent.value));
+    if (observer) observer.disconnect();
+
+    setTimeout(() => {
+      if (editor.value) {
+        editor.value.setContent(tiptapContent.value);
+      }
+    }, 300);
   } else {
     setTimeout(() => {
+      if (editor.value) {
+        editor.value.setContent(tiptapContent.value);
+      }
       setSections();
       setObserver();
     }, 300);
   }
+};
+
+const assignSectionAttributes = () => {
+  const headings = document.querySelectorAll('.tiptap h1, .tiptap h2, .tiptap h3, .tiptap h4, .tiptap h5, .tiptap h6');
+  let sectionIndex = 1;
+  headings.forEach((heading) => {
+    heading.setAttribute('section', String(sectionIndex));
+    sectionIndex++;
+  });
+
+  highlightedContributions.value?.forEach((contribution) => {
+    const contributionSection = document.getElementById(`${contribution.title}-${contribution.id}`);
+    if (contributionSection) {
+      contributionSection.setAttribute('section', String(sectionIndex));
+      sectionIndex++;
+    }
+  });
 };
 
 const setSections = () => {
@@ -349,32 +410,33 @@ const setSections = () => {
       active: true,
     },
   ];
-  editorData.value.blocks.forEach((block: any) => {
-    if (block.type === 'header') {
+
+  const contentArray = tiptapContent.value?.content || [];
+
+  contentArray.forEach((node: any) => {
+    if (node.type === 'heading') {
+      const text = node.content?.map((n: any) => n.text).join('') || '';
       newSections.push({
-        title: block.data.text,
-        type: block.data.level,
+        title: text,
+        type: node.attrs?.level || 2,
         active: false,
       });
     }
-    const sectionBlock = document.querySelector(`[data-id="${block.id}"]`);
-    if (sectionBlock) {
-      sectionBlock.setAttribute('section', String(newSections.length - 1));
-    }
   });
+
   highlightedContributions.value?.forEach((contribution) => {
     newSections.push({
       title: contribution.title,
       type: 3,
       active: false,
     });
-    const contributionSection = document.getElementById(`${contribution.title}-${contribution.id}`);
-    if (contributionSection) {
-      contributionSection.setAttribute('section', String(newSections.length - 1));
-    }
   });
 
   sections.value = newSections;
+
+  setTimeout(() => {
+    assignSectionAttributes();
+  }, 0);
 };
 
 const navigateToSection = (index: number) => {
@@ -422,52 +484,53 @@ const handlePositions = (contributions) => {
   contributions.forEach(async (contribution, index) => {
     const contributionData = trailStore.trail?.contributions.find((c) => c.id === contribution.id);
     if (!contributionData) return;
-    contributionData.highlighted_order = index + 1;
     await update('trail-contributions', contribution.id, {
-      highlighted_order: contributionData.highlighted_order,
+      highlighted_order: index + 1,
     });
   });
 };
 
-const loadEditor = async () => {
-  if (!editor.value || !editorData.value) return;
-  const res = await editor.value.loadEditor({
-    blocks: editorData.value.blocks,
-  });
-  if (res.success) {
-    trailStore.trail?.structures.push({
-      time: editorData.value.time,
-      version: res.data.version,
-      blocks: res.data.blocks,
-      id: res.data.id,
-      trail: trailId.value,
+const loadEditor = () => {
+  tiptapContent.value = getValidTiptapContent(editorData.value.blocks);
+
+  setTimeout(() => {
+    if (editor.value) {
+      editor.value.setContent(tiptapContent.value);
+    }
+
+    highlightedContributions.value?.forEach((contribution) => {
+      const comp = contributionRefs.value[`contribution-${contribution.id}`];
+      if (comp) {
+        comp.setContent(getValidTiptapContent(contribution.contribution));
+      }
     });
-  } else {
-    setMessage(t('pages.trailId.overview.loadError'), 'error', true);
-  }
+
+    setSections();
+  }, 300);
 };
 
 const saveData = async () => {
   saveLoading.value = true;
+
   try {
-    const res = await editor.value.getData();
-    if (!res.success) {
-      setMessage(t('pages.trailId.overview.saveError'), 'error', true);
-      return;
+    const contentToSave = tiptapContent.value;
+
+    console.log('Content to save: ', contentToSave);
+
+    const structurePayload: any = {
+      time: Date.now(),
+      version: 'tiptap-1.0',
+      blocks: contentToSave,
+      trail: trailId.value,
+    };
+
+    await create('structures', structurePayload);
+
+    if (trailStore.trail?.id) {
+      await trailStore.loadTrailData(trailStore.trail.id);
     }
-    await create('structures', {
-      time: Date.now(),
-      version: res.data.version,
-      blocks: res.data.blocks,
-      trail: trailId.value,
-    });
-    trailStore.trail?.structures.push({
-      time: Date.now(),
-      version: res.data.version,
-      blocks: res.data.blocks,
-      trail: trailId.value,
-    });
-    toggleReadOnly('save');
+
+    toggleReadOnly();
   } catch (e) {
     setMessage(t('pages.trailId.overview.saveError'), 'error', true);
   } finally {
@@ -475,37 +538,24 @@ const saveData = async () => {
   }
 };
 
-const resetData = async () => {
-  if (!backUpEditorData.value.blocks.length) {
-    editor.value.clearEditor();
-  } else {
-    editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
-    await loadEditor();
-  }
+const resetData = () => {
+  tiptapContent.value = JSON.parse(JSON.stringify(backUpEditorData.value));
+  readOnly.value = true;
 
-  toggleReadOnly('cancel');
-};
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const checkEditorReady = async () => {
-  let attempts = 0;
-  while (attempts < 10) {
-    try {
-      await editor.value.isReady;
-      return true;
-    } catch (error) {
-      await sleep(100);
-      attempts++;
+  setTimeout(() => {
+    if (editor.value) {
+      editor.value.setContent(tiptapContent.value);
     }
-  }
-  return false;
+    setSections();
+    setObserver();
+  }, 300);
 };
 
 const timeStampToDate = (timeStamp: number) => {
+  if (!timeStamp) return '';
   const date = new Date(timeStamp);
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 };
@@ -515,14 +565,17 @@ const activeSection = ref(0);
 
 const handleIntersection = (entries) => {
   entries.forEach((entry) => {
-    const entrySection = parseInt(entry.target.getAttribute('section'));
+    const sectionAttr = entry.target.getAttribute('section');
+    if (!sectionAttr) return;
+
+    const entrySection = parseInt(sectionAttr);
     if (activeSection.value !== entrySection && entry.isIntersecting) {
       activeSection.value = entrySection;
     }
   });
 };
 
-let observer;
+let observer: IntersectionObserver;
 
 const setObserver = () => {
   if (observer) {
@@ -543,14 +596,16 @@ const setObserver = () => {
   });
 };
 
-pageHeight.value = window.innerHeight;
-setObserver();
+onMounted(() => {
+  pageHeight.value = window.innerHeight;
+  setObserver();
 
-window.addEventListener('resize', () => {
-  setTimeout(() => {
-    pageHeight.value = window.innerHeight;
-    setObserver();
-  }, 300);
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
+      pageHeight.value = window.innerHeight;
+      setObserver();
+    }, 300);
+  });
 });
 </script>
 
