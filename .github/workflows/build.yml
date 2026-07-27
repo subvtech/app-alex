@@ -73,6 +73,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set preview environment variables by target branch
+        id: preview_vars
+        shell: bash
+        run: |
+          if [ "${{ github.base_ref }}" = "master" ]; then
+            echo "strapi_url=${{ secrets.STRAPI_URL }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "strapi_url=${{ secrets.STRAPI_TEST_URL }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -98,6 +108,8 @@ jobs:
         run: NITRO_PRESET=vercel vercel build --token=${{ secrets.VERCEL_TOKEN }}
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
+          STRAPI_URL: ${{ steps.preview_vars.outputs.strapi_url }}
+          NUXT_PUBLIC_STRAPI_URL: ${{ steps.preview_vars.outputs.strapi_url }}
 
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
