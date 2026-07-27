@@ -38,7 +38,7 @@ Via HTTPS
 
 ```bash
 ## Clone o projeto
-git clone http://gitlab.profbrenojac.com.br/projeto-alex/app-alex.git
+git clone https://github.com/subvtech/app-alex.git
 
 ## Instale as dependências
 yarn ou yarn install
