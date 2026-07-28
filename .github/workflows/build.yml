@@ -113,3 +113,37 @@ jobs:
 
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
+  vercel-deploy:
+    if: github.event_name == 'push' && github.ref_name == 'test'
+    runs-on: ubuntu-latest
+    env:
+      TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
+      TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+      - name: Install dependencies
+        run: |
+          yarn config set registry https://registry.npmjs.org
+          yarn config set network-timeout 600000
+          yarn install
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
+          TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
+      - name: Install Vercel CLI
+        run: npm install --global vercel
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: NITRO_PRESET=vercel vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
+          STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
+          NUXT_PUBLIC_STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
