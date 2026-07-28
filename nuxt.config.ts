@@ -1,6 +1,7 @@
 import type { NuxtPage } from 'nuxt/schema';
 
 const {
+  ANTHROPIC_API_KEY,
   COMPONENTS_PAGE,
   MATOMO_APP_ID,
   MATOMO_URL,
@@ -43,6 +44,7 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
+    anthropicApiKey: ANTHROPIC_API_KEY,
     public: {
       matomoAppId: MATOMO_APP_ID,
       matomoUrl: MATOMO_URL,
