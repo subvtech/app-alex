@@ -145,5 +145,6 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=8192'
           STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
           NUXT_PUBLIC_STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
