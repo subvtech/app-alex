@@ -45,6 +45,18 @@
     },
     "linkPlaceholder": "Insira um link"
   },
+  "tableMenu": {
+    "addColumnBefore": "Inserir coluna à esquerda",
+    "addColumnAfter": "Inserir coluna à direita",
+    "deleteColumn": "Excluir coluna",
+    "addRowBefore": "Inserir linha acima",
+    "addRowAfter": "Inserir linha abaixo",
+    "deleteRow": "Excluir linha",
+    "toggleHeaderRow": "Alternar linha de cabeçalho",
+    "toggleHeaderColumn": "Alternar coluna de cabeçalho",
+    "mergeOrSplit": "Mesclar ou dividir células",
+    "deleteTable": "Excluir tabela"
+  },
   "dragMenu": {
     "clearFormatting": "Limpar formatação",
     "copyToClipboard": "Copiar para o clipboard",

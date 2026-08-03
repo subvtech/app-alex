@@ -45,6 +45,18 @@
     },
     "linkPlaceholder": "Insert a link"
   },
+  "tableMenu": {
+    "addColumnBefore": "Insert column left",
+    "addColumnAfter": "Insert column right",
+    "deleteColumn": "Delete column",
+    "addRowBefore": "Insert row above",
+    "addRowAfter": "Insert row below",
+    "deleteRow": "Delete row",
+    "toggleHeaderRow": "Toggle header row",
+    "toggleHeaderColumn": "Toggle header column",
+    "mergeOrSplit": "Merge or split cells",
+    "deleteTable": "Delete table"
+  },
   "dragMenu": {
     "clearFormatting": "Clear Formatting",
     "copyToClipboard": "Copy to Clipboard",

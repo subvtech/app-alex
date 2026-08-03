@@ -5,6 +5,9 @@
       <div ref="bubbleMenuWrapper" v-show="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
         <tip-tap-menus-bubble v-if="editor" :editor="editor" :fixed-menu-bar="fixedMenu" @click.stop.prevent />
       </div>
+      <div v-show="showMenuBar" ref="tableMenuWrapper">
+        <tip-tap-menus-table v-if="editor" :editor="editor" @click.stop.prevent />
+      </div>
       <editor-content :class="!props.edit || props.noPadding ? 'no-padding' : ''" :editor="editor" />
     </div>
   </client-only>
@@ -55,6 +58,7 @@ import Carousel from './custom-plugins/carousel/Extension';
 import MediaUpload from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
 import { isTextSelected } from './menus/bubble/isTextSelected';
+import { isTableSelected } from './menus/table/isTableSelected';
 import mentionSuggestion from './custom-plugins/mentions/Suggestions';
 
 const doc = new Y.Doc();
@@ -131,6 +135,18 @@ const container = ref<HTMLDivElement | null>(null);
 // para garantir que já esteja disponível quando o Editor for criado no onMounted,
 // independentemente do valor inicial de `edit`
 const bubbleMenuWrapper = ref<HTMLDivElement | null>(null);
+const tableMenuWrapper = ref<HTMLDivElement | null>(null);
+
+const getTableRect = (): DOMRect => {
+  const view = editor.value?.view;
+  if (!view) {
+    return new DOMRect();
+  }
+  const { node } = view.domAtPos(editor.value.state.selection.from);
+  const element = node instanceof HTMLElement ? node : node?.parentElement;
+  const table = element?.closest('table');
+  return table?.getBoundingClientRect() ?? new DOMRect();
+};
 
 const generateUserColor = (username: string): string => {
   let hash = 0;
@@ -271,6 +287,26 @@ onMounted(async () => {
             return false;
           }
           return isTextSelected({ editor: editor.value });
+        },
+      }),
+      BubbleMenu.configure({
+        pluginKey: 'tableBubbleMenu',
+        element: tableMenuWrapper.value,
+        tippyOptions: {
+          duration: 100,
+          theme: 'transparent',
+          maxWidth: 1500,
+          // ancora na tabela, não no caret: ancorado no caret o menu fica sobre as
+          // células e engole os cliques nelas
+          placement: 'bottom-start',
+          getReferenceClientRect: () => getTableRect(),
+        },
+        updateDelay: 100,
+        shouldShow: ({ view }) => {
+          if (!view || !editor.value?.isEditable) {
+            return false;
+          }
+          return isTableSelected({ editor: editor.value });
         },
       }),
       Placeholder.configure({
@@ -572,6 +608,8 @@ const slashMenuBlocks = (blocks: string[]): string[] => {
             'orderedList',
             'todoList',
             'codeBlock',
+            'insert',
+            'table',
           ];
         case 'image':
           return ['insert', 'image'];
@@ -875,13 +913,13 @@ watch(
     }
 
     th {
-      background-color: var(--gray-1);
+      background-color: rgb(var(--v-theme-gray-100));
       font-weight: bold;
       text-align: left;
     }
 
     .selectedCell:after {
-      background: var(--gray-2);
+      background: rgba(var(--v-theme-secondary--1), 0.35);
       content: '';
       left: 0;
       right: 0;
@@ -893,7 +931,7 @@ watch(
     }
 
     .column-resize-handle {
-      background-color: var(--purple);
+      background-color: rgb(var(--v-theme-secondary-0));
       bottom: -2px;
       pointer-events: none;
       position: absolute;
