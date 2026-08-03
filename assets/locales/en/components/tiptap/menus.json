@@ -31,6 +31,25 @@
       "orderedList": "Ordered List",
       "todoList": "Todo List"
     },
+    "table": {
+      "insertTable": "Insert table",
+      "columns": "Columns",
+      "addColumnBefore": "Insert column before",
+      "addColumnAfter": "Insert column after",
+      "deleteColumn": "Delete column",
+      "toggleHeaderColumn": "Toggle header column",
+      "rows": "Rows",
+      "addRowBefore": "Insert row above",
+      "addRowAfter": "Insert row below",
+      "deleteRow": "Delete row",
+      "toggleHeaderRow": "Toggle header row",
+      "cells": "Cells",
+      "mergeCells": "Merge cells",
+      "splitCell": "Split cell",
+      "toggleHeaderCell": "Toggle header cell",
+      "table": "Table",
+      "deleteTable": "Delete table"
+    },
     "tooltip": {
       "bold": "Bold",
       "italic": "Italic",
