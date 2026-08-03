@@ -20,6 +20,7 @@
           full-width
           @update="handleGeneralUpdate"
         />
+        <alex-learningplan-settings-TeachersAndMonitors :learning-plan-id="parseInt(id.toString())" />
         <alex-learningplan-settings-invites
           :learning-plan-id="parseInt(id.toString())"
           :invite-enabled="learningPlan.invite_enabled"

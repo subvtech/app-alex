@@ -59,5 +59,8 @@ export const useStrapiUtils = () => {
     return { meta: result.meta, data: formatResult<T>(result.data) };
   }
 
-  return { findOne, find, formatResult, create, update };
+  async function destroy(contentType: string, id: number): Promise<any> {
+    return await strapi.delete(contentType, id);
+  }
+  return { findOne, find, formatResult, create, update, destroy };
 };

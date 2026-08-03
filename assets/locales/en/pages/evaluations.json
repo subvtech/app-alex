@@ -47,7 +47,20 @@
     "saveFail": "Failed to save rubric",
     "missingName": "Please define a name for the rubric",
     "selectCriteria": "Please select at least one criterion",
-    "emptyField": "The rubric has an empty field"
+    "emptyField": "The rubric has an empty field",
+    "ai": {
+      "generate": "Generate with AI",
+      "generating": "Generating rubric...",
+      "dialogTitle": "Generate rubric with AI",
+      "criteriaCount": "Number of criteria",
+      "extraInstructions": "Additional guidance (optional)",
+      "extraInstructionsHint": "e.g. emphasize the use of primary sources.",
+      "success": "Rubric generated. Review it before saving.",
+      "fail": "Could not generate the rubric.",
+      "empty": "The AI returned no criteria. Try again.",
+      "missingTask": "Select a task to generate the rubric.",
+      "reviewNotice": "AI-generated content. Review and adjust before saving."
+    }
   },
   "groupsSec": {
     "public": "Public",

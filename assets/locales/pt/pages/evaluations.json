@@ -47,7 +47,20 @@
     "saveFail": "Falha ao salvar rubrica",
     "missingName": "Defina um nome para a rubrica",
     "selectCriteria": "Selecione ao menos um critério",
-    "emptyField": "A rúbrica possui algum campo vazio"
+    "emptyField": "A rúbrica possui algum campo vazio",
+    "ai": {
+      "generate": "Gerar com IA",
+      "generating": "Gerando rubrica...",
+      "dialogTitle": "Gerar rubrica com IA",
+      "criteriaCount": "Quantidade de critérios",
+      "extraInstructions": "Orientações adicionais (opcional)",
+      "extraInstructionsHint": "Ex.: enfatize o uso de fontes primárias.",
+      "success": "Rubrica gerada. Revise antes de salvar.",
+      "fail": "Não foi possível gerar a rubrica.",
+      "empty": "A IA não retornou critérios. Tente novamente.",
+      "missingTask": "Selecione uma tarefa para gerar a rubrica.",
+      "reviewNotice": "Conteúdo gerado por IA. Revise e ajuste antes de salvar."
+    }
   },
   "groupsSec": {
     "public": "Público",
