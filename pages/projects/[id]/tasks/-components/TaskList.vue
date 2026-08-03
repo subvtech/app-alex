@@ -69,6 +69,7 @@ const { mutateAsync: deleteSprint, isPending: deletingTask } = useDeleteSprint(
 );
 const { mutateAsync: moveSprint } = useMoveSprint(learninplanId, queryClient, setMessage, t);
 const sprints = ref<Droppable<Sprint>[]>([]);
+const socket = useSocket();
 
 // refs
 const isCreatingTask = ref(false);
@@ -727,6 +728,22 @@ const handleInputCancel = (index: number) => {
 const updateSprints = () => {
   queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
 };
+
+const refreshTasksFromSocket = async () => {
+  if (isCreatingTask.value || editTask.value || editingTask.value) {
+    return;
+  }
+
+  await refetchSprints();
+};
+
+onMounted(() => {
+  socket.on('tasks:update', refreshTasksFromSocket);
+});
+
+onBeforeUnmount(() => {
+  socket.off('tasks:update', refreshTasksFromSocket);
+});
 </script>
 
 <template>

@@ -63,6 +63,7 @@ const modalDeleteColumn = ref(false);
 const editTask = ref<TaskSimple>();
 const selectedColumnToDelete = ref<Column<KanbanColumnTask> | null>(null);
 const isCreatingTaskColumnId = ref<number | null>(null);
+const socket = useSocket();
 const getDeleteColumnTexts = (column: Column<KanbanColumnTask> | null) => {
   if (requiredStatusColumn.includes(column?.status_type || '')) {
     return {
@@ -294,6 +295,25 @@ const handleAddColumn = async (title: string) => {
     addColumnRef.value?.setAddingColumn(false);
   }
 };
+
+const refreshKanbanFromSocket = async () => {
+  if (isCreatingTask.value || editTask.value) {
+    return;
+  }
+
+  await refetchSprints();
+  if (selectedSprint.value) {
+    await refetchKanban();
+  }
+};
+
+onMounted(() => {
+  socket.on('tasks:update', refreshKanbanFromSocket);
+});
+
+onBeforeUnmount(() => {
+  socket.off('tasks:update', refreshKanbanFromSocket);
+});
 defineExpose({ canDrag, setCanDrag });
 </script>
 

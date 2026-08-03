@@ -133,6 +133,7 @@
     "radix-vue": "^1.7.4",
     "sass": "^1.64.2",
     "shepherd.js": "^11.2.0",
+    "socket.io-client": "^4.8.3",
     "strapi-sdk-js": "^2.2.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
