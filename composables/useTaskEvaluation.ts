@@ -8,6 +8,7 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
   const learningPlanGradesQuery = ['grades', learningPlanId];
   const taskEvaluationDataQuery = ['taskEvaluationData', taskId];
   const taskSubmissionEvaluationDataQuery = ['taskSumbmissionEvaluationData', submissionId];
+  const submissionEvaluationGroupQuery = ['submissionEvaluationGroup', submissionId];
   const learningPlanTasksQuery = ['tasks', learningPlanId];
 
   const userEvaluationCriteriaQuery = ['criteria', user];
@@ -147,6 +148,57 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
           return composition.data[0] || null;
         },
         enabled: () => submissionId?.value > 0,
+      });
+    },
+
+    /**
+     * Rubrica associada diretamente a entrega (quando existe, tem prioridade
+     * sobre a rubrica da tarefa).
+     */
+    getSubmissionEvaluationGroup(enabled: null | Ref<boolean> = null) {
+      return useQuery({
+        queryKey: submissionEvaluationGroupQuery,
+        queryFn: async () => {
+          const submission = await findOne('task-submissions', submissionId?.value, {
+            populate: {
+              evaluation_group: { populate: ['evaluation_criterias'] },
+              task_evaluation_criterias: { populate: ['criteria'] },
+            },
+          });
+
+          return submission.data || null;
+        },
+        enabled: () => submissionId?.value > 0 && (enabled ? enabled.value : true),
+      });
+    },
+    /**
+     * Associa uma rubrica/grupo de criterios a entrega e ja recria a avaliacao
+     * dessa entrega com os criterios recem definidos.
+     */
+    submissionEvaluationGroupMutation(successConfirmation: null | Ref<boolean> = null) {
+      return useMutation({
+        mutationFn: async ({ groupId, evaluationCriterias }: any) => {
+          await update('task-submissions', submissionId?.value, {
+            evaluation_group: groupId,
+            evaluation_criterias: evaluationCriterias,
+          });
+
+          return create('task-submission-evaluations', {
+            task_submission: submissionId?.value,
+            evaluation_group: groupId,
+          });
+        },
+        onError(e) {
+          console.error(e);
+        },
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: submissionEvaluationGroupQuery });
+          queryClient.invalidateQueries({ queryKey: taskSubmissionEvaluationDataQuery });
+
+          if (successConfirmation) {
+            successConfirmation.value = false;
+          }
+        },
       });
     },
 

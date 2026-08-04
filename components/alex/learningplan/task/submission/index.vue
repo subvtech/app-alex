@@ -47,14 +47,24 @@
   <alex-custom-confirm-dialog
     v-model="openConfirmDialog"
     title="Tipo de avaliação não definido!"
-    subtitle="Deseja associar um tipo de avaliação para esta tarefa?"
-    submit-button-text="Associar Tipo Avaliação"
+    subtitle="Deseja associar um tipo de avaliação apenas para esta entrega ou para a tarefa inteira?"
+    submit-button-text="Associar nesta entrega"
     cancel-button-text="
-      Cancelar
+      Associar na tarefa
     "
     :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-    @submit="setTaskEvaluationGroup"
-    @cancel="openConfirmDialog = false"
+    @submit="onAssociateOnSubmission"
+    @cancel="setTaskEvaluationGroup"
+  />
+  <alex-evaluation-select-group-dialog
+    v-model="openSubmissionEvaluationDialog"
+    title="Tipo de avaliação da entrega"
+    question="Como deseja avaliar esta entrega?"
+    :loading="associatingSubmissionGroup"
+    :group-id="submissionEvaluationGroup?.id"
+    :group-type="submissionEvaluationGroup?.type || 'standard'"
+    :criteria-weights="submissionCriteriaWeights"
+    @submit="onAssociateSubmissionEvaluationGroup"
   />
 </template>
 
@@ -114,17 +124,37 @@ const submission = toRef(props, 'content');
 const submissionId = computed(() => submission.value?.id);
 
 const openConfirmDialog = ref(false);
+const openSubmissionEvaluationDialog = ref(false);
 
-const { getTaskEvaluatonData, getTaskSubmissionEvaluation, createSubmissionEvaluationMutation } = useTaskEvaluation(
-  learningPlanId,
-  taskId,
-  user,
-  submissionId,
-);
+const isTeacher = computed(() => props.type === 'professor');
+
+const {
+  getTaskEvaluatonData,
+  getTaskSubmissionEvaluation,
+  getSubmissionEvaluationGroup,
+  createSubmissionEvaluationMutation,
+  submissionEvaluationGroupMutation,
+} = useTaskEvaluation(learningPlanId, taskId, user, submissionId);
 
 const { data: taskEvaluationData } = getTaskEvaluatonData();
 const { data: taskSubmissionData } = getTaskSubmissionEvaluation();
+const { data: submissionEvaluationData } = getSubmissionEvaluationGroup(isTeacher);
 const { mutateAsync: createTaskSubmissionEvaluation } = createSubmissionEvaluationMutation();
+const { mutateAsync: associateSubmissionEvaluationGroup, isPending: associatingSubmissionGroup } =
+  submissionEvaluationGroupMutation(openSubmissionEvaluationDialog);
+
+/* A rubrica da entrega tem prioridade sobre a rubrica definida na tarefa. */
+const submissionEvaluationGroup = computed(() => submissionEvaluationData.value?.evaluation_group);
+
+const effectiveEvaluationGroup = computed(
+  () => submissionEvaluationGroup.value || taskEvaluationData.value?.evaluation_group,
+);
+
+const submissionCriteriaWeights = computed(() => {
+  return (submissionEvaluationData.value?.task_evaluation_criterias || []).reduce((criterias, currentCrit) => {
+    return { ...criterias, [currentCrit.criteria.id]: currentCrit.weight };
+  }, {});
+});
 
 const { t } = useI18n();
 const slots = useSlots();
@@ -244,12 +274,23 @@ const setTaskEvaluationGroup = async () => {
   await navigateTo({ path: `/courses/${learningPlanId.value}/tasks`, query: { taskId: taskId.value } });
 };
 
+const onAssociateOnSubmission = () => {
+  openConfirmDialog.value = false;
+  openSubmissionEvaluationDialog.value = true;
+};
+
+const onAssociateSubmissionEvaluationGroup = async ({ groupId, evaluationCriterias }) => {
+  await associateSubmissionEvaluationGroup({ groupId, evaluationCriterias });
+
+  dialog.value.openDialog();
+};
+
 const openDialog = async () => {
-  if (props.status === 'in_review' && !taskEvaluationData.value.evaluation_group) {
+  if (props.status === 'in_review' && !taskSubmissionData.value && !effectiveEvaluationGroup.value) {
     openConfirmDialog.value = true;
     return;
   } else if (!taskSubmissionData.value && props.status === 'in_review')
-    await createTaskSubmissionEvaluation({ groupId: taskEvaluationData.value?.evaluation_group?.id });
+    await createTaskSubmissionEvaluation({ groupId: effectiveEvaluationGroup.value?.id });
 
   dialog.value.openDialog();
 };

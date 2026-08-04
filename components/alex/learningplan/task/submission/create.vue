@@ -186,6 +186,17 @@
           {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Rubrica' : 'Grupo' }} :
           <alex-custom-chip status="secondary" :text="taskSubmissionEvaluationData?.evaluation_group?.name" />
         </div>
+        <div v-if="canChangeSubmissionEvaluationGroup" class="w-100 d-flex justify-space-between align-center">
+          <span class="text-body-3 text-gray-500">
+            {{ submissionEvaluationGroup ? 'Rubrica própria desta entrega' : 'Herdada da tarefa' }}
+          </span>
+          <alex-custom-button
+            size="small"
+            variant="text"
+            text="Alterar para esta entrega"
+            @click="openSubmissionEvaluationDialog = true"
+          />
+        </div>
         <h5 class="text-gray-800 text-h5 mt-4">
           {{ taskSubmissionEvaluationData?.evaluation_group?.type === 'rubric' ? 'Analise da tarefa' : 'Critérios' }}
         </h5>
@@ -219,6 +230,17 @@
         </div>
       </div>
     </div>
+    <alex-evaluation-select-group-dialog
+      v-model="openSubmissionEvaluationDialog"
+      title="Tipo de avaliação da entrega"
+      question="Como deseja avaliar esta entrega?"
+      submit-button-text="Aplicar nesta entrega"
+      :loading="associatingSubmissionGroup"
+      :group-id="submissionEvaluationGroup?.id"
+      :group-type="submissionEvaluationGroup?.type || 'standard'"
+      :criteria-weights="submissionCriteriaWeights"
+      @submit="onAssociateSubmissionEvaluationGroup"
+    />
   </alex-custom-dialog>
 </template>
 <script setup lang="ts">
@@ -319,12 +341,40 @@ const user = useStrapiUser();
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 
-const { getTaskSubmissionEvaluation, gradeSubmissionEvaluationCriteriasMutation, setEvaluationDateMutation } =
-  useTaskEvaluation(learningPlanId, taskId, user, submissionId);
+const openSubmissionEvaluationDialog = ref(false);
+const isTeacher = computed(() => props.memberType === 'professor');
+
+const {
+  getTaskSubmissionEvaluation,
+  getSubmissionEvaluationGroup,
+  gradeSubmissionEvaluationCriteriasMutation,
+  setEvaluationDateMutation,
+  submissionEvaluationGroupMutation,
+} = useTaskEvaluation(learningPlanId, taskId, user, submissionId);
 
 const { data: taskSubmissionEvaluationData } = getTaskSubmissionEvaluation();
+const { data: submissionEvaluationData } = getSubmissionEvaluationGroup(isTeacher);
 const { mutate: updateEvaluationGrades } = gradeSubmissionEvaluationCriteriasMutation();
 const { mutate: setEvaluationDate } = setEvaluationDateMutation();
+const { mutateAsync: associateSubmissionEvaluationGroup, isPending: associatingSubmissionGroup } =
+  submissionEvaluationGroupMutation(openSubmissionEvaluationDialog);
+
+/* Rubrica associada diretamente a esta entrega; quando ausente vale a da tarefa. */
+const submissionEvaluationGroup = computed(() => submissionEvaluationData.value?.evaluation_group);
+
+const canChangeSubmissionEvaluationGroup = computed(
+  () => isTeacher.value && !taskSubmissionEvaluationData.value?.evaluated_at,
+);
+
+const submissionCriteriaWeights = computed(() => {
+  return (submissionEvaluationData.value?.task_evaluation_criterias || []).reduce((criterias, currentCrit) => {
+    return { ...criterias, [currentCrit.criteria.id]: currentCrit.weight };
+  }, {});
+});
+
+const onAssociateSubmissionEvaluationGroup = async ({ groupId, evaluationCriterias }) => {
+  await associateSubmissionEvaluationGroup({ groupId, evaluationCriterias });
+};
 
 const isReadOnly = computed(() => {
   return props.readOnly || taskSubmissionEvaluationData.value?.evaluated_at;
