@@ -79,6 +79,30 @@
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
+    <!-- Table -->
+    <MenubarMenu>
+      <MenubarTrigger>
+        <v-icon icon="mdi-table" size="16px" />
+        <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
+      </MenubarTrigger>
+      <MenubarContent class="menuContent">
+        <template v-for="item in tableList">
+          <p v-if="item.isLabel" :key="`${item.name}-label`" class="tw-text-[9px] text-gray-700 px-2 py-1">
+            {{ item.name }}
+          </p>
+          <MenubarItem
+            v-else
+            :key="`${item.name}-item`"
+            :disabled="item.isDisabled?.()"
+            :data-highlighted="item.isActive?.()"
+            @select="item.onClick?.()"
+          >
+            <v-icon :icon="item.icon" class="tw-mt-0.5 mr-2" size="14px" />
+            {{ item.name }}
+          </MenubarItem>
+        </template>
+      </MenubarContent>
+    </MenubarMenu>
   </Menubar>
 </template>
 
@@ -97,6 +121,7 @@ interface menuItens {
   value?: string;
   isLabel?: boolean;
   isActive?: () => boolean;
+  isDisabled?: () => boolean;
   onClick?: () => void;
 }
 
@@ -104,6 +129,8 @@ const { t } = useI18n();
 
 const getTranslation = (key: string) =>
   t(`components.tiptap.menus.bubbleMenu.blocks.${key}`);
+
+const getTableTranslation = (key: string) => t(`components.tiptap.menus.bubbleMenu.table.${key}`);
 
 const contentTypeList: menuItens[] = [
   {
@@ -262,6 +289,106 @@ const textAlignOptions: menuItens[] = [
     isActive: () => props.editor.isActive({ textAlign: 'justify' }),
   },
 ];
+
+const isInTable = computed(() => props.editor.isActive('table'));
+
+const tableList = computed<menuItens[]>(() => [
+  {
+    name: getTableTranslation('insertTable'),
+    icon: 'mdi-table-plus',
+    onClick: () => props.editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+    isDisabled: () => isInTable.value || !props.editor.can().insertTable({ rows: 3, cols: 3, withHeaderRow: true }),
+  },
+  {
+    name: getTableTranslation('columns'),
+    isLabel: true,
+  },
+  {
+    name: getTableTranslation('addColumnBefore'),
+    icon: 'mdi-table-column-plus-before',
+    onClick: () => props.editor.chain().focus().addColumnBefore().run(),
+    isDisabled: () => !props.editor.can().addColumnBefore(),
+  },
+  {
+    name: getTableTranslation('addColumnAfter'),
+    icon: 'mdi-table-column-plus-after',
+    onClick: () => props.editor.chain().focus().addColumnAfter().run(),
+    isDisabled: () => !props.editor.can().addColumnAfter(),
+  },
+  {
+    name: getTableTranslation('deleteColumn'),
+    icon: 'mdi-table-column-remove',
+    onClick: () => props.editor.chain().focus().deleteColumn().run(),
+    isDisabled: () => !props.editor.can().deleteColumn(),
+  },
+  {
+    name: getTableTranslation('toggleHeaderColumn'),
+    icon: 'mdi-table-column',
+    onClick: () => props.editor.chain().focus().toggleHeaderColumn().run(),
+    isDisabled: () => !props.editor.can().toggleHeaderColumn(),
+  },
+  {
+    name: getTableTranslation('rows'),
+    isLabel: true,
+  },
+  {
+    name: getTableTranslation('addRowBefore'),
+    icon: 'mdi-table-row-plus-before',
+    onClick: () => props.editor.chain().focus().addRowBefore().run(),
+    isDisabled: () => !props.editor.can().addRowBefore(),
+  },
+  {
+    name: getTableTranslation('addRowAfter'),
+    icon: 'mdi-table-row-plus-after',
+    onClick: () => props.editor.chain().focus().addRowAfter().run(),
+    isDisabled: () => !props.editor.can().addRowAfter(),
+  },
+  {
+    name: getTableTranslation('deleteRow'),
+    icon: 'mdi-table-row-remove',
+    onClick: () => props.editor.chain().focus().deleteRow().run(),
+    isDisabled: () => !props.editor.can().deleteRow(),
+  },
+  {
+    name: getTableTranslation('toggleHeaderRow'),
+    icon: 'mdi-table-row',
+    onClick: () => props.editor.chain().focus().toggleHeaderRow().run(),
+    isDisabled: () => !props.editor.can().toggleHeaderRow(),
+  },
+  {
+    name: getTableTranslation('cells'),
+    isLabel: true,
+  },
+  {
+    name: getTableTranslation('mergeCells'),
+    icon: 'mdi-table-merge-cells',
+    onClick: () => props.editor.chain().focus().mergeCells().run(),
+    isDisabled: () => !props.editor.can().mergeCells(),
+  },
+  {
+    name: getTableTranslation('splitCell'),
+    icon: 'mdi-table-split-cell',
+    onClick: () => props.editor.chain().focus().splitCell().run(),
+    isDisabled: () => !props.editor.can().splitCell(),
+  },
+  {
+    name: getTableTranslation('toggleHeaderCell'),
+    icon: 'mdi-table-headers-eye',
+    onClick: () => props.editor.chain().focus().toggleHeaderCell().run(),
+    isActive: () => props.editor.isActive('tableHeader'),
+    isDisabled: () => !props.editor.can().toggleHeaderCell(),
+  },
+  {
+    name: getTableTranslation('table'),
+    isLabel: true,
+  },
+  {
+    name: getTableTranslation('deleteTable'),
+    icon: 'mdi-table-remove',
+    onClick: () => props.editor.chain().focus().deleteTable().run(),
+    isDisabled: () => !props.editor.can().deleteTable(),
+  },
+]);
 
 const setFontFamily = (fontFamily: string) => {
   if (!fontFamily || fontFamily.length === 0) {

@@ -31,6 +31,25 @@
       "orderedList": "Lista ordenada",
       "todoList": "Lista de tarefas"
     },
+    "table": {
+      "insertTable": "Inserir tabela",
+      "columns": "Colunas",
+      "addColumnBefore": "Inserir coluna à esquerda",
+      "addColumnAfter": "Inserir coluna à direita",
+      "deleteColumn": "Excluir coluna",
+      "toggleHeaderColumn": "Alternar coluna de cabeçalho",
+      "rows": "Linhas",
+      "addRowBefore": "Inserir linha acima",
+      "addRowAfter": "Inserir linha abaixo",
+      "deleteRow": "Excluir linha",
+      "toggleHeaderRow": "Alternar linha de cabeçalho",
+      "cells": "Células",
+      "mergeCells": "Mesclar células",
+      "splitCell": "Dividir célula",
+      "toggleHeaderCell": "Alternar célula de cabeçalho",
+      "table": "Tabela",
+      "deleteTable": "Excluir tabela"
+    },
     "tooltip": {
       "bold": "Negrito",
       "italic": "Itálico",
