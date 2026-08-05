@@ -248,6 +248,15 @@
           />
         </alex-custom-dialog>
       </v-row>
+
+      <alex-rubric-ai-generator
+        v-if="editable && title"
+        class="mb-6"
+        :task-title="title"
+        :task-description="description"
+        :learning-goals="taskLearningGoals"
+      />
+
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
         <alex-learningplan-task-resources
@@ -362,6 +371,10 @@ const sendAfterDeadline = ref(props.sendAfterDeadline);
 const goals = ref(props.goals);
 const tags = ref(props.tags);
 const title = ref(props.title);
+
+const taskLearningGoals = computed(() => {
+  return goals.value.map((goal) => `${goal?.verb?.text ?? ''} ${goal?.description ?? ''}`.trim()).filter(Boolean);
+});
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 const model = defineModel({ default: false });

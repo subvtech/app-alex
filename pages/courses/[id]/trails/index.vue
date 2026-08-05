@@ -205,6 +205,7 @@ const { update } = useStrapi();
 const userStore = useStrapiUser();
 const strapiClient = useStrapiClient();
 const { setMessage } = useMessageStore();
+const socket = useSocket();
 
 const openCopyDialog = ref<TrailSimple | null>(null);
 const yourProjects = ref<LearningPlanMemberSimple[]>([]);
@@ -218,6 +219,10 @@ const page = ref(1);
 const createTrailDialog = ref(false);
 
 const learningPlanStore = useLearningPlanStore();
+
+const refreshTrails = async () => {
+  await learningPlanStore.loadLearningPlan(+route.params.id, false);
+};
 
 const learningStructure = computed(() => {
   return (
@@ -322,6 +327,8 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
+  socket.on('trails:update', refreshTrails);
+
   find('learning-plan-members', {
     filters: { user: userStore?.value?.id },
     populate: ['learningplan.cover_image'],
@@ -333,6 +340,10 @@ onMounted(() => {
       (member) => member.status === 'joined' && member.learningplan.type === 'course' && member.role === 'facilitator',
     );
   });
+});
+
+onBeforeUnmount(() => {
+  socket.off('trails:update', refreshTrails);
 });
 
 watch(openCopyDialog, () => {

@@ -164,6 +164,7 @@ const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const loader = ref(false);
 const { setMessage } = useMessageStore();
+const socket = useSocket();
 const learningPlanStore = useLearningPlanStore();
 const teacherDrawer = ref(false);
 const slideTransition = (i: number) => (tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up');
@@ -486,10 +487,26 @@ const openDrawer = (id: number) => {
   teacherDrawer.value = true;
 };
 
+const refreshTasksFromSocket = async () => {
+  if (isCreatingTask.value || teacherDrawer.value || editTaskId.value !== -1) {
+    return;
+  }
+
+  if (learningPlanStore.learningPlan) {
+    await learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, false);
+  }
+};
+
 onMounted(() => {
+  socket.on('tasks:update', refreshTasksFromSocket);
+
   if (route.query?.taskId) {
     openDrawer(Number.parseInt(route.query.taskId.toString()));
   }
+});
+
+onBeforeUnmount(() => {
+  socket.off('tasks:update', refreshTasksFromSocket);
 });
 
 watch(teacherDrawer, (open) => {

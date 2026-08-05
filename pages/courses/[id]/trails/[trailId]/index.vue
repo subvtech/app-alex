@@ -95,7 +95,15 @@
             {{ $t('pages.trailId.overview.lastUpdated') }}
             {{ timeStampToDate(editorData.time) }}
           </p>
-          <AppEditor ref="editor" key-id="editorjs" />
+
+          <Tiptap
+            ref="editor"
+            @update:model-value="(val) => (tiptapContent = val)"
+            :edit="!readOnly"
+            :doc-name="`trail-${trailId}`"
+            :collaboration="true"
+          />
+
           <div v-if="readOnly">
             <div
               v-for="contribution in highlightedContributions"
@@ -108,12 +116,7 @@
                   class="mr-2 user-avatar"
                   :size="24"
                   :profile-picture="
-                    contribution.student.photo
-                      ? {
-                          url: contribution.student.photo,
-                          id: contribution.student.id,
-                        }
-                      : null
+                    contribution.student.photo ? { url: contribution.student.photo, id: contribution.student.id } : null
                   "
                   :placeholder="contribution.student.name"
                 ></app-user-avatar>
@@ -123,7 +126,6 @@
                   :trail-id="trailId"
                   :learning-plan-id="learningPlanId"
                 />
-
                 <span class="text-gray-600 text-body-5">
                   {{ timeStampToDate(contribution.time) }}
                 </span>
@@ -132,12 +134,7 @@
                 {{ contribution.title }}
               </h3>
               <div>
-                <AppEditor
-                  :ref="`contribution-${contribution.id}`"
-                  :key-id="`contribution-${contribution.id}`"
-                  :data="contribution.contribution"
-                  :read-only="readOnly"
-                />
+                <Tiptap :ref="(el) => setContributionRef(el, contribution.id)" :edit="false" :collaboration="false" />
               </div>
             </div>
             <div
@@ -150,6 +147,7 @@
             </div>
           </div>
         </div>
+
         <div v-if="readOnly" class="d-lg-block sections-col h-100" cols="2">
           <div class="sections-container">
             <p class="text-gray-800 text-h6 mb-4">Seções</p>
@@ -182,15 +180,20 @@
         </div>
       </div>
     </div>
+
+    <div class="bubble-menu-wrapper" style="display: none"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+import Tiptap from '~/components/TipTap/index.vue';
+
 definePageMeta({
   hideLearningPlanBanner: true,
 });
+
 const { update, create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
@@ -200,36 +203,33 @@ useHeaderTrails('');
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
-definePageMeta({
-  hideLearningPlanBanner: true,
-});
-
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
 const isLoading = ref(false);
 const sidebar = ref(false);
+const { t } = useI18n();
 
-const backUpEditorData = ref({ blocks: [] });
+const tiptapContent = ref<Record<string, any>>({});
+const backUpEditorData = ref({});
+const contributionRefs = ref<Record<string, any>>({});
+
+const setContributionRef = (el: any, id: number) => {
+  if (el) {
+    contributionRefs.value[`contribution-${id}`] = el;
+  }
+};
+
 const showEditor = computed(() => {
   return true;
-  // !trailStore.loading && (editorData.value.blocks.length || !readOnly.value);
 });
-const { t } = useI18n();
+
 const editorData = computed(() => {
   const data = trailStore.trail?.structures[trailStore.trail?.structures.length - 1];
   return {
     time: data && data.time ? parseInt(data.time.toString()) : 0,
     version: data?.version || '',
-    blocks:
-      data?.blocks.map((block: any) => {
-        return {
-          type: block.type,
-          data: block.data,
-          tunes: block.tunes || {},
-          id: block.id || '',
-        };
-      }) || [],
+    blocks: data?.blocks || {},
   };
 });
 
@@ -242,7 +242,7 @@ const highlightedContributions = computed(() => {
         id: contribution.id,
         title: contribution.title,
         contribution: contribution.contribution,
-        time: contribution.contribution.time,
+        time: contribution.contribution?.time || 0,
         student: {
           id: contribution.student_member.user.id,
           name: contribution.student_member.user.fullname,
@@ -261,7 +261,7 @@ const highlightedContributionsSimple = computed(() => {
       id: contribution.id,
       title: contribution.title,
       contribution: contribution.contribution,
-      time: contribution.contribution.time,
+      time: contribution.time,
     };
   });
 });
@@ -271,15 +271,9 @@ onMounted(async () => {
   while (trailStore.loading) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  if (editorData.value.blocks.length) {
-    if (await checkEditorReady()) {
-      readOnly.value = false;
 
-      await loadEditor();
-      toggleReadOnly('save');
-    } else {
-      setMessage(t('pages.trailId.overview.loadError'), 'red', true);
-    }
+  if (editorData.value.blocks) {
+    loadEditor();
   }
   isLoading.value = false;
 });
@@ -302,20 +296,84 @@ const isAvailableTooltip = (title: string) => {
   return false;
 };
 
-const toggleReadOnly = async (mode: string | '') => {
+const loadEditor = () => {
+  tiptapContent.value = editorData.value.blocks;
+
+  setTimeout(() => {
+    if (editor.value) {
+      editor.value.setContent(tiptapContent.value);
+    }
+
+    highlightedContributions.value?.forEach((contribution) => {
+      const comp = contributionRefs.value[`contribution-${contribution.id}`];
+      if (comp) {
+        comp.setContent(contribution.contribution);
+      }
+    });
+  }, 300);
+};
+
+const toggleReadOnly = (mode?: string) => {
   readOnly.value = !readOnly.value;
-  if (editor.value && editorData.value.blocks.length) {
-    await editor.value.toggleReadOnly(mode);
-  }
 
   if (!readOnly.value) {
-    backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
-    observer.disconnect();
+    backUpEditorData.value = JSON.parse(JSON.stringify(tiptapContent.value));
+    if (observer) observer.disconnect();
+
+    setTimeout(() => {
+      if (editor.value) {
+        editor.value.setContent(tiptapContent.value);
+      }
+    }, 300);
   } else {
     setTimeout(() => {
+      if (editor.value) {
+        editor.value.setContent(tiptapContent.value);
+      }
       setSections();
       setObserver();
     }, 300);
+  }
+};
+
+const resetData = () => {
+  tiptapContent.value = JSON.parse(JSON.stringify(backUpEditorData.value));
+  readOnly.value = true;
+
+  setTimeout(() => {
+    if (editor.value) {
+      editor.value.setContent(tiptapContent.value);
+    }
+    setSections();
+    setObserver();
+  }, 300);
+};
+
+const saveData = async () => {
+  saveLoading.value = true;
+  try {
+    console.log('Saving data:', tiptapContent.value);
+    const contentToSave = tiptapContent.value;
+
+    await create('structures', {
+      time: Date.now(),
+      version: 'tiptap-1.0',
+      blocks: contentToSave,
+      trail: trailId.value,
+    });
+
+    trailStore.trail?.structures.push({
+      time: Date.now(),
+      version: 'tiptap-1.0',
+      blocks: contentToSave as BlockSimple[],
+      trail: trailId.value,
+    });
+
+    toggleReadOnly('save');
+  } catch (e) {
+    setMessage(t('pages.trailId.overview.saveError'), 'error', true);
+  } finally {
+    saveLoading.value = false;
   }
 };
 
@@ -327,29 +385,26 @@ const setSections = () => {
       active: true,
     },
   ];
-  editorData.value.blocks.forEach((block: any) => {
-    if (block.type === 'header') {
+
+  const contentArray = tiptapContent.value?.content || [];
+
+  contentArray.forEach((node: any, index: number) => {
+    if (node.type === 'heading') {
+      const text = node.content?.map((n: any) => n.text).join('') || '';
       newSections.push({
-        title: block.data.text,
-        type: block.data.level,
+        title: text,
+        type: node.attrs?.level || 2,
         active: false,
       });
     }
-    const sectionBlock = document.querySelector(`[data-id="${block.id}"]`);
-    if (sectionBlock) {
-      sectionBlock.setAttribute('section', String(newSections.length - 1));
-    }
   });
+
   highlightedContributions.value?.forEach((contribution) => {
     newSections.push({
       title: contribution.title,
       type: 3,
       active: false,
     });
-    const contributionSection = document.getElementById(`${contribution.title}-${contribution.id}`);
-    if (contributionSection) {
-      contributionSection.setAttribute('section', String(newSections.length - 1));
-    }
   });
 
   sections.value = newSections;
@@ -407,83 +462,11 @@ const handlePositions = (contributions) => {
   });
 };
 
-const loadEditor = async () => {
-  if (!editor.value || !editorData.value) return;
-  const res = await editor.value.loadEditor({
-    blocks: editorData.value.blocks,
-  });
-  if (res.success) {
-    trailStore.trail?.structures.push({
-      time: editorData.value.time,
-      version: res.data.version,
-      blocks: res.data.blocks,
-      id: res.data.id,
-      trail: trailId.value,
-    });
-  } else {
-    setMessage(t('pages.trailId.overview.loadError'), 'error', true);
-  }
-};
-
-const saveData = async () => {
-  saveLoading.value = true;
-  try {
-    const res = await editor.value.getData();
-    if (!res.success) {
-      setMessage(t('pages.trailId.overview.saveError'), 'error', true);
-      return;
-    }
-    await create('structures', {
-      time: Date.now(),
-      version: res.data.version,
-      blocks: res.data.blocks,
-      trail: trailId.value,
-    });
-    trailStore.trail?.structures.push({
-      time: Date.now(),
-      version: res.data.version,
-      blocks: res.data.blocks,
-      trail: trailId.value,
-    });
-    toggleReadOnly('save');
-  } catch (e) {
-    setMessage(t('pages.trailId.overview.saveError'), 'error', true);
-  } finally {
-    saveLoading.value = false;
-  }
-};
-
-const resetData = async () => {
-  if (!backUpEditorData.value.blocks.length) {
-    editor.value.clearEditor();
-  } else {
-    editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
-    await loadEditor();
-  }
-
-  toggleReadOnly('cancel');
-};
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const checkEditorReady = async () => {
-  let attempts = 0;
-  while (attempts < 10) {
-    try {
-      await editor.value.isReady;
-      return true;
-    } catch (error) {
-      await sleep(100);
-      attempts++;
-    }
-  }
-  return false;
-};
-
 const timeStampToDate = (timeStamp: number) => {
+  if (!timeStamp) return '';
   const date = new Date(timeStamp);
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 };
@@ -493,14 +476,17 @@ const activeSection = ref(0);
 
 const handleIntersection = (entries) => {
   entries.forEach((entry) => {
-    const entrySection = parseInt(entry.target.getAttribute('section'));
+    const sectionAttr = entry.target.getAttribute('section');
+    if (!sectionAttr) return;
+
+    const entrySection = parseInt(sectionAttr);
     if (activeSection.value !== entrySection && entry.isIntersecting) {
       activeSection.value = entrySection;
     }
   });
 };
 
-let observer;
+let observer: IntersectionObserver;
 
 const setObserver = () => {
   if (observer) {
@@ -521,18 +507,21 @@ const setObserver = () => {
   });
 };
 
-pageHeight.value = window.innerHeight;
-setObserver();
+onMounted(() => {
+  pageHeight.value = window.innerHeight;
+  setObserver();
 
-window.addEventListener('resize', () => {
-  setTimeout(() => {
-    pageHeight.value = window.innerHeight;
-    setObserver();
-  }, 300);
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
+      pageHeight.value = window.innerHeight;
+      setObserver();
+    }, 300);
+  });
 });
 </script>
 
 <style scoped lang="scss">
+/* Todos os estilos mantidos intactos */
 .pl-20 {
   padding-left: 80px;
 }
@@ -540,11 +529,9 @@ window.addEventListener('resize', () => {
   min-height: 436px;
   position: relative;
 }
-
 .empty-state-text {
   max-width: 314px;
 }
-
 .sections-container {
   max-width: 240px;
   position: -webkit-sticky;
@@ -556,12 +543,10 @@ window.addEventListener('resize', () => {
     opacity 200ms,
     display 200ms;
 }
-
 .sections-col {
   position: absolute;
   right: 0;
 }
-
 .text-overflow {
   white-space: wrap !important;
   text-wrap: normal !important;
@@ -584,17 +569,14 @@ window.addEventListener('resize', () => {
     color: #30363b !important;
   }
 }
-
 .contributions-container {
   border-top: 1px solid rgb(var(--v-theme-gray-100));
 }
-
 #editor-container {
   container-type: inline-size;
   container-name: editor;
   padding-bottom: 100px;
 }
-
 @keyframes slideaway {
   from {
     display: block;
@@ -604,7 +586,6 @@ window.addEventListener('resize', () => {
     opacity: 0;
   }
 }
-
 @keyframes slidein {
   from {
     transform: translateX(40px);
@@ -614,14 +595,12 @@ window.addEventListener('resize', () => {
     display: block;
   }
 }
-
 .sticky-buttons {
   position: -webkit-sticky;
   position: sticky;
   top: 88px;
   z-index: 1;
 }
-
 .user-card {
   display: none;
   position: absolute;
@@ -631,15 +610,12 @@ window.addEventListener('resize', () => {
     display: block;
   }
 }
-
 .user-avatar {
   padding: 4px 0px 4px 0px;
 }
-
 .user-avatar:hover ~ .user-card {
   display: block !important;
 }
-
 @container editor (max-width: 1330px) {
   .sections-container {
     animation: slideaway 200ms;
