@@ -33,6 +33,7 @@ jobs:
             echo "strapi_url=${{ secrets.STRAPI_URL }}" >> "$GITHUB_OUTPUT"
             echo "open_ai_key=${{ secrets.OPEN_AI_KEY }}" >> "$GITHUB_OUTPUT"
             echo "matomo_app_id=${{ secrets.MATOMO_APP_ID }}" >> "$GITHUB_OUTPUT"
+            echo "service=app" >> "$GITHUB_OUTPUT"
           else
             echo "tag=test" >> "$GITHUB_OUTPUT"
             echo "components_page=on" >> "$GITHUB_OUTPUT"
@@ -61,6 +62,19 @@ jobs:
             open_ai_key=${{ steps.vars.outputs.open_ai_key }}
             tiptap_app_id=${{ secrets.TIPTAP_APP_ID }}
             tiptap_key=${{ secrets.TIPTAP_KEY }}
+
+      - name: Deploy to production server
+        if: github.ref_name == 'master'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+          username: ${{ secrets.DEPLOY_SSH_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /root/services/alex
+            docker compose pull ${{ steps.vars.outputs.service }}
+            docker compose up -d ${{ steps.vars.outputs.service }}
+
   vercel-preview:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
