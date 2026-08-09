@@ -181,7 +181,7 @@ onMounted(async () => {
     setAvailableBlocks(props.allowedBlocks);
     provider = new TiptapCollabProvider({
       name: props.docName, // Unique document identifier for syncing. This is your document name.
-      appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
+      baseUrl: app.$config.public.hocuspocusUrl, // Your Cloud Dashboard AppID or `baseURL` for on-premises
       token: TipTapToken, // Your JWT token
       document: doc,
       // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
