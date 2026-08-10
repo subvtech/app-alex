@@ -6,7 +6,7 @@
     :invite-link-hash="learningPlanStore.invitationLink?.hash"
     :invite-link-expires-at="expiresAtDate"
     :invitation-duration="learningPlanStore.learningPlan?.invitation_duration"
-    :can-edit="learningPlanStore.userIsFacilitator"
+    :can-edit="effectiveUserIsFacilitator"
     :schedules="schedules"
     @update="(message) => updateCourse(true, message)"
   />
@@ -19,9 +19,13 @@ definePageMeta({
 });
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const i18n = useI18n();
 const route = useRoute();
 const id = Number(route.params.id);
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 const schedules = computed(
   () =>
     learningPlanStore.schedules?.map((item) => {

@@ -16,7 +16,7 @@
       :action-text="$t('pages.classes.createClass')"
       action-icon="mdi-account-multiple-plus-outline"
       :filter-keys="['name']"
-      :hide-action="!userIsCourseFacilitator"
+      :hide-action="!effectiveUserIsFacilitator"
       empty-state-object-name="pages.classes.participant"
       entity="class"
       hide-secondary-action
@@ -31,7 +31,7 @@
             image: item?.in_charge_member?.user?.avatar,
           }"
           :class-members="getClassMembersInfo(item?.learning_plan_members)"
-          :no-options="!learningPlanStore.userIsFacilitator"
+          :no-options="!effectiveUserIsFacilitator"
           :can-delete="!item.learning_plan_members.length"
           @delete="() => deleteClass(item.id)"
           @open="() => openCard(item)"
@@ -81,12 +81,16 @@ const { t } = useI18n();
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const headerStore = usePageHeaderStore();
 const strapi = useStrapi();
 const formAddGroup = useForm();
 
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const userIsCourseFacilitator = computed(() => learningPlanStore.userLearningMember?.role === 'facilitator');
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
+const userIsCourseFacilitator = computed(() => effectiveUserIsFacilitator.value);
 const dialogConfirmDeleteClass = ref(false);
 const searchClasses = ref('');
 const removingClassId = ref(0);

@@ -19,7 +19,7 @@
           @click="sidebar = !sidebar"
         />
         <alex-custom-button
-          v-if="readOnly && learningPlanStore.userIsFacilitator && !trailStore.loading"
+          v-if="readOnly && effectiveUserIsFacilitator && !trailStore.loading"
           variant="primary"
           size="large"
           class="ml-2"
@@ -27,7 +27,7 @@
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div v-else-if="learningPlanStore.userIsFacilitator && !isLoading">
+        <div v-else-if="effectiveUserIsFacilitator && !isLoading">
           <alex-custom-button
             variant="secondary"
             size="large"
@@ -138,7 +138,7 @@
               </div>
             </div>
             <div
-              v-if="!learningPlanStore.userIsFacilitator"
+              v-if="!effectiveUserIsFacilitator"
               class="w-100 pt-12 d-flex justify-center align-center contributions-container"
             >
               <alex-custom-button class="ma-auto" prepend-icon="mdi-plus" size="large" @click="goToContributions()">
@@ -201,7 +201,11 @@ const trailStore = useTrailStore();
 const trailId = computed(() => parseInt(route.params?.trailId.toString()));
 useHeaderTrails('');
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 
 const saveLoading = ref(false);
 const readOnly = ref(true);
