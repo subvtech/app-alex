@@ -11,8 +11,6 @@ definePageMeta({
 
 const user = useStrapiUser<User>();
 
-// O Strapi trunca em `maxLimit: 100` (config/api.js), entao um unico request nunca
-// devolve tudo. Percorre as paginas ate juntar a colecao inteira.
 const findAll = async (resource: string, params: Record<string, any>) => {
   const { find } = useStrapi();
   const pageSize = 100;
@@ -40,8 +38,6 @@ const { data: dashboardStats, isLoading: isStatsLoading } = useQuery({
 
     const now = new Date();
 
-    // Um learningplan em draft ou removido chega como `data: null`. Sem essa
-    // normalizacao o acesso a `.attributes` derruba os dois donuts de uma vez.
     const plans = members
       .map((member: any) => ({
         role: member.attributes.role,
@@ -51,10 +47,6 @@ const { data: dashboardStats, isLoading: isStatsLoading } = useQuery({
 
     const isActive = (member: (typeof plans)[number]) => !member.plan.end_date || new Date(member.plan.end_date) >= now;
 
-    // "Criados" = onde o usuario e facilitator, o papel de quem cria o plano.
-    // Todo o resto do enum (student, student_leader, partner, collaborator) conta
-    // como "Participando" — se listar apenas 'student', os demais papeis entram no
-    // total e nao aparecem em nenhuma linha da legenda.
     const buildStats = (type: string) => {
       const all = plans.filter((member) => member.plan.type === type);
       const active = all.filter(isActive);
@@ -80,9 +72,6 @@ const { data: userTasks, isLoading: isTasksLoading } = useQuery({
   queryFn: async (): Promise<RecentTask[]> => {
     const members = await findAll('task-members', {
       filters: {
-        // O campo `user` do task-member nao e preenchido na criacao (nem pelo
-        // addStudents do backend, nem pelo front), entao o vinculo com o usuario
-        // so existe atraves do learning_plan_member / learning_plan_group.
         $or: [
           { learning_plan_member: { user: user.value?.id } },
           { learning_plan_group: { group_members: { student_member: { user: user.value?.id } } } },
@@ -92,7 +81,6 @@ const { data: userTasks, isLoading: isTasksLoading } = useQuery({
       populate: { task: { populate: ['tags', 'learningplan'] } },
     });
 
-    // Sem prazo definido a tarefa vai para o fim da lista, nao para o comeco.
     const deadline = (date?: string | null) => (date ? new Date(date).getTime() : Number.POSITIVE_INFINITY);
 
     return members
