@@ -115,6 +115,17 @@ function convertBlock(block: EditorJsBlock, extensions?: Extensions): ProseMirro
     case 'alert':
     case 'warning':
       return convertAlert(data, extensions);
+    case 'linkTool':
+    case 'link':
+      return convertLink(data, extensions);
+    case 'table':
+      return convertTable(data, extensions);
+    case 'carousel':
+      return convertCarousel(data);
+    case 'delimiter':
+      return convertDelimiter();
+    case 'quote':
+      return convertQuote(data, extensions);
     default:
       console.warn(`[convertEditorJsToTiptap] Tipo desconhecido: "${type}"`);
       return makeFallbackParagraph(type);
@@ -317,9 +328,10 @@ function convertFileSet(data: any): ProseMirrorNode {
 function parseInlineContent(html: string, extensions?: Extensions): ProseMirrorNode[] {
   if (!html) return [];
 
-  // Se não tem tags HTML, retorna texto puro direto (otimização)
-  if (!/<[^>]+>/.test(html)) {
-    return [{ type: 'text', text: html }];
+  // Se não tem tags HTML, decodifica entidades e retorna texto puro (otimização)
+  if (!/\<[^>]+\>/.test(html)) {
+    const decoded = decodeHtmlEntities(html);
+    return [{ type: 'text', text: decoded }];
   }
 
   // Usa generateJSON do Tiptap se extensions disponíveis
@@ -341,7 +353,23 @@ function parseInlineContent(html: string, extensions?: Extensions): ProseMirrorN
 
   // Fallback: strip de tags e texto puro
   const plainText = html.replace(/<[^>]+>/g, '');
-  return plainText ? [{ type: 'text', text: plainText }] : [];
+  const decoded = decodeHtmlEntities(plainText);
+  return decoded ? [{ type: 'text', text: decoded }] : [];
+}
+
+/**
+ * Decodifica entidades HTML comuns (&nbsp;, &amp;, &lt;, &gt;, &quot;, &#39;, etc.)
+ */
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&#x27;/gi, "'")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)));
 }
 
 // ---------------------------------------------------------------------------
@@ -366,6 +394,159 @@ function convertAlert(
       },
     ],
   };
+}
+
+// ---------------------------------------------------------------------------
+// link / linkTool → paragraph com texto linkado
+// { link: "https://...", meta: { title, description, image: { url } } }
+// ---------------------------------------------------------------------------
+
+function convertLink(
+  data: { link?: string; meta?: { title?: string; description?: string; image?: { url?: string } } },
+  extensions?: Extensions,
+): ProseMirrorNode {
+  const url = data.link || '';
+  const title = data.meta?.title || url;
+  const description = data.meta?.description || '';
+
+  const content: ProseMirrorNode[] = [
+    {
+      type: 'text',
+      text: title,
+      marks: url ? [{ type: 'link', attrs: { href: url, target: '_blank' } }] : [],
+    },
+  ];
+
+  // Se tem descrição, adiciona como segundo parágrafo
+  if (description) {
+    return {
+      type: 'blockquote',
+      content: [
+        { type: 'paragraph', content },
+        {
+          type: 'paragraph',
+          content: parseInlineContent(description, extensions),
+        },
+      ],
+    };
+  }
+
+  return { type: 'paragraph', content };
+}
+
+// ---------------------------------------------------------------------------
+// table → table > tableRow > tableCell
+// { content: [["col1","col2"],["a","b"]], withHeadings?: boolean }
+// ---------------------------------------------------------------------------
+
+function convertTable(
+  data: { content?: string[][]; withHeadings?: boolean },
+  extensions?: Extensions,
+): ProseMirrorNode {
+  const rows = data.content || [];
+  if (!rows.length) {
+    return { type: 'paragraph' };
+  }
+
+  return {
+    type: 'table',
+    content: rows.map((row, rowIndex) => ({
+      type: 'tableRow',
+      content: row.map((cellHtml) => ({
+        type: data.withHeadings && rowIndex === 0 ? 'tableHeader' : 'tableCell',
+        content: [
+          {
+            type: 'paragraph',
+            content: cellHtml ? parseInlineContent(cellHtml, extensions) : [],
+          },
+        ],
+      })),
+    })),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// carousel → sequência de mediaUpload (imagens)
+// data é array: [{ title, image, type, video, url }]
+// ---------------------------------------------------------------------------
+
+function convertCarousel(data: any): ProseMirrorNode {
+  // data do carousel é o array de slides diretamente
+  const slides = Array.isArray(data) ? data : [];
+
+  if (!slides.length) {
+    return { type: 'paragraph', content: [{ type: 'text', text: '[carousel vazio]' }] };
+  }
+
+  // Cada slide vira um mediaUpload de imagem ou vídeo
+  // Retorna um wrapper doc-level: como convertBlock retorna um único nó,
+  // usamos um blockquote para agrupar os slides
+  return {
+    type: 'blockquote',
+    content: slides.map((slide: any) => {
+      const src = slide.image || slide.video || slide.url || '';
+      const isVideo = !!(slide.video || slide.type === 'video');
+      return {
+        type: 'mediaUpload',
+        attrs: {
+          media: {
+            src,
+            title: slide.title || '',
+            id: slide.imgId || slide.videoId || null,
+            size: 100,
+            align: 'center',
+          },
+          format: isVideo ? 'video' : 'image',
+        },
+      };
+    }),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// delimiter → horizontalRule
+// ---------------------------------------------------------------------------
+
+function convertDelimiter(): ProseMirrorNode {
+  return { type: 'horizontalRule' };
+}
+
+// ---------------------------------------------------------------------------
+// quote → blockquote
+// { text: "...", caption: "...", alignment: "left" }
+// ---------------------------------------------------------------------------
+
+function convertQuote(
+  data: { text?: string; caption?: string; alignment?: string },
+  extensions?: Extensions,
+): ProseMirrorNode {
+  const content: ProseMirrorNode[] = [];
+
+  if (data.text) {
+    content.push({
+      type: 'paragraph',
+      content: parseInlineContent(data.text, extensions),
+    });
+  }
+
+  if (data.caption) {
+    content.push({
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: `— ${data.caption}`,
+          marks: [{ type: 'italic' }],
+        },
+      ],
+    });
+  }
+
+  if (!content.length) {
+    content.push({ type: 'paragraph' });
+  }
+
+  return { type: 'blockquote', content };
 }
 
 // ---------------------------------------------------------------------------
