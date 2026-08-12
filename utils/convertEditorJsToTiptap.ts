@@ -113,13 +113,8 @@ function convertBlock(block: EditorJsBlock, extensions?: Extensions): ProseMirro
     case 'fileSet':
       return convertFileSet(data);
     case 'alert':
-      return convertAlert(data, extensions);
     case 'warning':
-      return convertWarning(data, extensions);
-    case 'quote':
-      return convertQuote(data, extensions);
-    case 'delimiter':
-      return convertDelimiter();
+      return convertAlert(data, extensions);
     default:
       console.warn(`[convertEditorJsToTiptap] Tipo desconhecido: "${type}"`);
       return makeFallbackParagraph(type);
@@ -307,78 +302,6 @@ function convertFileSet(data: any): ProseMirrorNode {
   };
 }
 
-/**
- * alert → blockquote
- * { message: "...", text: "...", type: "info" }
- * → { type: "blockquote", content: [{ type: "paragraph", content: [...] }] }
- */
-function convertAlert(
-  data: { message?: string; text?: string; type?: string },
-  extensions?: Extensions,
-): ProseMirrorNode {
-  const text = data.message || data.text || '';
-  return {
-    type: 'blockquote',
-    content: [
-      {
-        type: 'paragraph',
-        content: parseInlineContent(text, extensions),
-      },
-    ],
-  };
-}
-
-/**
- * warning → blockquote
- * { title: "...", message: "..." }
- */
-function convertWarning(
-  data: { title?: string; message?: string; text?: string },
-  extensions?: Extensions,
-): ProseMirrorNode {
-  const titleText = data.title ? `<b>${data.title}</b><br>` : '';
-  const messageText = data.message || data.text || '';
-  return {
-    type: 'blockquote',
-    content: [
-      {
-        type: 'paragraph',
-        content: parseInlineContent(`${titleText}${messageText}`, extensions),
-      },
-    ],
-  };
-}
-
-/**
- * quote → blockquote
- * { text: "...", caption: "..." }
- */
-function convertQuote(
-  data: { text?: string; caption?: string },
-  extensions?: Extensions,
-): ProseMirrorNode {
-  const text = data.text || '';
-  const caption = data.caption ? `<br><em>— ${data.caption}</em>` : '';
-  return {
-    type: 'blockquote',
-    content: [
-      {
-        type: 'paragraph',
-        content: parseInlineContent(`${text}${caption}`, extensions),
-      },
-    ],
-  };
-}
-
-/**
- * delimiter → horizontalRule
- */
-function convertDelimiter(): ProseMirrorNode {
-  return {
-    type: 'horizontalRule',
-  };
-}
-
 // ---------------------------------------------------------------------------
 // Parser de conteúdo inline (HTML → ProseMirror nodes com marks)
 // ---------------------------------------------------------------------------
@@ -419,6 +342,30 @@ function parseInlineContent(html: string, extensions?: Extensions): ProseMirrorN
   // Fallback: strip de tags e texto puro
   const plainText = html.replace(/<[^>]+>/g, '');
   return plainText ? [{ type: 'text', text: plainText }] : [];
+}
+
+// ---------------------------------------------------------------------------
+// alert / warning → blockquote
+// { message: "Atenção: ...", type?: "info" | "warning" | ... }
+// ---------------------------------------------------------------------------
+
+function convertAlert(
+  data: { message?: string; text?: string },
+  extensions?: Extensions,
+): ProseMirrorNode {
+  const text = data.message || data.text || '';
+  if (!text) {
+    return { type: 'blockquote', content: [{ type: 'paragraph' }] };
+  }
+  return {
+    type: 'blockquote',
+    content: [
+      {
+        type: 'paragraph',
+        content: parseInlineContent(text, extensions),
+      },
+    ],
+  };
 }
 
 // ---------------------------------------------------------------------------

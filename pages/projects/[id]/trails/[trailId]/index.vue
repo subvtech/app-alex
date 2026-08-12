@@ -193,6 +193,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { contributionType } from '~/pages/projects/[id]/trails/[trailId]/contributions.vue';
 import Tiptap from '~/components/TipTap/index.vue';
+import { convertEditorJsBlocksToTiptap, isEditorJsFormat } from '~/utils/convertEditorJsToTiptap';
 
 definePageMeta({
   hideLearningPlanBanner: true,
@@ -491,7 +492,15 @@ const handlePositions = (contributions) => {
 };
 
 const loadEditor = () => {
-  tiptapContent.value = getValidTiptapContent(editorData.value.blocks);
+  const rawBlocks = editorData.value.blocks;
+
+  // Detecta formato antigo (Editor.js) e converte em memória para ProseMirror JSON
+  if (isEditorJsFormat(rawBlocks)) {
+    console.info('[loadEditor] Formato Editor.js detectado em trilha de projeto, convertendo para Tiptap...');
+    tiptapContent.value = convertEditorJsBlocksToTiptap(rawBlocks);
+  } else {
+    tiptapContent.value = getValidTiptapContent(rawBlocks);
+  }
 
   setTimeout(() => {
     if (editor.value) {
@@ -501,7 +510,13 @@ const loadEditor = () => {
     highlightedContributions.value?.forEach((contribution) => {
       const comp = contributionRefs.value[`contribution-${contribution.id}`];
       if (comp) {
-        comp.setContent(getValidTiptapContent(contribution.contribution));
+        // Contribuições antigas também podem estar em formato Editor.js
+        const rawContribution = contribution.contribution;
+        if (isEditorJsFormat(rawContribution)) {
+          comp.setContent(convertEditorJsBlocksToTiptap(rawContribution));
+        } else {
+          comp.setContent(getValidTiptapContent(rawContribution));
+        }
       }
     });
 

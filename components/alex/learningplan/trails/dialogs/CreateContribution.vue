@@ -74,6 +74,7 @@
 import { ref, computed } from 'vue';
 import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 import Tiptap from '~/components/TipTap/index.vue';
+import { convertEditorJsBlocksToTiptap, isEditorJsFormat } from '~/utils/convertEditorJsToTiptap';
 
 const props = defineProps<{ studentId?: number; trailId?: number }>();
 const emits = defineEmits(['highlight', 'block']);
@@ -201,7 +202,13 @@ const openDialog = (editMode: string, contributionData?: contributionType) => {
   } else if (contributionData) {
     contribution.value = contributionData;
     title.value = contributionData.title;
-    tiptapContent.value = getValidTiptapContent(contributionData.contribution);
+    // Contribuições antigas podem estar em formato Editor.js
+    const rawContribution = contributionData.contribution;
+    if (isEditorJsFormat(rawContribution)) {
+      tiptapContent.value = convertEditorJsBlocksToTiptap(rawContribution);
+    } else {
+      tiptapContent.value = getValidTiptapContent(rawContribution);
+    }
   }
 
   dialog.value = true;
