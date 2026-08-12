@@ -329,7 +329,7 @@ function parseInlineContent(html: string, extensions?: Extensions): ProseMirrorN
   if (!html) return [];
 
   // Se não tem tags HTML, decodifica entidades e retorna texto puro (otimização)
-  if (!/\<[^>]+\>/.test(html)) {
+  if (!/<[^>]+>/.test(html)) {
     const decoded = decodeHtmlEntities(html);
     return [{ type: 'text', text: decoded }];
   }
