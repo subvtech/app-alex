@@ -85,7 +85,6 @@ jobs:
     env:
       TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
       TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
-      HOCUSPOCUS_URL: ${{ secrets.HOCUSPOCUS_URL_TEST }}
 
     steps:
       - name: Checkout repository
@@ -137,7 +136,6 @@ jobs:
     env:
       TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
       TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
-      HOCUSPOCUS_URL: ${{ secrets.HOCUSPOCUS_URL_TEST }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
