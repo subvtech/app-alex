@@ -28,7 +28,6 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.ref_name }}" = "master" ]; then
-            echo "hocuspocus_url=${{ secrets.HOCUSPOCUS_URL }}" >> "$GITHUB_OUTPUT"
             echo "tag=prod" >> "$GITHUB_OUTPUT"
             echo "components_page=off" >> "$GITHUB_OUTPUT"
             echo "strapi_url=${{ secrets.STRAPI_URL }}" >> "$GITHUB_OUTPUT"
@@ -36,7 +35,6 @@ jobs:
             echo "matomo_app_id=${{ secrets.MATOMO_APP_ID }}" >> "$GITHUB_OUTPUT"
             echo "service=app" >> "$GITHUB_OUTPUT"
           else
-            echo "hocuspocus_url=${{ secrets.HOCUSPOCUS_URL_TEST }}" >> "$GITHUB_OUTPUT"
             echo "tag=test" >> "$GITHUB_OUTPUT"
             echo "components_page=on" >> "$GITHUB_OUTPUT"
             echo "strapi_url=${{ secrets.STRAPI_TEST_URL }}" >> "$GITHUB_OUTPUT"
@@ -57,7 +55,6 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:v2-${{ steps.vars.outputs.tag }}
           build-args: |
-            hocuspocus_url=${{ steps.vars.outputs.hocuspocus_url }}
             matomo_url=${{ secrets.MATOMO_URL }}
             matomo_app_id=${{ steps.vars.outputs.matomo_app_id }}
             strapi_url=${{ steps.vars.outputs.strapi_url }}
