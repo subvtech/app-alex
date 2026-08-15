@@ -33,6 +33,7 @@ jobs:
             echo "strapi_url=${{ secrets.STRAPI_URL }}" >> "$GITHUB_OUTPUT"
             echo "open_ai_key=${{ secrets.OPEN_AI_KEY }}" >> "$GITHUB_OUTPUT"
             echo "matomo_app_id=${{ secrets.MATOMO_APP_ID }}" >> "$GITHUB_OUTPUT"
+            echo "hocuspocus_url=${{ secrets.HOCUSPOCUS_URL }}" >> "$GITHUB_OUTPUT"
             echo "service=app" >> "$GITHUB_OUTPUT"
           else
             echo "tag=test" >> "$GITHUB_OUTPUT"
@@ -40,6 +41,7 @@ jobs:
             echo "strapi_url=${{ secrets.STRAPI_TEST_URL }}" >> "$GITHUB_OUTPUT"
             echo "open_ai_key=${{ secrets.OPEN_AI_KEY_TEST }}" >> "$GITHUB_OUTPUT"
             echo "matomo_app_id=${{ secrets.MATOMO_APP_ID_TEST }}" >> "$GITHUB_OUTPUT"
+            echo "hocuspocus_url=${{ secrets.HOCUSPOCUS_URL_TEST }}" >> "$GITHUB_OUTPUT"
           fi
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -62,6 +64,7 @@ jobs:
             open_ai_key=${{ steps.vars.outputs.open_ai_key }}
             tiptap_app_id=${{ secrets.TIPTAP_APP_ID }}
             tiptap_key=${{ secrets.TIPTAP_KEY }}
+            hocuspocus_url=${{ steps.vars.outputs.hocuspocus_url }}
 
       - name: Deploy to production server
         if: github.ref_name == 'master'
@@ -93,8 +96,10 @@ jobs:
         run: |
           if [ "${{ github.base_ref }}" = "master" ]; then
             echo "strapi_url=${{ secrets.STRAPI_URL }}" >> "$GITHUB_OUTPUT"
+            echo "hocuspocus_url=${{ secrets.HOCUSPOCUS_URL }}" >> "$GITHUB_OUTPUT"
           else
             echo "strapi_url=${{ secrets.STRAPI_TEST_URL }}" >> "$GITHUB_OUTPUT"
+            echo "hocuspocus_url=${{ secrets.HOCUSPOCUS_URL_TEST }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Setup Node.js
@@ -124,6 +129,8 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=8192'
           STRAPI_URL: ${{ steps.preview_vars.outputs.strapi_url }}
           NUXT_PUBLIC_STRAPI_URL: ${{ steps.preview_vars.outputs.strapi_url }}
+          HOCUSPOCUS_URL: ${{ steps.preview_vars.outputs.hocuspocus_url }}
+          NUXT_PUBLIC_HOCUSPOCUS_URL: ${{ steps.preview_vars.outputs.hocuspocus_url }}
 
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
@@ -160,5 +167,7 @@ jobs:
           STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
           NUXT_PUBLIC_STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HOCUSPOCUS_URL: ${{ secrets.HOCUSPOCUS_URL_TEST }}
+          NUXT_PUBLIC_HOCUSPOCUS_URL: ${{ secrets.HOCUSPOCUS_URL_TEST }}
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
