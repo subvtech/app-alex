@@ -179,19 +179,27 @@ onMounted(async () => {
     isLoading.value = props.showLoader;
     const TipTapToken = await getTipTapToken(user.value?.id);
     setAvailableBlocks(props.allowedBlocks);
-    provider = new TiptapCollabProvider({
-      name: props.docName, // Unique document identifier for syncing. This is your document name.
-      appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
-      token: TipTapToken, // Your JWT token
+    const hocuspocusUrl = app.$config.public.hocuspocusUrl as string | undefined;
+
+    const providerOptions: any = {
+      name: props.docName,
+      token: TipTapToken,
       document: doc,
-      // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
       onSynced() {
         if (!doc.getMap('config').get('initialContentLoaded') && editor) {
           doc.getMap('config').set('initialContentLoaded', true);
         }
         isLoading.value = false;
       },
-    });
+    };
+
+    if (hocuspocusUrl) {
+      providerOptions.baseUrl = hocuspocusUrl;
+    } else {
+      providerOptions.appId = app.$config.public.tipTapAppId;
+    }
+
+    provider = new TiptapCollabProvider(providerOptions);
   }
 
   // Garante que o DOM dentro do <client-only> já foi montado antes de criar o Editor.
