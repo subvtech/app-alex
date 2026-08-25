@@ -19,6 +19,10 @@
     "notFound": "Metamask not detected",
     "tokenExpired": "Token expirado, tente novamente"
   },
+  "google": {
+    "btn": "Entrar com o Google",
+    "error": "Falha ao autenticar com o Google. Tente novamente."
+  },
   "loginError": "Email ou senha incorretos!",
   "confirmEmail": "Por favor, valide seu e-mail antes de continuar.",
   "blockedUser": "Usuário bloqueado, entre em contato com o suporte.",

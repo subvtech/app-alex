@@ -62,6 +62,7 @@ jobs:
             open_ai_key=${{ steps.vars.outputs.open_ai_key }}
             tiptap_app_id=${{ secrets.TIPTAP_APP_ID }}
             tiptap_key=${{ secrets.TIPTAP_KEY }}
+            google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}
 
       - name: Deploy to production server
         if: github.ref_name == 'master'
@@ -82,6 +83,7 @@ jobs:
     env:
       TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
       TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
 
     steps:
       - name: Checkout repository
@@ -124,6 +126,7 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=8192'
           STRAPI_URL: ${{ steps.preview_vars.outputs.strapi_url }}
           NUXT_PUBLIC_STRAPI_URL: ${{ steps.preview_vars.outputs.strapi_url }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
 
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
@@ -133,6 +136,7 @@ jobs:
     env:
       TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
       TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -160,5 +164,6 @@ jobs:
           STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
           NUXT_PUBLIC_STRAPI_URL: ${{ secrets.STRAPI_TEST_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
