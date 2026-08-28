@@ -26,8 +26,6 @@ const props = defineProps({
   },
 });
 
-console.log('props.fixedMenuBar', props.fixedMenuBar);
-
 const { width } = useWindowSize();
 
 const isVerticalDivider = computed(() => width.value > 850 || (props.fixedMenuBar && width.value > 560));
