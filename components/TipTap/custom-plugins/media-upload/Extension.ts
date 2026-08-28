@@ -37,6 +37,8 @@ export default Node.create<MediaConfig>({
           size: 100,
           align: 'center',
           id: null,
+          uploadKey: null,
+          uploading: false,
         } as MediaType,
       },
       format: {
@@ -58,12 +60,34 @@ export default Node.create<MediaConfig>({
     return [
       {
         tag: 'media-upload',
+        getAttrs: (element) => {
+          const media = element.getAttribute('data-media');
+
+          if (!media) {
+            return {};
+          }
+
+          try {
+            return {
+              media: JSON.parse(media),
+              format: element.getAttribute('data-format') || undefined,
+            };
+          } catch {
+            return {};
+          }
+        },
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['media-upload', mergeAttributes(HTMLAttributes)];
+    return [
+      'media-upload',
+      mergeAttributes({
+        'data-media': JSON.stringify(HTMLAttributes.media),
+        'data-format': HTMLAttributes.format,
+      }),
+    ];
   },
 
   addNodeView() {
