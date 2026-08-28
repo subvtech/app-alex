@@ -72,14 +72,21 @@ export interface filterType {
 const route = useRoute();
 const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const headerStore = usePageHeaderStore();
 const { id } = route.params;
 const search = ref('');
 const filterDrawer = ref();
 const chips = ref<string[]>([]);
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 const isProfessor = computed(() => {
-  return [MemberRoles.FACILITATOR, MemberRoles.COLLABORATOR].includes(
-    learningPlanStore.userLearningMember?.role as MemberRoles,
+  return (
+    !viewModeStudentStore.viewAsStudent &&
+    [MemberRoles.FACILITATOR, MemberRoles.COLLABORATOR].includes(
+      learningPlanStore.userLearningMember?.role as MemberRoles,
+    )
   );
 });
 

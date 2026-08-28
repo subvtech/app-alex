@@ -26,10 +26,14 @@ type assessment = {
 const i18Dir = 'pages.assessments';
 
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const learningPlanId = computed(() => learningPlanStore.learningPlan?.id);
 const user = useStrapiUser();
 const { t } = useI18n();
 const i18n = useI18n();
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 // const assessments = ref<assessment[]>();
 const page = ref(1);
 const search = ref('');
@@ -41,8 +45,6 @@ const { getLearningPlanGrades, createGradeMutation, deleteGradeMutation, getLear
   null,
   user,
 );
-
-console.log('Facilitator:', learningPlanStore.userIsFacilitator);
 
 const { data: learningPlanGrades } = getLearningPlanGrades();
 const { data: tasks } = getLearningPlanTasks();
@@ -170,7 +172,7 @@ const dropdownItems = (assessments: assessment) => [
         density="comfortable"
       />
       <alex-custom-button
-        v-if="learningPlanStore.userIsFacilitator"
+        v-if="effectiveUserIsFacilitator"
         prepend-icon="mdi-plus"
         size="large"
         :loading="creatingGradeAssessment"

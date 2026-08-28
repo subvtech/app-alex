@@ -245,11 +245,15 @@ const searchGroups = ref('');
 //
 const usersToInvite = ref([]);
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const classStore = useClassStore();
 
 const route = useRoute();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const userIsCourseFacilitator = computed(() => learningPlanStore.userLearningMember?.role === 'facilitator');
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
+const userIsCourseFacilitator = computed(() => effectiveUserIsFacilitator.value);
 const sendingInvites = ref(false);
 const creatingGroup = ref(false);
 // Remove
