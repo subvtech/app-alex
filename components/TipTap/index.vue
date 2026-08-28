@@ -1,7 +1,11 @@
 <template>
   <client-only>
     <TipTap-loader v-if="isLoading" />
-    <div ref="container" class="rounded-lg w-100 tw-transition-opacity" :class="{ 'tw-opacity-0': isLoading }">
+    <div
+      ref="container"
+      class="rounded-lg w-100 position-relative tw-transition-opacity"
+      :class="{ 'tw-opacity-0': isLoading }"
+    >
       <div ref="bubbleMenuWrapper" v-show="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
         <tip-tap-menus-bubble v-if="editor" :editor="editor" :fixed-menu-bar="fixedMenu" @click.stop.prevent />
       </div>
@@ -172,6 +176,108 @@ const getTipTapToken = async (userID: number | undefined) => {
   }
 };
 
+const uploadImageFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append('files', file, file.name);
+
+  try {
+    const res = await strapiClient<Upload[]>('/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const uploadedFile = res[0];
+    if (!uploadedFile?.url || uploadedFile.id === undefined) {
+      throw new Error('Upload response did not contain a valid file');
+    }
+
+    const { url, id } = uploadedFile;
+    temporaryMedia.value.push(id);
+    return {
+      success: 1,
+      url,
+      id,
+      title: file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
+    };
+  } catch (error) {
+    setMessage(t('components.tiptap.mediaUpload.errors.upload'), 'error', true);
+    return { success: 0 };
+  }
+};
+
+const updateMediaNode = (uploadKey: string, media) => {
+  if (!editor.value) return;
+
+  editor.value.commands.command(({ state, dispatch }) => {
+    let updated = false;
+    state.doc.descendants((node, pos) => {
+      if (node.type.name === 'mediaUpload' && node.attrs.media.uploadKey === uploadKey) {
+        dispatch?.(state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, media }));
+        updated = true;
+        return false;
+      }
+      return true;
+    });
+    return updated;
+  });
+};
+
+const insertImageFile = async (file: File) => {
+  if (!isEditable.value || !file.type.startsWith('image/')) {
+    return false;
+  }
+
+  if (!editor.value) return false;
+
+  const uploadKey = `${Date.now()}-${Math.random()}`;
+  const localUrl = URL.createObjectURL(file);
+
+  editor.value
+    .chain()
+    .focus()
+    .insertContent({
+      type: 'mediaUpload',
+      attrs: {
+        media: {
+          src: localUrl,
+          title: file.name,
+          id: null,
+          size: 100,
+          align: 'center',
+          uploadKey,
+          uploading: true,
+        },
+        format: 'image',
+      },
+    })
+    .run();
+
+  const res = await uploadImageFile(file);
+  if (res.success) {
+    updateMediaNode(uploadKey, {
+      src: res.url,
+      title: res.title,
+      id: res.id,
+      size: 100,
+      align: 'center',
+      uploadKey,
+      uploading: false,
+    });
+  } else {
+    updateMediaNode(uploadKey, {
+      src: '',
+      title: file.name,
+      id: null,
+      size: 100,
+      align: 'center',
+      uploadKey,
+      uploading: false,
+    });
+  }
+  URL.revokeObjectURL(localUrl);
+
+  return true;
+};
+
 onMounted(async () => {
   const user = useStrapiUser();
   let provider;
@@ -219,6 +325,14 @@ onMounted(async () => {
     editable: isEditable.value,
     editorProps: {
       handlePaste: (_view, event, _slice) => {
+        const imageFile = Array.from(event.clipboardData?.files || []).find((file) => file.type.startsWith('image/'));
+
+        if (imageFile) {
+          event.preventDefault();
+          insertImageFile(imageFile);
+          return true;
+        }
+
         const text = event.clipboardData?.getData('text/plain');
 
         if (!text) return false;
@@ -251,6 +365,21 @@ onMounted(async () => {
         }
 
         return false;
+      },
+      handleDrop: (_view, event, _slice, moved) => {
+        if (moved) {
+          return false;
+        }
+
+        const imageFile = Array.from(event.dataTransfer?.files || []).find((file) => file.type.startsWith('image/'));
+
+        if (!imageFile) {
+          return false;
+        }
+
+        event.preventDefault();
+        insertImageFile(imageFile);
+        return true;
       },
     },
     extensions: [
@@ -468,28 +597,7 @@ const blockToolsMap = {
   MediaUpload: MediaUpload.configure({
     readOnly: () => !isEditable.value,
     defaultFormat: defaultBlock.value === 'image' ? 'image' : 'video',
-    uploadMedia: async (file: File) => {
-      const formData = new FormData();
-      formData.append('files', file, file.name);
-      try {
-        const res = await strapiClient<Upload[]>('/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const { url, id } = res[0];
-        temporaryMedia.value.push(id);
-        return {
-          success: 1,
-          url,
-          id,
-          title: file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
-        };
-      } catch (error) {
-        return {
-          success: 0,
-        };
-      }
-    },
+    uploadMedia: uploadImageFile,
     deleteMedia: (id: string) => {
       // mediaToDelete.value.push(id);
       strapiClient(`/upload/files/${id}`, {
