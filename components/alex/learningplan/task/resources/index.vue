@@ -219,17 +219,27 @@ const trail = computed(() => {
   return trails.value?.find((trail) => trail.id === taskStore.task?.trail?.id);
 });
 
-const isValidTrail = (trail: TrailSimple) => {
-  if (!trail.structures.length) return false;
-  if (!trail.structures[trail.structures.length - 1].blocks.length) return false;
-  return true;
+const handleTrailClick = (trail: TrailSimple) => {
+  loadTrail(trail.id);
 };
 
-const handleTrailClick = (trail: TrailSimple) => {
-  if (isValidTrail(trail)) {
-    selectedTrail.value = trail;
-  } else {
-    setMessage(t('components.learningPlan.drawer.task.learningResources.invalidTrail'), 'warning', true, false, true);
+const loadTrail = async (trailId: number) => {
+  try {
+    isLoading.value = true;
+    const response = await findOne<TrailSimple>('trails', trailId, {
+      populate: {
+        cover_image: true,
+        structures: {
+          populate: ['blocks'],
+        },
+      },
+    });
+    selectedTrail.value = response.data;
+  } catch (error) {
+    console.error('[TaskResources] trail loading failed', { trailId, error });
+    setMessage(t('components.learningPlan.drawer.task.learningResources.updateError'), 'red', true);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -261,10 +271,11 @@ const updateBlocks = async (type: 'ADD' | 'REMOVE', selectedBlocks?: number[]) =
     if (props.blocks) {
       blocks.push(...(props.blocks as number[]));
     }
-    if ((!blocks.length || props.taskId === -1) && type === 'ADD') return;
+    if (props.taskId === -1 && type === 'ADD') return;
     await updateTask(blocks, type);
     taskStore.task?.id === props.taskId ? updateTaskStore(blocks, type) : updateLearningplanStore(blocks, type);
-  } catch (e) {
+  } catch (error) {
+    console.error('[TaskResources] updateBlocks failed', { error });
     setMessage(t('components.learningPlan.drawer.task.learningResources.updateError'), 'red', true);
   } finally {
     isLoading.value = false;
@@ -273,10 +284,11 @@ const updateBlocks = async (type: 'ADD' | 'REMOVE', selectedBlocks?: number[]) =
 };
 
 const updateTask = async (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
-  await update('tasks', props.taskId, {
-    blocks: type === 'ADD' ? blocks : [],
-    trail: type === 'ADD' ? selectedTrail.value?.id : null,
-  });
+  const payload: { trail: number | null; blocks?: BlockSimple[] | number[] } = {
+    trail: type === 'ADD' ? selectedTrail.value?.id || null : null,
+  };
+  if (type === 'REMOVE' || blocks.length) payload.blocks = type === 'ADD' ? blocks : [];
+  await update('tasks', props.taskId, payload);
 
   if (taskStore.task) {
     taskStore.task.trail = type === 'ADD' ? selectedTrail.value : undefined;
@@ -329,32 +341,14 @@ const handleNewTrail = async () => {
       return;
     }
 
-    const structureData = await create<StructureSimple>('structures', {
+    await create<StructureSimple>('structures', {
       trail: selectedTrail.value,
       time: Date.now(),
       version: res.data.version,
       blocks: res.data.blocks,
     });
 
-    const StructureBlocks = await findOne<StructureSimple>('structures', structureData.data.id, {
-      populate: ['blocks'],
-    });
-
-    // Testar
-    const structure = !props.project
-      ? learningPlanStore.learningPlan?.learning_structures[0]
-      : learningPlanStore.learningPlan?.learning_structures.find(({ id }) => id === learningStructure.value);
-
-    const localTrail = structure?.trails.find((trail) => trail.id === selectedTrail.value?.id);
-    localTrail?.structures.push({
-      id: StructureBlocks.data.id,
-      time: Date.now(),
-      version: StructureBlocks.data.version,
-      blocks: StructureBlocks.data.blocks,
-      trail: localTrail,
-    });
-    const blocksId = StructureBlocks.data.blocks.map((block) => block.id);
-    updateBlocks('ADD', blocksId);
+    updateBlocks('ADD');
   } catch (e) {
     setMessage(t('pages.trailId.overview.saveError'), 'warning', true);
   } finally {

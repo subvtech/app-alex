@@ -7,30 +7,27 @@
       />
       <div>
         <p class="text-gray-500 text-h5">
-          {{
-            $t('components.learningPlan.drawer.task.learningResources.selected')
-          }}
+          {{ $t('components.learningPlan.drawer.task.learningResources.selected') }}
         </p>
         <p class="text-gray-800 text-h3">{{ selectedTrail.title }}</p>
       </div>
     </div>
     <div class="px-6 min-h-150">
-      <alex-custom-skeleton
-        v-if="isEditorLoading"
-        class="w-100 height-150 bg-blue"
-        color="gray-200"
-      />
-      <app-editor
-        ref="editor"
-        :selected-blocks="editMode ? blocksIds : undefined"
+      <alex-custom-skeleton v-if="isEditorLoading" class="w-100 height-150 bg-blue" color="gray-200" />
+      <Tiptap
+        :edit="false"
+        :doc-name="`trail-${selectedTrail.id}`"
+        :collaboration="true"
+        show-loader
         :class="isEditorLoading ? 'tw-opacity-0' : ''"
-        @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import Tiptap from '~/components/TipTap/index.vue';
+
 interface propsType {
   selectedTrail: TrailSimple;
   blocks?: BlockSimple[] | number[];
@@ -42,69 +39,43 @@ const props = withDefaults(defineProps<propsType>(), {
   editMode: false,
 });
 
-const blocksIds = computed(() => {
-  return props.blocks?.map((block) => {
-    return block.id ? block.id : block;
-  }) as number[];
-});
-
-const trailCover = computed(
-  () =>
-    props.selectedTrail.cover_image?.url || '/images/cover_image_course.svg',
-);
+const trailCover = computed(() => props.selectedTrail.cover_image?.url || '/images/cover_image_course.svg');
 const isEditorLoading = ref(false);
 const editorData = computed(() => {
-  const data =
-    props.selectedTrail?.structures[props.selectedTrail?.structures.length - 1];
+  const data = props.selectedTrail?.structures[props.selectedTrail?.structures.length - 1];
+  let content: any = data?.blocks;
+  if (typeof content === 'string') {
+    try {
+      content = JSON.parse(content);
+    } catch {
+      content = undefined;
+    }
+  }
+
   return {
     time: data && data.time ? parseInt(data.time.toString()) : 0,
     version: data?.version || '',
-    blocks:
-      data?.blocks
-        .filter((block) => props.editMode || blocksIds.value.includes(block.id))
-        .map((block) => ({
-          type: block.type,
-          data: block.data,
-          tunes: block.tunes || {},
-          id: block.id || '',
-        })) || [],
+    content: content?.type === 'doc' ? content : { type: 'doc', content: [] },
   };
 });
 
-const editor = ref();
-const checkEditorReady = async () => {
-  let attempts = 0;
-  while (attempts < 10) {
-    try {
-      await editor.value.isReady;
-      return true;
-    } catch (error) {
-      await sleep(100);
-      attempts++;
-    }
-  }
-  return false;
-};
-
-onMounted(async () => {
-  if (editorData.value.blocks.length) {
-    isEditorLoading.value = true;
-    await checkEditorReady();
-    await editor.value.loadEditor({
-      blocks: editorData.value.blocks,
-    });
-    await editor.value.toggleReadOnly();
-    isEditorLoading.value = false;
-  }
+onMounted(() => {
+  isEditorLoading.value = false;
 });
 
-const selectedBlocks = ref<String[]>([]);
 const getSelectedBlocks = () => {
-  return selectedBlocks.value;
+  const blocks = props.selectedTrail.structures[props.selectedTrail.structures.length - 1]?.blocks;
+  return Array.isArray(blocks) ? blocks.map((block) => block.id) : [];
 };
 
-const handleNewTrail = async () => {
-  return await editor.value.getData();
+const handleNewTrail = () => {
+  return {
+    success: 1,
+    data: {
+      version: 'tiptap-1.0',
+      blocks: editorData.value.content,
+    },
+  };
 };
 
 defineExpose({
