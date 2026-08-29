@@ -82,6 +82,11 @@ const { t } = useI18n();
 
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
+
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 
 const tab = {
   firstTitle: t('components.trails.header.overview'),
@@ -98,7 +103,7 @@ const tabs = computed(() => {
     { label: tab.thirdTitle, value: '2' },
   ];
 
-  if (learningPlanStore.userIsFacilitator) {
+  if (effectiveUserIsFacilitator.value) {
     defaultTabs.push({
       label: '',
       icon: 'mdi-cog-outline',

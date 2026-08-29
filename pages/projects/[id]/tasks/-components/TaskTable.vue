@@ -4,6 +4,7 @@ import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 // import { TaskStatus } from '~/models/simple/taskSimple.model';
 import { SprintTask } from '../-types';
+import { colors } from '@unovis/ts';
 
 interface LocalSprintTask extends SprintTask {
   local?: boolean;
@@ -488,7 +489,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       </v-tooltip>
                     </td>
 
-                    <td v-if="hideLevels" class="min-w-48">
+                    <td v-if="hideLevels" class="min-w-48 field-cell field-outline">
                       <span
                         :class="
                           item.parent_task?.organization === 'epic' ||
@@ -506,9 +507,13 @@ const setDragStart = (id: number, e: DragEvent) => {
                       </span>
                     </td>
 
-                    <td v-if="hideLevels" class="min-w-48">
+                    <td v-if="hideLevels" class="min-w-48 field-cell field-outline">
                       <span
-                        :class="item.parent_task?.organization === 'story' ? 'tree-title-ellipsis' : 'tw-text-black/30'"
+                        :class="[
+                          item.parent_task?.organization === 'story' ? 'tree-title-ellipsis' : 'tw-text-black/30',
+                          'd-block',
+                          'max-w-full',
+                        ]"
                         >{{
                           item.parent_task?.organization === 'story' ? item.parent_task.title : 'Sem historia'
                         }}</span
@@ -611,11 +616,27 @@ const setDragStart = (id: number, e: DragEvent) => {
 
 <style scoped>
 .tree-title-ellipsis {
+  display: block;
+  min-width: 0;
   max-width: 100%;
-  width: auto;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.field-cell {
+  flex: 0 0 192px;
+  width: 192px;
+  min-width: 192px;
+  max-width: 192px;
+  overflow: hidden;
+  padding: 0 8px;
+}
+
+.field-cell .tree-title-ellipsis {
+  width: 100%;
+  text-align: left;
 }
 
 .draggable-row {

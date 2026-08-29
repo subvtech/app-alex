@@ -107,6 +107,7 @@
       :profile-picture="profilePicture"
       :is-professor="isProfessor"
       @display:settings="emit('display:settings')"
+      @view-as-student="emit('view-as-student')"
     />
     <div class="d-flex justify-space-between align-center px-6 overflow-x-auto">
       <alex-custom-tabs
@@ -123,7 +124,7 @@
 </template>
 <script setup lang="ts">
 import { TabType } from '@/components/alex/custom/Tabs.vue';
-const emit = defineEmits(['select:option', 'display:settings']);
+const emit = defineEmits(['select:option', 'display:settings', 'view-as-student']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
 type BannerProps = {

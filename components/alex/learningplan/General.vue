@@ -27,9 +27,9 @@
                 return { ...item };
               })
             "
-            :no-icon="learningPlanStore.userIsFacilitator"
+            :no-icon="effectiveUserIsFacilitator"
             :course-id="learningPlan.id"
-            :can-edit="learningPlanStore.userIsFacilitator"
+            :can-edit="effectiveUserIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
           <app-about
@@ -39,8 +39,8 @@
             full-width
             :text="learningPlan.description"
             :user-id="user.id"
-            :no-icon="learningPlanStore.userIsFacilitator"
-            :can-edit="learningPlanStore.userIsFacilitator"
+            :no-icon="effectiveUserIsFacilitator"
+            :can-edit="effectiveUserIsFacilitator"
             :empty-text-message="$t('pages.courses.about.empty')"
             @update="updateAbout"
           />
@@ -48,11 +48,11 @@
             sizing-class="pa-0 w-100"
             class="w-100"
             is-nested
-            :can-edit="canEdit"
+            :can-edit="effectiveUserIsFacilitator"
             :course-id="learningPlan.id"
             :user-id="user.id"
             :data="learningGoals"
-            :no-icon="learningPlanStore.userIsFacilitator"
+            :no-icon="effectiveUserIsFacilitator"
             :tooltip="$t('components.courses.goals.tooltip')"
             @update="(data) => emit('update', data)"
           />
@@ -64,8 +64,8 @@
             :data="learningPlan.details"
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
-            :can-edit="learningPlanStore.userIsFacilitator"
-            :no-icon="learningPlanStore.userIsFacilitator"
+            :can-edit="effectiveUserIsFacilitator"
+            :no-icon="effectiveUserIsFacilitator"
             @update="(data) => emit('update', data)"
           />
         </div>
@@ -137,14 +137,14 @@
       <alex-learningplan-meetings
         :learning-plan-classes="learningPlanClasses"
         :learning-plan-id="learningPlan?.id"
-        :can-edit="learningPlanStore.userIsFacilitator"
+        :can-edit="effectiveUserIsFacilitator"
         :class-info="classInfo"
       />
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
           (learningPlanStore.generalTags?.length === 0 &&
-            learningPlanStore.userIsFacilitator) ||
+            effectiveUserIsFacilitator) ||
           (learningPlanStore.generalTags?.length !== 0 && !loading)
         "
         is-general
@@ -155,14 +155,14 @@
         :user-id="user.id"
         :learning-plan-id="learningPlan?.id"
         :tags="learningPlanStore.generalTags"
-        :can-edit="learningPlanStore.userIsFacilitator"
+        :can-edit="effectiveUserIsFacilitator"
         :loading="loading"
       />
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
           (learningPlanStore.technicalTags?.length === 0 &&
-            learningPlanStore.userIsFacilitator) ||
+            effectiveUserIsFacilitator) ||
           (learningPlanStore.technicalTags?.length !== 0 && !loading)
         "
         :title="$t('components.competences.technical.title')"
@@ -172,7 +172,7 @@
         :user-id="user.id"
         :learning-plan-id="learningPlan?.id"
         :tags="learningPlanStore.technicalTags"
-        :can-edit="learningPlanStore.userIsFacilitator"
+        :can-edit="effectiveUserIsFacilitator"
         :loading="loading"
       />
     </div>
@@ -198,6 +198,7 @@ const props = withDefaults(defineProps<GeneralProps>(), {
 
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const i18n = useI18n();
 
 const { generateUrl, generateNewInvite, calcRemainingTime } =
@@ -208,6 +209,9 @@ const emit = defineEmits(['update']);
 const user = useStrapiUser<User>();
 
 const plainLink = ref<string | null>(null);
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {

@@ -141,6 +141,7 @@ definePageMeta({
 const teacherDrawer = ref(false);
 const studentDrawer = ref(false);
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const headerStore = usePageHeaderStore();
 const route = useRoute();
 const { t } = useI18n();
@@ -149,6 +150,9 @@ const { setMessage } = useMessageStore();
 const strapi = useStrapi();
 const taskId = computed(() => Number.parseInt(taskIdValue.toString()));
 const learningPlanId = computed(() => Number.parseInt(route.params?.id.toString()));
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 const taskStore = useTaskStore();
 const tasks = ref<Task[]>([]);
 const studentDetailsId = ref<number>(-1);
@@ -341,7 +345,7 @@ watch(
           disabled: true,
         },
       ];
-      if (!learningPlanStore.userIsFacilitator) {
+      if (!effectiveUserIsFacilitator.value) {
         navigateTo(`/courses/${route.params.id}/tasks`);
       }
     }

@@ -13,6 +13,10 @@ ARG matomo_url
 ARG open_ai_key
 ARG tiptap_app_id
 ARG tiptap_key
+<<<<<<< HEAD
+=======
+ARG google_client_id
+>>>>>>> 6c7550fd0773241d4fa9081b8c7908e8ae760d9a
 
 WORKDIR /opt/app
 RUN addgroup -S alex && adduser -S alex -G alex
@@ -28,6 +32,10 @@ ENV MATOMO_URL=$matomo_url
 ENV OPEN_AI_KEY=$open_ai_key
 ENV TIPTAP_APP_ID=$tiptap_app_id
 ENV TIPTAP_KEY=$tiptap_key
+<<<<<<< HEAD
+=======
+ENV GOOGLE_CLIENT_ID=$google_client_id
+>>>>>>> 6c7550fd0773241d4fa9081b8c7908e8ae760d9a
 
 RUN npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
 RUN npm config set //registry.tiptap.dev/:_authToken $tiptap_key
