@@ -96,7 +96,7 @@ const filteredsavedMembersTeachers = computed(() =>
 );
 
 const filteredsavedMembersMonitors = computed(() =>
-  savedMembersMonitors.value.filter((member) => member?.user?.isProfessor === false),
+  savedMembersMonitors.value.filter((member) => member?.role === 'collaborator'),
 );
 
 const deleteDialog = ref(false);
