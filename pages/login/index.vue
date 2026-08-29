@@ -86,7 +86,10 @@
           </div>
 
           <div class="d-flex flex-column">
-            <div id="google-login-button" class="google-login-button"></div>
+            <div
+              id="google-login-button"
+              class="mx-auto w-[306px] max-w-full [&>div]:flex [&>div]:justify-center [&>iframe]:!block [&>iframe]:!h-[40px] [&>iframe]:!rounded-md"
+            ></div>
             <v-btn block class="card-btn metamask d-flex" :loading="logging2" @click="metalogin">
               <img src="public/images/metamask.png" alt="" />
               <span>{{ $t('pages.login.metamask.btn') }}</span>

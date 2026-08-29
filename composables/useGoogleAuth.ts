@@ -98,7 +98,7 @@ export const useGoogleAuth = () => {
       text: 'continue_with',
       shape: 'rectangular',
       logo_alignment: 'left',
-      width: 320,
+      width: 306,
     });
   };
 
