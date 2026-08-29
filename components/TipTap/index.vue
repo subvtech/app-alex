@@ -474,7 +474,6 @@ onMounted(async () => {
 });
 const blockToolsMap = {
   starterKit: StarterKit.configure({
-    history: false,
     codeBlock: false,
   }),
   CustomMention: CustomMention.configure({
