@@ -22,12 +22,32 @@
             @click="removeMedia"
           />
         </div>
-        <Popover v-if="contentType === 'image'" :open="popover" @update:open="(e) => (popover = e)">
-          <PopoverTrigger
-            class="w-100 d-flex transition-justify-content"
-            :style="`justify-content: ${media.align}`"
-            :disabled="readOnly"
+        <div
+          v-if="contentType === 'image' && readOnly"
+          class="w-100 d-flex transition-justify-content"
+          :style="`justify-content: ${media.align}`"
+          @click="handleImageClick"
+        >
+          <div
+            class="w-100 d-flex align-center transition-justify-content"
+            :style="`max-width: ${containerWidth}; justify-content: ${media.align}`"
           >
+            <div class="image-preview position-relative" :style="`width: ${media.size}%`">
+              <img
+                ref="image"
+                :key="media.title"
+                :src="media.src"
+                :alt="media.title"
+                class="w-100 rounded img-component tw-transition-all cursor-zoom-in"
+                :draggable="false"
+                @click.stop="handleImageClick"
+                @load="imageOriginalWidth = image.naturalWidth"
+              />
+            </div>
+          </div>
+        </div>
+        <Popover v-else-if="contentType === 'image'" :open="popover" @update:open="(e) => (popover = e)">
+          <PopoverTrigger class="w-100 d-flex transition-justify-content" :style="`justify-content: ${media.align}`">
             <div
               class="w-100 d-flex align-center transition-justify-content"
               :style="`max-width: ${containerWidth}; justify-content: ${media.align}`"
@@ -307,6 +327,12 @@ const lastPanPoint = ref({ x: 0, y: 0 });
 
 const imageContainer = ref<HTMLElement>();
 const fullscreenImage = ref<HTMLImageElement>();
+
+const handleImageClick = () => {
+  if (readOnly.value) {
+    openFullscreen();
+  }
+};
 
 const openFullscreen = () => {
   popover.value = false;
