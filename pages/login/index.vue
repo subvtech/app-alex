@@ -86,27 +86,7 @@
           </div>
 
           <div class="d-flex flex-column">
-            <v-btn block class="card-btn google d-flex" :loading="googleLoading" @click="googleLogin">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="google-icon" aria-hidden="true">
-                <path
-                  fill="#4285F4"
-                  d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.1c-.6 3-2.3 5.6-4.9 7.3v6h8c4.7-4.3 7.3-10.7 7.3-17.4z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-8-6c-2.1 1.4-4.8 2.2-7.9 2.2-6 0-11.1-4.1-12.9-9.6H2.8v6.2C6.8 42.6 14.8 48 24 48z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M11.1 28.8c-.5-1.4-.7-2.9-.7-4.4s.2-3 .7-4.4v-6.2H2.8C1 17.1 0 20.4 0 24s1 6.9 2.8 9.8l8.3-5z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M24 9.6c3.3 0 6.3 1.1 8.6 3.4l6.5-6.5C35.1 2.5 29.9 0 24 0 14.8 0 6.8 5.4 2.8 13.8l8.3 5.2C12.9 13.7 18 9.6 24 9.6z"
-                />
-              </svg>
-              <span>{{ $t('pages.login.google.btn') }}</span>
-            </v-btn>
+            <div id="google-login-button" class="google-login-button"></div>
             <v-btn block class="card-btn metamask d-flex" :loading="logging2" @click="metalogin">
               <img src="public/images/metamask.png" alt="" />
               <span>{{ $t('pages.login.metamask.btn') }}</span>
@@ -119,14 +99,18 @@
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
 import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
+import { useForm } from 'vee-validate';
 const hasError = ref(false);
 const errorMessage = ref('');
 const route = useRoute();
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
+});
+
+useHead({
+  meta: [{ httpEquiv: 'Cross-Origin-Opener-Policy', content: 'same-origin-allow-popups' }],
 });
 
 const redirect = (route.query.redirect as string) || useCookie('redirect').value;
@@ -136,6 +120,7 @@ const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const { mapStrapiErrors } = useStrapiHelpers();
+const { renderGoogleButton } = useGoogleAuth();
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
   keepValuesOnUnmount: true,
@@ -150,7 +135,10 @@ const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
 const { metalogin } = useMetamask(logging2);
-const { googleLogin, loading: googleLoading } = useGoogleAuth();
+
+onMounted(() => {
+  renderGoogleButton('google-login-button');
+});
 
 const submit = handleSubmit(async () => {
   logging.value = true;
