@@ -1,6 +1,6 @@
-// Resolver em nível de módulo: GSI só é inicializado uma vez por client_id
-let _gsiClientId: string | null = null;
-let _credentialResolve: ((c: string | null) => void) | null = null;
+type GoogleCredentialResponse = {
+  credential?: string;
+};
 
 export const useGoogleAuth = () => {
   const config = useRuntimeConfig();
@@ -12,58 +12,12 @@ export const useGoogleAuth = () => {
 
   const loading = ref(false);
 
-  const loadGsiScript = (): Promise<void> =>
-    new Promise((resolve, reject) => {
-      if (window.google?.accounts?.id) {
-        resolve();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('google-script-load-error'));
-      document.head.appendChild(script);
-    });
-
-  const loadGsiAndInit = async (clientId: string): Promise<void> => {
-    await loadGsiScript();
-    if (_gsiClientId === clientId) return;
-    window.google!.accounts!.id.initialize({
-      client_id: clientId,
-      callback: ({ credential }) => {
-        _credentialResolve?.(credential);
-        _credentialResolve = null;
-      },
-      error_callback: () => {
-        _credentialResolve?.(null);
-        _credentialResolve = null;
-      },
-      use_fedcm_for_prompt: true,
-    });
-    _gsiClientId = clientId;
-  };
-
-  const googleLogin = async () => {
-    const clientId = config.public.googleClientId as string;
-    if (!clientId) {
-      setMessage(i18n.t('pages.login.google.error'), 'red', true);
-      if (import.meta.dev) console.error('[useGoogleAuth] GOOGLE_CLIENT_ID não está definido.');
-      return;
-    }
+  const processGoogleLogin = async (credential: string) => {
+    if (!credential) return;
 
     loading.value = true;
+
     try {
-      await loadGsiAndInit(clientId);
-
-      const credential = await new Promise<string | null>((resolve) => {
-        _credentialResolve = resolve;
-        window.google!.accounts!.id.prompt();
-      });
-
-      if (!credential) return;
-
       const client = useStrapiClient();
       const response = await client<{
         jwt: string;
@@ -91,5 +45,62 @@ export const useGoogleAuth = () => {
     }
   };
 
-  return { googleLogin, loading };
+  const loadGsiScript = (): Promise<void> =>
+    new Promise((resolve, reject) => {
+      if (window.google?.accounts?.id) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('google-script-load-error'));
+      document.head.appendChild(script);
+    });
+
+  const renderGoogleButton = async (elementId: string) => {
+    const clientId = config.public.googleClientId as string;
+    if (!clientId) {
+      setMessage(i18n.t('pages.login.google.error'), 'red', true);
+      if (import.meta.dev) console.error('[useGoogleAuth] GOOGLE_CLIENT_ID não está definido.');
+      return;
+    }
+
+    await loadGsiScript();
+
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    const googleAccounts = window.google!.accounts!.id;
+
+    googleAccounts.initialize({
+      client_id: clientId,
+      callback: (response: GoogleCredentialResponse) => {
+        if (response?.credential) {
+          processGoogleLogin(response.credential);
+        }
+      },
+      auto_select: false,
+      cancel_on_tap_outside: false,
+      context: 'signin',
+      ux_mode: 'popup',
+      type: 'standard',
+    });
+
+    element.innerHTML = '';
+    googleAccounts.renderButton(element, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'continue_with',
+      shape: 'rectangular',
+      logo_alignment: 'left',
+      width: 320,
+    });
+  };
+
+  return { renderGoogleButton, loading };
 };
