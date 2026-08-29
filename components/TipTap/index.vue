@@ -598,7 +598,6 @@ const blockToolsMap = {
     defaultFormat: defaultBlock.value === 'image' ? 'image' : 'video',
     uploadMedia: uploadImageFile,
     deleteMedia: (id: string) => {
-      // mediaToDelete.value.push(id);
       strapiClient(`/upload/files/${id}`, {
         method: 'DELETE',
       });
@@ -741,10 +740,6 @@ watch(
       console.warn('[TipTap] modelValue watcher skipped because editor is not ready');
       return;
     }
-    // HTML
-    // const isSame = editor.value.getHTML() === value;
-
-    // JSON
     const isSame = JSON.stringify(editor.value.getJSON()) === JSON.stringify(value);
 
     if (!isSame) {
@@ -761,14 +756,12 @@ watch(
   }
 }
 
-/* Basic editor styles */
 .tiptap {
   outline: none !important;
   :first-child {
     margin-top: 0;
   }
 
-  /* List styles */
   ul,
   ol {
     padding: 0 1rem;
@@ -788,7 +781,6 @@ watch(
     list-style-type: decimal;
   }
 
-  /* Task list specific styles */
   ul[data-type='taskList'] {
     list-style: none;
     margin-left: 0;
@@ -818,7 +810,6 @@ watch(
     }
   }
 
-  /* Heading styles */
   h1,
   h2,
   h3,
@@ -854,7 +845,6 @@ watch(
     font-size: 1rem;
   }
 
-  /* Link styles */
   a {
     color: #99c3ff;
     cursor: pointer;
@@ -867,7 +857,6 @@ watch(
     }
   }
 
-  /* Code and preformatted text styles */
   code {
     background-color: #212121;
     border-radius: 0.4rem;
@@ -1032,7 +1021,6 @@ watch(
   word-break: normal;
 }
 
-/* Render the username above the caret */
 .collaboration-cursor__label {
   border-radius: 3px 3px 3px 0;
   color: #0d0d0d;
