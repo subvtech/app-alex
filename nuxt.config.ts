@@ -54,10 +54,7 @@ export default defineNuxtConfig({
       tipTapAppId: TIPTAP_APP_ID,
       tipTapKey: TIPTAP_KEY,
       useMock: USE_MOCK === 'true',
-<<<<<<< HEAD
-=======
       googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
->>>>>>> 6c7550fd0773241d4fa9081b8c7908e8ae760d9a
     },
   },
   strapi: {

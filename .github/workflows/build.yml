@@ -83,10 +83,7 @@ jobs:
     env:
       TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
       TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
-<<<<<<< HEAD
-=======
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
->>>>>>> 6c7550fd0773241d4fa9081b8c7908e8ae760d9a
 
     steps:
       - name: Checkout repository
@@ -139,10 +136,7 @@ jobs:
     env:
       TIPTAP_KEY: ${{ secrets.TIPTAP_KEY }}
       TIPTAP_APP_ID: ${{ secrets.TIPTAP_APP_ID }}
-<<<<<<< HEAD
-=======
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
->>>>>>> 6c7550fd0773241d4fa9081b8c7908e8ae760d9a
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
