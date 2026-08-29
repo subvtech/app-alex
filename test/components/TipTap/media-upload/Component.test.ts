@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createI18n } from 'vue-i18n';
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
 import { vuetify } from '../../../../plugins/vuetify';
 import MediaUploadComponent from '../../../../components/TipTap/custom-plugins/media-upload/Component.vue';
 
@@ -68,5 +70,19 @@ describe('TipTap media upload component', () => {
     await wrapper.vm.handleImageClick();
 
     expect(wrapper.vm.showFullscreen).toBe(true);
+  });
+
+  it('undo works with StarterKit history enabled', () => {
+    const editor = new Editor({
+      extensions: [StarterKit.configure({ codeBlock: false })],
+      content: '<p>hello</p>',
+    });
+
+    editor.commands.insertContent('<p>world</p>');
+    expect(editor.getText()).toContain('world');
+
+    editor.commands.undo();
+
+    expect(editor.getText()).toBe('hello');
   });
 });
