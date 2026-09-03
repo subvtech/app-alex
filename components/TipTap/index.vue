@@ -407,13 +407,9 @@ onMounted(async () => {
           return '';
         },
       }),
-      ...(props.edit
-        ? [
-            SlashMenu.configure({
-              suggestion: suggestion(slashMenuBlocks(props.allowedBlocks)),
-            }),
-          ]
-        : []),
+      SlashMenu.configure({
+        suggestion: suggestion(slashMenuBlocks(props.allowedBlocks)),
+      }),
       VueDragHandle.configure({
         editor: () => editor.value,
         showDragHandle: () => isEditable.value && !props.fixedMenu,
