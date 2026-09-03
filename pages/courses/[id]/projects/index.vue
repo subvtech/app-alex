@@ -11,8 +11,12 @@
 // });
 
 const learningPlanStore = useLearningPlanStore();
+const viewModeStudentStore = useViewModeStudentStore();
 const userStore = useStrapiUser();
 const { find } = useStrapiUtils();
+const effectiveUserIsFacilitator = computed(() => {
+  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
+});
 
 const learningPlanData = ref<any | undefined>(undefined);
 const yourProjects = ref<number[]>([]);
