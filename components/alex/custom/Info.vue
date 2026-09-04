@@ -230,16 +230,6 @@
             </div>
           </template>
         </alex-custom-tooltip>
-        <v-btn
-          v-if="isProfessor"
-          variant="outlined"
-          size="default"
-          class="view-as-student-banner-btn"
-          color="white"
-          @click="emit('view-as-student')"
-        >
-          {{ viewModeStudentButtonLabel }}
-        </v-btn>
       </div>
     </div>
   </div>
@@ -248,7 +238,7 @@
 <script setup lang="ts">
 import { Upload } from '~/models/upload.model';
 
-const emit = defineEmits(['display:settings', 'view-as-student']);
+const emit = defineEmits(['display:settings']);
 interface MyProps {
   profilePicture?: Upload | null;
   userId: number;
@@ -329,14 +319,6 @@ const props = withDefaults(defineProps<MyProps>(), {
   username: undefined,
 });
 // const { copyToClipboard } = useCopyText();
-const viewModeStudentStore = useViewModeStudentStore();
-
-const viewModeStudentButtonLabel = computed(() => {
-  return viewModeStudentStore.viewAsStudent
-    ? 'Sair do Modo Aluno'
-    : 'Modo Aluno';
-});
-
 const biggerImage = computed(() => {
   return props.resize && props.profilePictureSize > 100;
 });
@@ -372,21 +354,6 @@ const startDateOrEndDate = computed(() => {
 .white-bg {
   background-color: white;
   color: #232b32;
-}
-.view-as-student-banner-btn {
-  position: absolute;
-  bottom: 22px;
-  right: 1px;
-  background-color: #0000005d;
-  text-transform: none;
-  min-width: 140px;
-  padding-inline: 16px;
-  border-radius: 8px;
-  border: none;
-  font-weight: bold;
-}
-.view-as-student-banner-btn:hover {
-  background-color: rgba(255, 255, 255, 0.08);
 }
 .title-container {
   max-width: 80%;

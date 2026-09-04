@@ -1,7 +1,7 @@
 <template>
   <v-snackbar
     v-if="currentShow"
-    :model-value="currentShow"
+    v-model="currentShow"
     class="snackbar"
     :color="currentFill ? currentColor : 'white'"
     :timeout="timeSpan"

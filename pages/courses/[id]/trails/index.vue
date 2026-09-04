@@ -19,7 +19,7 @@
       />
 
       <alex-custom-button
-        v-if="effectiveUserIsFacilitator"
+        v-if="learningPlanStore.userIsFacilitator"
         prepend-icon="mdi-plus"
         size="large"
         :disabled="!learningStructure"
@@ -64,7 +64,7 @@
               :key="item.raw.title + index"
               :hide="item.raw.hidden"
               :name="item.raw.title"
-              :can-edit="effectiveUserIsFacilitator"
+              :can-edit="learningPlanStore.userIsFacilitator || true"
               :description="item.raw.description"
               :image="{
                 url: item.raw?.cover_image?.url,
@@ -183,7 +183,7 @@
       </div>
     </alex-custom-dialog>
     <alex-learningplan-trails-dialogs-create
-      v-if="effectiveUserIsFacilitator && !!learningStructure"
+      v-if="learningPlanStore.userIsFacilitator && !!learningStructure"
       :model-value="createTrailDialog"
       :learning-structure="learningStructure"
       @course-created="handleCreatedTrail"
@@ -219,10 +219,6 @@ const page = ref(1);
 const createTrailDialog = ref(false);
 
 const learningPlanStore = useLearningPlanStore();
-const viewModeStudentStore = useViewModeStudentStore();
-const effectiveUserIsFacilitator = computed(() => {
-  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
-});
 
 const refreshTrails = async () => {
   await learningPlanStore.loadLearningPlan(+route.params.id, false);

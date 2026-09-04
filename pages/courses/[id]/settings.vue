@@ -5,7 +5,7 @@
     :learning-plan-id="learningPlanId"
     :owner="owner"
     :invitation-link="learningPlanStore.invitationLink"
-    :can-edit="effectiveUserIsFacilitator"
+    :can-edit="learningPlanStore.userIsFacilitator"
     :schedules="schedules"
   />
 </template>
@@ -17,12 +17,8 @@ definePageMeta({
   middleware: 'auth',
 });
 const learningPlanStore = useLearningPlanStore();
-const viewModeStudentStore = useViewModeStudentStore();
 const owner = ref<any>();
 const route = useRoute();
-const effectiveUserIsFacilitator = computed(() => {
-  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
-});
 const schedules = computed(() =>
   learningPlanStore.schedules.map((item) => {
     return {

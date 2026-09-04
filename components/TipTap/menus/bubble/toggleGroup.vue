@@ -77,6 +77,8 @@ const props = defineProps({
   },
 });
 
+console.log('props.fixedMenuBar', props.fixedMenuBar);
+
 const { t } = useI18n();
 
 const getTranslation = (key: string) => t(`components.tiptap.menus.bubbleMenu.tooltip.${key}`);

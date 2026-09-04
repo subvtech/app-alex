@@ -2,7 +2,6 @@
 import { useQuery } from '@tanstack/vue-query';
 import RecentTasks from '~/components/dashboard/recentTasks.vue';
 import DashboardStatsCard from '~/components/dashboard/statusCard.vue';
-import type { RecentTask } from '~/models/simple/recentTask.model';
 
 definePageMeta({
   middleware: 'auth',
@@ -11,102 +10,168 @@ definePageMeta({
 
 const user = useStrapiUser<User>();
 
-const findAll = async (resource: string, params: Record<string, any>) => {
-  const { find } = useStrapi();
-  const pageSize = 100;
-  const results: any[] = [];
-  let page = 1;
-  let pageCount = 1;
-
-  do {
-    const res: any = await find(resource, { ...params, pagination: { page, pageSize } });
-    results.push(...(res.data || []));
-    pageCount = res.meta?.pagination?.pageCount ?? 1;
-    page += 1;
-  } while (page <= pageCount);
-
-  return results;
-};
-
 const { data: dashboardStats, isLoading: isStatsLoading } = useQuery({
   queryKey: ['dashboard-stats', user.value?.id],
   queryFn: async () => {
-    const members = await findAll('learning-plan-members', {
+    const { find } = useStrapi();
+    const res = await find('learning-plan-members', {
       filters: { user: user.value?.id },
       populate: ['learningplan'],
     });
 
     const now = new Date();
 
-    const plans = members
-      .map((member: any) => ({
-        role: member.attributes.role,
-        plan: member.attributes.learningplan?.data?.attributes ?? null,
-      }))
-      .filter((member) => member.plan && !member.plan.archived_at);
+    const allProjectMembers =
+      res.data?.filter(
+        (member: any) =>
+          member.attributes.learningplan.data.attributes.type === 'project' &&
+          !member.attributes.learningplan.data.attributes.archived_at,
+      ) || [];
 
-    const isActive = (member: (typeof plans)[number]) => !member.plan.end_date || new Date(member.plan.end_date) >= now;
+    const allCourseMembers =
+      res.data?.filter(
+        (member: any) =>
+          member.attributes.learningplan.data.attributes.type === 'course' &&
+          !member.attributes.learningplan.data.attributes.archived_at,
+      ) || [];
 
-    const buildStats = (type: string) => {
-      const all = plans.filter((member) => member.plan.type === type);
-      const active = all.filter(isActive);
-
-      return {
-        created: active.filter((member) => member.role === 'facilitator').length,
-        participating: active.filter((member) => member.role !== 'facilitator').length,
-        finalized: all.length - active.length,
-        total: all.length,
-      };
-    };
-
-    return {
-      projectStats: buildStats('project'),
-      courseStats: buildStats('course'),
-    };
-  },
-  enabled: computed(() => !!user.value?.id),
-});
-
-const { data: userTasks, isLoading: isTasksLoading } = useQuery({
-  queryKey: ['dashboard-tasks', user.value?.id],
-  queryFn: async (): Promise<RecentTask[]> => {
-    const members = await findAll('task-members', {
-      filters: {
-        $or: [
-          { learning_plan_member: { user: user.value?.id } },
-          { learning_plan_group: { group_members: { student_member: { user: user.value?.id } } } },
-        ],
-        status: { $ne: 'done' },
-      },
-      populate: { task: { populate: ['tags', 'learningplan'] } },
+    const activeProjectMembers = allProjectMembers.filter((member: any) => {
+      const endDate = member.attributes.learningplan.data.attributes.end_date
+        ? new Date(member.attributes.learningplan.data.attributes.end_date)
+        : null;
+      return !endDate || endDate >= now;
     });
 
-    const deadline = (date?: string | null) => (date ? new Date(date).getTime() : Number.POSITIVE_INFINITY);
+    const activeCourseMembers = allCourseMembers.filter((member: any) => {
+      const endDate = member.attributes.learningplan.data.attributes.end_date
+        ? new Date(member.attributes.learningplan.data.attributes.end_date)
+        : null;
+      return !endDate || endDate >= now;
+    });
 
-    return members
-      .map((member: any): RecentTask | null => {
-        const task = member.attributes.task?.data;
-        if (!task) return null;
-
-        return {
-          id: task.id,
-          title: task.attributes.title,
-          description: tiptapToPlainText(task.attributes.description),
-          status: member.attributes.status || 'to_do',
-          finish_at: task.attributes.finish_at,
-          parent_name: task.attributes.learningplan?.data?.attributes?.title ?? null,
-          tags: (task.attributes.tags?.data || []).map((tag: any) => ({
-            id: tag.id,
-            text: tag.attributes.text,
-          })),
-        };
-      })
-      .filter((task: RecentTask | null): task is RecentTask => !!task)
-      .sort((a: RecentTask, b: RecentTask) => deadline(a.finish_at) - deadline(b.finish_at))
-      .slice(0, 5);
+    return {
+      projectStats: {
+        created: activeProjectMembers.filter((m: any) => m.attributes.role === 'facilitator').length,
+        participating: activeProjectMembers.filter((m: any) => m.attributes.role === 'student').length,
+        finalized: allProjectMembers.length - activeProjectMembers.length,
+        total: allProjectMembers.length,
+      },
+      courseStats: {
+        created: activeCourseMembers.filter((m: any) => m.attributes.role === 'facilitator').length,
+        participating: activeCourseMembers.filter((m: any) => m.attributes.role === 'student').length,
+        finalized: allCourseMembers.length - activeCourseMembers.length,
+        total: allCourseMembers.length,
+      },
+    };
   },
   enabled: computed(() => !!user.value?.id),
 });
+
+const userTasks = ref<TaskSimple[]>([
+  {
+    id: 1,
+    position: 1,
+    submission_required: true,
+    status: 'to_do',
+    title: 'Entregar relatório do projeto',
+    organization: 'standard',
+    description: 'Faça o upload do relatório final do projeto.',
+    type: 'individual',
+    tags: [
+      { id: 1, name: 'Relatório' },
+      { id: 2, name: 'Urgente' },
+    ],
+    blocks: [],
+    start_at: '2024-07-01',
+    finish_at: '2024-07-10',
+    archived_at: null,
+    can_submit_after_deadline: false,
+    can_change_from_review: false,
+    allowed_editor_plugins: '',
+    submission_description: '',
+    kanban_column_task: { id: 1, name: 'to_do' },
+  },
+  {
+    id: 2,
+    position: 2,
+    submission_required: false,
+    status: 'in_progress',
+    title: 'Participar do fórum de discussão',
+    organization: 'standard',
+    description: 'Contribua com pelo menos uma mensagem no fórum.',
+    type: 'group',
+    tags: [{ id: 3, name: 'Discussão' }],
+    blocks: [],
+    start_at: '2024-07-05',
+    finish_at: '2024-07-15',
+    archived_at: null,
+    can_submit_after_deadline: true,
+    can_change_from_review: true,
+    allowed_editor_plugins: '',
+    submission_description: '',
+    kanban_column_task: { id: 2, name: 'in_progress' },
+  },
+  {
+    id: 3,
+    position: 3,
+    submission_required: true,
+    status: 'to_do',
+    title: 'Revisar material complementar',
+    organization: 'standard',
+    description: 'Leia os artigos recomendados para a próxima aula.',
+    type: 'individual',
+    tags: [{ id: 4, name: 'Leitura' }],
+    blocks: [],
+    start_at: '2024-07-08',
+    finish_at: '2024-07-20',
+    archived_at: null,
+    can_submit_after_deadline: false,
+    can_change_from_review: false,
+    allowed_editor_plugins: '',
+    submission_description: '',
+    kanban_column_task: { id: 3, name: 'to_do' },
+  },
+  {
+    id: 4,
+    position: 4,
+    submission_required: true,
+    status: 'under_review',
+    title: 'Revisar material complementar',
+    organization: 'standard',
+    description: 'Leia os artigos recomendados para a próxima aula.',
+    type: 'individual',
+    tags: [{ id: 4, name: 'Leitura' }],
+    blocks: [],
+    start_at: '2024-07-08',
+    finish_at: '2024-07-20',
+    archived_at: null,
+    can_submit_after_deadline: false,
+    can_change_from_review: false,
+    allowed_editor_plugins: '',
+    submission_description: '',
+    kanban_column_task: { id: 4, name: 'under_review' },
+  },
+  {
+    id: 5,
+    position: 5,
+    submission_required: true,
+    status: 'done',
+    title: 'Revisar material complementar',
+    organization: 'standard',
+    description: 'Leia os artigos recomendados para a próxima aula.',
+    type: 'individual',
+    tags: [{ id: 4, name: 'Leitura' }],
+    blocks: [],
+    start_at: '2024-07-08',
+    finish_at: '2024-07-20',
+    archived_at: null,
+    can_submit_after_deadline: false,
+    can_change_from_review: false,
+    allowed_editor_plugins: '',
+    submission_description: '',
+    kanban_column_task: { id: 5, name: 'done' },
+  },
+]);
 
 const getWelcomeMessage = () => {
   const messages = [
@@ -120,6 +185,11 @@ const getWelcomeMessage = () => {
 </script>
 
 <template>
+  <v-row justify="center">
+    <v-col cols="12">Bem vindo ao Alex</v-col>
+  </v-row>
+
+  <!--
   <div class="tw-space-y-6">
     <v-card class="tw-bg-white tw-shadow-lg" rounded="lg" elevation="0">
       <v-card-text class="pa-6">
@@ -166,10 +236,11 @@ const getWelcomeMessage = () => {
       <v-col cols="12" md="8">
         <v-card class="tw-bg-white tw-shadow-sm tw-h-full" rounded="lg" elevation="0">
           <v-card-text class="pa-6">
-            <RecentTasks :tasks="userTasks" :is-loading="isTasksLoading" />
+            <RecentTasks :tasks="userTasks" />
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
   </div>
+  -->
 </template>
