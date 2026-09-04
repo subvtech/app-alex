@@ -12,7 +12,7 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card class="card card-acesso d-flex justify-center">
+      <v-card class="card card-acesso d-flex justify-center align-center">
         <div class="form d-flex flex-column" style="max-width: 400px">
           <div class="d-flex flex-column">
             <v-card-title class="text-white text-h3 text-center text-bold mt-16 !tw-hidden md:!tw-block">
@@ -85,16 +85,10 @@
             <v-divider color="secondary" :thickness="1" class="border-opacity-100"></v-divider>
           </div>
 
-          <div class="d-flex flex-column">
-            <div
-              id="google-login-button"
-              class="mx-auto w-[306px] max-w-full [&>div]:flex [&>div]:justify-center [&>iframe]:!block [&>iframe]:!h-[40px] [&>iframe]:!rounded-md"
-            ></div>
-            <v-btn block class="card-btn metamask d-flex" :loading="logging2" @click="metalogin">
-              <img src="public/images/metamask.png" alt="" />
-              <span>{{ $t('pages.login.metamask.btn') }}</span>
-            </v-btn>
-          </div>
+          <v-btn block class="card-btn metamask d-flex" :loading="logging2" @click="metalogin">
+            <img src="public/images/metamask.png" alt="" />
+            <span>{{ $t('pages.login.metamask.btn') }}</span>
+          </v-btn>
         </div>
       </v-card>
     </v-col>
@@ -102,18 +96,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
 import { useForm } from 'vee-validate';
+import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
 const hasError = ref(false);
 const errorMessage = ref('');
 const route = useRoute();
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
-});
-
-useHead({
-  meta: [{ httpEquiv: 'Cross-Origin-Opener-Policy', content: 'same-origin-allow-popups' }],
 });
 
 const redirect = (route.query.redirect as string) || useCookie('redirect').value;
@@ -123,7 +113,6 @@ const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const { mapStrapiErrors } = useStrapiHelpers();
-const { renderGoogleButton } = useGoogleAuth();
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
   keepValuesOnUnmount: true,
@@ -138,10 +127,6 @@ const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
 const { metalogin } = useMetamask(logging2);
-
-onMounted(() => {
-  renderGoogleButton('google-login-button');
-});
 
 const submit = handleSubmit(async () => {
   logging.value = true;
@@ -187,7 +172,7 @@ const submit = handleSubmit(async () => {
     top: 0;
 
     .form {
-      gap: 24px;
+      gap: 40px;
 
       .v-card-subtitle {
         font-size: 1.25rem;
@@ -243,27 +228,6 @@ const submit = handleSubmit(async () => {
         height: 30px;
         width: 30px;
         margin-right: 10px;
-      }
-      span {
-        font-size: 16px;
-        color: #000000;
-        font-family: 'Sen';
-      }
-    }
-
-    .google {
-      background-color: white !important;
-      align-items: center;
-      text-transform: none !important;
-      width: 306px;
-      min-width: 0px !important;
-      margin-inline: auto;
-
-      .google-icon {
-        height: 24px;
-        width: 24px;
-        margin-right: 10px;
-        flex-shrink: 0;
       }
       span {
         font-size: 16px;

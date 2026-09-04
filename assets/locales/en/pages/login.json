@@ -19,10 +19,6 @@
     "notFound": "Metamask wallet wasn't detected",
     "tokenExpired": "Token expired, try again"
   },
-  "google": {
-    "btn": "Sign in with Google",
-    "error": "Google authentication failed. Please try again."
-  },
   "loginError": "Invalid email or invalid password, maybe both",
   "confirmEmail": "Please validate your email before proceeding.",
   "blockedUser": "User blocked, please contact support",

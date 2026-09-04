@@ -26,12 +26,11 @@ const filters = ref({
 
 const i18Texts = computed(() => {
   return {
-    title: 'Filtros 1',
+    title: 'Filtros',
     selectPlaceholder: 'Selecionar Integrantes',
     selectLabel: 'Integrantes', // t(`${drawer}.type`),
   };
 });
-
 const schema = yup.object().shape(
   {
     finalDateStart: yup.date().optional(),

@@ -54,22 +54,13 @@ export default defineNuxtConfig({
       tipTapAppId: TIPTAP_APP_ID,
       tipTapKey: TIPTAP_KEY,
       useMock: USE_MOCK === 'true',
-      googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
     },
   },
   strapi: {
     url: STRAPI_URL,
     auth: { populate: ['role', 'learningplans', 'favorites'] },
   },
-  routeRules: {
-    '/**': {
-      headers: {
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-        'Cross-Origin-Embedder-Policy': 'unsafe-none',
-      },
-    },
-    ...(USE_MOCK ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } } : {}),
-  },
+  routeRules: USE_MOCK ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } } : undefined,
   shadcn: {
     prefix: '',
     /**

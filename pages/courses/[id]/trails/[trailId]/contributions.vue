@@ -215,12 +215,8 @@ const expanded = ref();
 const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
 );
-const viewModeStudentStore = useViewModeStudentStore();
-const effectiveUserIsFacilitator = computed(() => {
-  return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
-});
 
-const isProfessor = computed(() => effectiveUserIsFacilitator.value);
+const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
 
 const filteredStudents = computed(() => {
   return contributions.value.otherContributions.filter((student) =>
@@ -233,7 +229,7 @@ const contributions = computed(() => {
   const otherContributions: studentsContributionsType[] = [];
   const contributions = trailStore.trail?.contributions;
   const trailId = trailStore.trail?.id;
-  const userId = effectiveUserIsFacilitator.value
+  const userId = learningPlanStore.userIsFacilitator
     ? -1
     : learningPlanStore.activeMembers.find(
         (member) => member.user.id === user.value.id,

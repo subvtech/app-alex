@@ -8,7 +8,7 @@
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
       :user-id="user.id"
       :title="bannerTitle.title"
-      :show-settings="effectiveUserIsFacilitator"
+      :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"
       :fullname="learningPlanStore.facilitator?.user?.fullname"
       :description="learningPlanStore.learningPlan?.title"
@@ -18,7 +18,7 @@
       :links="isJoinRoutePath ? [] : generalLinks"
       :selected-option="selectedOption"
       :copy-object="
-        learningPlanStore.activeInvitationLinkUrl && effectiveUserIsFacilitator
+        learningPlanStore.activeInvitationLinkUrl && learningPlanStore.userIsFacilitator
           ? {
               label: $t('pages.courses.invite'),
               copyText: learningPlanStore.activeInvitationLinkUrl,
@@ -35,9 +35,8 @@
       darker-background
       show-shade
       show-menu
-      :is-professor="learningPlanStore.userIsFacilitator"
+      is-professor
       @select:option="selectOption"
-      @view-as-student="viewModeStudentStore.toggle()"
     />
     <NuxtPage @update="fetchData" />
   </section>
@@ -108,7 +107,7 @@ const fetchData = async () => {
 const pageRoute = computed(() => route.name);
 
 const bannerTitle = computed(() => {
-  if (effectiveUserIsFacilitator.value) {
+  if (learningPlanStore.userIsFacilitator) {
     return {
       title: i18n.t('pages.courses.identifier'),
       subtitle: learningPlanStore.learningPlan?.slug,
@@ -167,7 +166,7 @@ const generalLinks = computed<TabType[]>(() => [
     value: 4,
     to: `/courses/${learningPlanId.value}/projects`,
   },
-  ...(effectiveUserIsFacilitator.value
+  ...(learningPlanStore.userIsFacilitator
     ? [
         {
           label: i18n.t('pages.courses.assessments'),
@@ -190,12 +189,4 @@ const generalLinks = computed<TabType[]>(() => [
         },
       ]),
 ]);
-
-const viewModeStudentStore = useViewModeStudentStore();
-
-const effectiveUserIsFacilitator = computed(() => {
-  return (
-    !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator
-  );
-});
 </script>

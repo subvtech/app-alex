@@ -22,52 +22,28 @@
             @click="removeMedia"
           />
         </div>
-        <div
-          v-if="contentType === 'image' && readOnly"
-          class="w-100 d-flex transition-justify-content"
-          :style="`justify-content: ${media.align}`"
-          @click="handleImageClick"
-        >
-          <div
-            class="w-100 d-flex align-center transition-justify-content"
-            :style="`max-width: ${containerWidth}; justify-content: ${media.align}`"
+        <Popover v-if="contentType === 'image'" :open="popover" @update:open="(e) => (popover = e)">
+          <PopoverTrigger
+            class="w-100 d-flex transition-justify-content"
+            :style="`justify-content: ${media.align}`"
+            :disabled="readOnly"
           >
-            <div class="image-preview position-relative" :style="`width: ${media.size}%`">
+            <div
+              class="w-100 d-flex align-center transition-justify-content"
+              :style="`max-width: ${containerWidth}; justify-content: ${media.align}`"
+            >
               <img
                 ref="image"
                 :key="media.title"
                 :src="media.src"
                 :alt="media.title"
-                class="w-100 rounded img-component tw-transition-all cursor-zoom-in"
+                :class="{ selected: popover }"
+                preload
+                class="max-width-100 rounded img-component tw-transition-all"
                 :draggable="false"
-                @click.stop="handleImageClick"
+                :style="`width: ${media.size}%`"
                 @load="imageOriginalWidth = image.naturalWidth"
               />
-            </div>
-          </div>
-        </div>
-        <Popover v-else-if="contentType === 'image'" :open="popover" @update:open="(e) => (popover = e)">
-          <PopoverTrigger class="w-100 d-flex transition-justify-content" :style="`justify-content: ${media.align}`">
-            <div
-              class="w-100 d-flex align-center transition-justify-content"
-              :style="`max-width: ${containerWidth}; justify-content: ${media.align}`"
-            >
-              <div class="image-preview position-relative" :style="`width: ${media.size}%`">
-                <img
-                  ref="image"
-                  :key="media.title"
-                  :src="media.src"
-                  :alt="media.title"
-                  :class="{ selected: popover }"
-                  preload
-                  class="w-100 rounded img-component tw-transition-all"
-                  :draggable="false"
-                  @load="imageOriginalWidth = image.naturalWidth"
-                />
-                <div v-if="media.uploading" class="image-uploading">
-                  <v-progress-circular indeterminate color="white" size="40" />
-                </div>
-              </div>
             </div>
           </PopoverTrigger>
           <PopoverContent class="pa-1" side="top">
@@ -168,8 +144,6 @@ interface Media {
   id: string | null;
   size: number;
   align: string;
-  uploadKey?: string | null;
-  uploading?: boolean;
 }
 
 const image = ref();
@@ -205,8 +179,6 @@ const media = ref<Media>({
   id: props.node.attrs.media.id,
   size: props.node.attrs.media.size || 100,
   align: props.node.attrs.media.align || 'center',
-  uploadKey: props.node.attrs.media.uploadKey || null,
-  uploading: props.node.attrs.media.uploading || false,
 });
 
 const readOnly = computed(() => props.extension.options.readOnly());
@@ -228,8 +200,6 @@ watch(
       id: newMedia.id,
       size: newMedia.size || 100,
       align: newMedia.align || 'center',
-      uploadKey: newMedia.uploadKey || null,
-      uploading: newMedia.uploading || false,
     };
   },
 );
@@ -327,12 +297,6 @@ const lastPanPoint = ref({ x: 0, y: 0 });
 
 const imageContainer = ref<HTMLElement>();
 const fullscreenImage = ref<HTMLImageElement>();
-
-const handleImageClick = () => {
-  if (readOnly.value) {
-    openFullscreen();
-  }
-};
 
 const openFullscreen = () => {
   popover.value = false;
@@ -445,20 +409,6 @@ onUnmounted(() => {
 .img-component {
   border: 4px solid transparent;
   /* transition: all 0.5s ease; */
-}
-
-.image-preview {
-  max-width: 100%;
-}
-
-.image-uploading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 4px;
 }
 
 .transition-justify-content {
