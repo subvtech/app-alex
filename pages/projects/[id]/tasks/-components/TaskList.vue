@@ -1154,6 +1154,7 @@ onBeforeUnmount(() => {
         }
       "
       @moved="updateTable"
+      @delete-task="handleDeleteTask"
     />
   </div>
 </template>
