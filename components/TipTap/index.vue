@@ -1,7 +1,11 @@
 <template>
   <client-only>
     <TipTap-loader v-if="isLoading" />
-    <div ref="container" class="rounded-lg w-100 tw-transition-opacity" :class="{ 'tw-opacity-0': isLoading }">
+    <div
+      ref="container"
+      class="rounded-lg w-100 position-relative tw-transition-opacity"
+      :class="{ 'tw-opacity-0': isLoading }"
+    >
       <div ref="bubbleMenuWrapper" v-show="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
         <tip-tap-menus-bubble v-if="editor" :editor="editor" :fixed-menu-bar="fixedMenu" @click.stop.prevent />
       </div>
@@ -21,7 +25,6 @@ import { Placeholder } from '@tiptap/extension-placeholder';
 import { UniqueID } from '@tiptap-pro/extension-unique-id';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
-import { ListItem } from '@tiptap/extension-list-item';
 import { Link } from '@tiptap/extension-link';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';
@@ -37,10 +40,6 @@ import { TableRow } from '@tiptap/extension-table-row';
 import { Typography } from '@tiptap/extension-typography';
 import { Superscript } from '@tiptap/extension-superscript';
 import { Subscript } from '@tiptap/extension-subscript';
-import { Document } from '@tiptap/extension-document';
-import { Text } from '@tiptap/extension-text';
-import { Dropcursor } from '@tiptap/extension-dropcursor';
-import { Paragraph } from '@tiptap/extension-paragraph';
 
 import { common, createLowlight } from 'lowlight';
 
@@ -74,8 +73,8 @@ export type MentionUserPropsArray = MentionUserProps[];
 
 const props = defineProps({
   modelValue: {
-    type: String,
-    default: '',
+    type: [String, Object] as PropType<string | Record<string, any>>,
+    default: undefined,
   },
   edit: {
     type: Boolean,
@@ -117,19 +116,28 @@ const defaultBlock = computed(() => {
   return props.allowedBlocks.length === 1 ? props.allowedBlocks[0] : '';
 });
 
+const normalizeContent = (value: string | Record<string, any> | undefined) => {
+  if (!value) return undefined;
+  if (typeof value !== 'string') return value;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed;
+  } catch {
+    console.warn('[TipTap] normalizeContent kept string because JSON.parse failed', { value });
+    return value;
+  }
+};
+
 const showMenuBar = computed(() => {
   return isEditable.value && (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'));
 });
-// const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
 
 const editor = ref();
 const isEditable = ref(props.edit);
 
 const container = ref<HTMLDivElement | null>(null);
-// ref escopado à instância, sempre montado no DOM (ver v-show no template),
-// para garantir que já esteja disponível quando o Editor for criado no onMounted,
-// independentemente do valor inicial de `edit`
 const bubbleMenuWrapper = ref<HTMLDivElement | null>(null);
 
 const generateUserColor = (username: string): string => {
@@ -172,6 +180,108 @@ const getTipTapToken = async (userID: number | undefined) => {
   }
 };
 
+const uploadImageFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append('files', file, file.name);
+
+  try {
+    const res = await strapiClient<Upload[]>('/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const uploadedFile = res[0];
+    if (!uploadedFile?.url || uploadedFile.id === undefined) {
+      throw new Error('Upload response did not contain a valid file');
+    }
+
+    const { url, id } = uploadedFile;
+    temporaryMedia.value.push(id);
+    return {
+      success: 1,
+      url,
+      id,
+      title: file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
+    };
+  } catch (error) {
+    setMessage(t('components.tiptap.mediaUpload.errors.upload'), 'error', true);
+    return { success: 0 };
+  }
+};
+
+const updateMediaNode = (uploadKey: string, media) => {
+  if (!editor.value) return;
+
+  editor.value.commands.command(({ state, dispatch }) => {
+    let updated = false;
+    state.doc.descendants((node, pos) => {
+      if (node.type.name === 'mediaUpload' && node.attrs.media.uploadKey === uploadKey) {
+        dispatch?.(state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, media }));
+        updated = true;
+        return false;
+      }
+      return true;
+    });
+    return updated;
+  });
+};
+
+const insertImageFile = async (file: File) => {
+  if (!isEditable.value || !file.type.startsWith('image/')) {
+    return false;
+  }
+
+  if (!editor.value) return false;
+
+  const uploadKey = `${Date.now()}-${Math.random()}`;
+  const localUrl = URL.createObjectURL(file);
+
+  editor.value
+    .chain()
+    .focus()
+    .insertContent({
+      type: 'mediaUpload',
+      attrs: {
+        media: {
+          src: localUrl,
+          title: file.name,
+          id: null,
+          size: 100,
+          align: 'center',
+          uploadKey,
+          uploading: true,
+        },
+        format: 'image',
+      },
+    })
+    .run();
+
+  const res = await uploadImageFile(file);
+  if (res.success) {
+    updateMediaNode(uploadKey, {
+      src: res.url,
+      title: res.title,
+      id: res.id,
+      size: 100,
+      align: 'center',
+      uploadKey,
+      uploading: false,
+    });
+  } else {
+    updateMediaNode(uploadKey, {
+      src: '',
+      title: file.name,
+      id: null,
+      size: 100,
+      align: 'center',
+      uploadKey,
+      uploading: false,
+    });
+  }
+  URL.revokeObjectURL(localUrl);
+
+  return true;
+};
+
 onMounted(async () => {
   const user = useStrapiUser();
   let provider;
@@ -202,9 +312,6 @@ onMounted(async () => {
     provider = new TiptapCollabProvider(providerOptions);
   }
 
-  // Garante que o DOM dentro do <client-only> já foi montado antes de criar o Editor.
-  // Como o wrapper agora usa v-show (não v-if), ele já existe no DOM independentemente
-  // do valor inicial de `edit`/`showMenuBar`.
   await nextTick();
 
   const setCollaborationExtensions = (): AnyExtension[] => [
@@ -227,6 +334,14 @@ onMounted(async () => {
     editable: isEditable.value,
     editorProps: {
       handlePaste: (_view, event, _slice) => {
+        const imageFile = Array.from(event.clipboardData?.files || []).find((file) => file.type.startsWith('image/'));
+
+        if (imageFile) {
+          event.preventDefault();
+          insertImageFile(imageFile);
+          return true;
+        }
+
         const text = event.clipboardData?.getData('text/plain');
 
         if (!text) return false;
@@ -260,11 +375,23 @@ onMounted(async () => {
 
         return false;
       },
+      handleDrop: (_view, event, _slice, moved) => {
+        if (moved) {
+          return false;
+        }
+
+        const imageFile = Array.from(event.dataTransfer?.files || []).find((file) => file.type.startsWith('image/'));
+
+        if (!imageFile) {
+          return false;
+        }
+
+        event.preventDefault();
+        insertImageFile(imageFile);
+        return true;
+      },
     },
     extensions: [
-      Document,
-      Text,
-      Dropcursor,
       BubbleMenu.configure({
         element: bubbleMenuWrapper.value,
         tippyOptions: {
@@ -330,11 +457,15 @@ onMounted(async () => {
       ...setCollaborationExtensions(),
       ...getSelectedBlockTools(),
     ],
-    content: props.modelValue,
+    content: normalizeContent(props.modelValue),
     onUpdate: ({ editor }) => {
       emits('update:modelValue', editor.getJSON());
     },
     onContentError({ editor, disableCollaboration }) {
+      console.error('[TipTap] onContentError', {
+        currentJson: editor.getJSON(),
+        currentHtml: editor.getHTML(),
+      });
       disableCollaboration();
       const emitUpdate = false;
       editor.setEditable(false, emitUpdate);
@@ -348,7 +479,6 @@ onMounted(async () => {
 });
 const blockToolsMap = {
   starterKit: StarterKit.configure({
-    history: false,
     codeBlock: false,
   }),
   CustomMention: CustomMention.configure({
@@ -399,7 +529,6 @@ const blockToolsMap = {
   }),
   TaskList,
   TaskItem: TaskItem.configure({ nested: true }),
-  ListItem,
   TextStyle,
   FontFamily,
   CodeBlockLowlight: CodeBlockLowlight.configure({
@@ -417,7 +546,6 @@ const blockToolsMap = {
   Typography,
   Superscript,
   Subscript,
-  Paragraph,
   Carousel: Carousel.configure({
     handleFileSelected: async (slides) => {
       const formData = new FormData();
@@ -464,9 +592,6 @@ const blockToolsMap = {
       }
     },
     handleDeletedFiles: (id: string) => {
-      // Para editores com botão de salvar, temos que guardar o ID dos arquivos e apenas deletar com a confirmação do usuário
-      // if (file.videoId) mediaToDelete.value.push(file.videoId);
-      // if (file.imgId) mediaToDelete.value.push(file.imgId);
       strapiClient(`/upload/files/${id}`, {
         method: 'DELETE',
       });
@@ -476,30 +601,8 @@ const blockToolsMap = {
   MediaUpload: MediaUpload.configure({
     readOnly: () => !isEditable.value,
     defaultFormat: defaultBlock.value === 'image' ? 'image' : 'video',
-    uploadMedia: async (file: File) => {
-      const formData = new FormData();
-      formData.append('files', file, file.name);
-      try {
-        const res = await strapiClient<Upload[]>('/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const { url, id } = res[0];
-        temporaryMedia.value.push(id);
-        return {
-          success: 1,
-          url,
-          id,
-          title: file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
-        };
-      } catch (error) {
-        return {
-          success: 0,
-        };
-      }
-    },
+    uploadMedia: uploadImageFile,
     deleteMedia: (id: string) => {
-      // mediaToDelete.value.push(id);
       strapiClient(`/upload/files/${id}`, {
         method: 'DELETE',
       });
@@ -639,16 +742,13 @@ watch(
       emitHeight();
     }, 300);
     if (!editor.value) {
+      console.warn('[TipTap] modelValue watcher skipped because editor is not ready');
       return;
     }
-    // HTML
-    // const isSame = editor.value.getHTML() === value;
-
-    // JSON
     const isSame = JSON.stringify(editor.value.getJSON()) === JSON.stringify(value);
 
     if (!isSame) {
-      editor.value.commands.setContent(value, false);
+      editor.value.commands.setContent(normalizeContent(value), false);
     }
   },
 );
@@ -661,14 +761,12 @@ watch(
   }
 }
 
-/* Basic editor styles */
 .tiptap {
   outline: none !important;
   :first-child {
     margin-top: 0;
   }
 
-  /* List styles */
   ul,
   ol {
     padding: 0 1rem;
@@ -688,7 +786,6 @@ watch(
     list-style-type: decimal;
   }
 
-  /* Task list specific styles */
   ul[data-type='taskList'] {
     list-style: none;
     margin-left: 0;
@@ -718,7 +815,6 @@ watch(
     }
   }
 
-  /* Heading styles */
   h1,
   h2,
   h3,
@@ -754,7 +850,6 @@ watch(
     font-size: 1rem;
   }
 
-  /* Link styles */
   a {
     color: #99c3ff;
     cursor: pointer;
@@ -767,7 +862,6 @@ watch(
     }
   }
 
-  /* Code and preformatted text styles */
   code {
     background-color: #212121;
     border-radius: 0.4rem;
@@ -932,7 +1026,6 @@ watch(
   word-break: normal;
 }
 
-/* Render the username above the caret */
 .collaboration-cursor__label {
   border-radius: 3px 3px 3px 0;
   color: #0d0d0d;
