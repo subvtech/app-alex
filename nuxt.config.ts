@@ -3,6 +3,7 @@ import type { NuxtPage } from 'nuxt/schema';
 const {
   ANTHROPIC_API_KEY,
   COMPONENTS_PAGE,
+  HOCUSPOCUS_URL,
   MATOMO_APP_ID,
   MATOMO_URL,
   OPEN_AI_KEY,
@@ -51,9 +52,10 @@ export default defineNuxtConfig({
       openAiKey: OPEN_AI_KEY,
       showComponentsPage: COMPONENTS_PAGE === 'on',
       strapiUrl: STRAPI_URL,
-      tipTapAppId: TIPTAP_APP_ID,
+      tipTapAppId: TIPTAP_APP_ID || 'xk2vdw92',
       tipTapKey: TIPTAP_KEY,
       useMock: USE_MOCK === 'true',
+      hocuspocusUrl: HOCUSPOCUS_URL,
     },
   },
   strapi: {
