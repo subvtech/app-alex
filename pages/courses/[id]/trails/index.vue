@@ -200,7 +200,7 @@ import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTr
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const { find, findOne } = useStrapiUtils();
+const { findOne, findAll } = useStrapiUtils();
 const { update } = useStrapi();
 const userStore = useStrapiUser();
 const strapiClient = useStrapiClient();
@@ -333,7 +333,7 @@ onBeforeMount(() => {
 onMounted(() => {
   socket.on('trails:update', refreshTrails);
 
-  find('learning-plan-members', {
+  findAll('learning-plan-members', {
     filters: { user: userStore?.value?.id },
     populate: ['learningplan.cover_image'],
   }).then(({ data }) => {

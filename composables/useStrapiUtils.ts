@@ -49,6 +49,43 @@ export const useStrapiUtils = () => {
       data: formattedResult,
     };
   }
+
+  async function findAll<T>(
+    contentType: string,
+    params?: Strapi4RequestParams,
+    pageSize = 100,
+  ): Promise<{ meta: any; data: T[] }> {
+    let page = 1;
+    let pageCount = 1;
+    const allFormattedData: T[] = [];
+    let lastMeta: any = null;
+
+    do {
+      const mergedParams: Strapi4RequestParams = {
+        ...params,
+        pagination: {
+          ...(params?.pagination && 'pageSize' in params.pagination ? params.pagination : {}),
+          page,
+          pageSize,
+        },
+      };
+
+      const result = await strapi.find<T>(contentType, mergedParams);
+      const formattedResult = result.data ? result.data.map(formatResult<T>) : (result as unknown as T[]);
+      if (Array.isArray(formattedResult)) {
+        allFormattedData.push(...formattedResult);
+      }
+
+      lastMeta = result.meta;
+      pageCount = (result.meta as any)?.pagination?.pageCount ?? 1;
+      page += 1;
+    } while (page <= pageCount);
+
+    return {
+      meta: lastMeta,
+      data: allFormattedData,
+    };
+  }
   async function create<T>(contentType: string, data: Partial<T>): Promise<{ meta: any; data: T }> {
     const result = await strapi.create<T>(contentType, data);
     return { meta: result.meta, data: formatResult<T>(result.data) };
@@ -62,5 +99,5 @@ export const useStrapiUtils = () => {
   async function destroy(contentType: string, id: number): Promise<any> {
     return await strapi.delete(contentType, id);
   }
-  return { findOne, find, formatResult, create, update, destroy };
+  return { findOne, find, findAll, formatResult, create, update, destroy };
 };
