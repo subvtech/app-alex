@@ -17,7 +17,30 @@
 
     <div class="tw-flex-1">
       <!-- Tags -->
-      <alex-learningplan-task-tags v-model="tags" class="mt-2 mb-4" :task-id="task?.id" :edit="canEdit" />
+      <div class="d-flex align-center justify-space-between mt-2 mb-4">
+        <alex-learningplan-task-tags v-model="tags" :task-id="task?.id" :edit="canEdit" />
+        <alex-custom-button
+          v-if="canEdit"
+          color="error"
+          prepend-icon="mdi-delete-outline"
+          variant="text"
+          @click="openDeleteDialog"
+        >
+          {{ t('pages.projects.tasks.dropdown_delete') }}
+        </alex-custom-button>
+      </div>
+      <alex-custom-confirm-dialog
+        v-model="deleteModal"
+        no-input-confirmation
+        variant="error"
+        :cancel-button-text="t('pages.projects.tasks.delete_cancel_text')"
+        :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+        :submit-button-text="t('pages.projects.tasks.delete_confirm_text')"
+        :subtitle="deleteDialogText.subtitle"
+        :title="deleteDialogText.title"
+        @cancel="cancelDelete"
+        @submit="confirmDelete"
+      />
 
       <!-- Informações -->
       <alex-inputs-editable-text
@@ -179,6 +202,18 @@ interface DrawerProjectProps {
   individualLearning?: boolean;
 }
 
+interface LocalSprintTask extends SprintTask {
+  local?: boolean;
+}
+
+type DeleteItemPayload = {
+  title: string;
+  id: number;
+  hasChildren: boolean;
+  organization: 'standard' | 'story' | 'epic';
+  sprintId?: number;
+};
+
 const props = withDefaults(defineProps<DrawerProjectProps>(), {
   task: undefined,
   sprints: () => [],
@@ -186,7 +221,7 @@ const props = withDefaults(defineProps<DrawerProjectProps>(), {
   individualLearning: false,
 });
 const open = defineModel<boolean>({ required: true });
-const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 'moved']);
+const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 'moved', 'delete-task']);
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { update } = useStrapi();
@@ -198,6 +233,8 @@ const tags = ref<TagSimple[]>([]);
 const status = ref<KanbanColumn | null>(null);
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
+const deleteModal = ref(false);
+const taskToDelete = ref<LocalSprintTask | null>(null);
 
 const submissionRequired = ref<boolean | null>(null);
 const canSubmitAfterDeadline = ref<boolean | null>(null);
@@ -594,4 +631,35 @@ useOnStopTyping(
   false,
   false,
 );
+
+const confirmDelete = () => {
+  emit('delete-task', {
+    title: taskToDelete.value?.title || '',
+    id: taskToDelete.value?.id || 0,
+    sprintId: taskToDelete.value?.sprint?.id,
+    hasChildren: !!taskToDelete.value?.tasks?.length,
+    organization: taskToDelete.value?.organization || 'standard',
+  } satisfies DeleteItemPayload);
+  cancelDelete();
+};
+
+const openDeleteDialog = () => {
+  if (!props.task) return;
+  taskToDelete.value = props.task;
+  deleteModal.value = true;
+};
+
+const deleteDialogText = computed(() => {
+  return {
+    title: t('pages.projects.tasks.delete_title', {
+      item: taskToDelete.value?.title,
+    }),
+    subtitle: t(`pages.projects.tasks.delete_${taskToDelete.value?.organization}_subtitle`),
+  };
+});
+
+const cancelDelete = () => {
+  deleteModal.value = false;
+  taskToDelete.value = null;
+};
 </script>
