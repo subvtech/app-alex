@@ -8,7 +8,7 @@ const i18dir = 'components.projects.individual_learning.trails';
 
 const { t } = useI18n();
 const { update } = useStrapi();
-const { findOne, find } = useStrapiUtils();
+const { findOne, find, findAll } = useStrapiUtils();
 const { setMessage } = useMessageStore();
 const userStore = useStrapiUser();
 const strapiClient = useStrapiClient();
@@ -212,15 +212,24 @@ onBeforeMount(async () => {
 });
 
 onMounted(() => {
-  find('learning-plan-members', {
+  findAll('learning-plan-members', {
     filters: { user: userStore?.value?.id },
     populate: ['learningplan.cover_image'],
   }).then(({ data }) => {
     yourProjects.value = (data as LearningPlanMemberSimple[]).filter(
-      (member) => member.status === 'joined' && ['project', 'course-project'].includes(member.learningplan.type),
+      (member) =>
+        member.status === 'joined' &&
+        ['project', 'course-project'].includes(member.learningplan.type) &&
+        !member.learningplan.archived_at &&
+        !member.learningplan.archive_at,
     );
     yourCourses.value = (data as LearningPlanMemberSimple[]).filter(
-      (member) => member.status === 'joined' && member.learningplan.type === 'course' && member.role === 'facilitator',
+      (member) =>
+        member.status === 'joined' &&
+        member.learningplan.type === 'course' &&
+        member.role === 'facilitator' &&
+        !member.learningplan.archived_at &&
+        !member.learningplan.archive_at,
     );
   });
 });
