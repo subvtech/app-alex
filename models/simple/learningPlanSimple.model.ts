@@ -18,6 +18,7 @@ export interface LearningPlanSimple {
   media: MediaSimple[];
   type: ValueOf<typeof LearningPlanType>;
   archive_at: string | null;
+  archived_at?: string | null;
   details: any | null;
   updatedAt: string | null;
   message: string | null;

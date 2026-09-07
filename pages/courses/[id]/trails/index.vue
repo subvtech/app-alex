@@ -338,10 +338,19 @@ onMounted(() => {
     populate: ['learningplan.cover_image'],
   }).then(({ data }) => {
     yourProjects.value = (data as LearningPlanMemberSimple[]).filter(
-      (member) => member.status === 'joined' && ['project', 'course-project'].includes(member.learningplan.type),
+      (member) =>
+        member.status === 'joined' &&
+        ['project', 'course-project'].includes(member.learningplan.type) &&
+        !member.learningplan.archived_at &&
+        !member.learningplan.archive_at,
     );
     yourCourses.value = (data as LearningPlanMemberSimple[]).filter(
-      (member) => member.status === 'joined' && member.learningplan.type === 'course' && member.role === 'facilitator',
+      (member) =>
+        member.status === 'joined' &&
+        member.learningplan.type === 'course' &&
+        member.role === 'facilitator' &&
+        !member.learningplan.archived_at &&
+        !member.learningplan.archive_at,
     );
   });
 });
