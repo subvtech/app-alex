@@ -237,7 +237,7 @@ const learningStructure = computed(() => {
 const trails = computed<TrailSimple[]>(() => {
   return (
     learningPlanStore.standardTrails?.map((trail) => {
-      const lastStructure = trail.structures[trail.structures?.length - 1 || 0] || {};
+      const lastStructure = trail.structures?.at(-1) ?? {};
       return {
         ...trail,
         blocks: lastStructure.blocks || [],

@@ -159,17 +159,23 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const standardTrails = computed(() => {
-    const { trails = [] } =
-      learningPlan.value?.learning_structures.filter((v) => v.type === LearningPlanScructureSimpleType.STANDARD)[0] ??
-      {};
+    const standardStructures =
+      learningPlan.value?.learning_structures.filter(
+        (v) => v.type === LearningPlanScructureSimpleType.STANDARD,
+      ) || [];
+
+    const trails = standardStructures.flatMap((structure) => structure.trails || []);
 
     return userIsFacilitator.value ? trails : trails.filter((trail) => !trail.hidden);
   });
 
   const studentTrails = computed(() => {
-    const { trails = [] } =
-      learningPlan.value?.learning_structures.filter((v) => v.type === LearningPlanScructureSimpleType.STUDENT)[0] ??
-      {};
+    const studentStructures =
+      learningPlan.value?.learning_structures.filter(
+        (v) => v.type === LearningPlanScructureSimpleType.STUDENT,
+      ) || [];
+
+    const trails = studentStructures.flatMap((structure) => structure.trails || []);
 
     return trails.filter((trail) => !trail.hidden);
   });
