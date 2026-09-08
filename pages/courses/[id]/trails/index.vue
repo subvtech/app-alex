@@ -111,7 +111,7 @@
           v-for="project in yourProjects"
           :key="project.learningplan.id"
           class="tw-flex tw-items-center tw-gap-4 tw-rounded-xl tw-px-2 tw-py-2 tw-cursor-pointer hover:tw-shadow tw-transition"
-          @click="() => toggleSelectedTrails(project.id)"
+          @click="() => toggleSelectedTrails(project.learningplan.id)"
         >
           <div class="tw-w-full tw-overflow-hidden tw-flex-[0_0_88.8px] tw-h-[60px] tw-rounded-xl tw-shadow-lg">
             <img
@@ -131,7 +131,7 @@
             v-model="selectedTrails"
             class="tw-pointer-events-none !tw-pa-0 !tw-ma-0"
             color="rgb(0, 183, 204)"
-            :value="project.id"
+            :value="project.learningplan.id"
             hide-spin-buttons
             hide-details
           />
@@ -149,7 +149,7 @@
           v-for="project in yourCourses"
           :key="project.learningplan.id"
           class="tw-flex tw-items-center tw-gap-4 tw-rounded-xl tw-px-2 tw-py-2 tw-cursor-pointer hover:tw-shadow tw-transition"
-          @click="() => toggleSelectedTrails(project.id)"
+          @click="() => toggleSelectedTrails(project.learningplan.id)"
         >
           <div class="tw-w-full tw-overflow-hidden tw-flex-[0_0_88.8px] tw-h-[60px] tw-rounded-xl tw-shadow-lg">
             <img
@@ -170,7 +170,7 @@
               v-model="selectedTrails"
               class="tw-pointer-events-none tw-h-[24px] tw-w-[24px] !tw-pa-0 !tw-ma-0"
               color="rgb(0, 183, 204)"
-              :value="project.id"
+              :value="project.learningplan.id"
               hide-spin-buttons
               hide-details
             />
