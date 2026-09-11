@@ -45,6 +45,7 @@ const props = withDefaults(defineProps<SprintProps>(), { activeFilter: false });
 
 defineEmits<{
   'move-task': [item: SprintTask];
+  'move-to-backlog': [item: SprintTask];
   'delete-task': [item: SprintTask];
   'edit-task': [item: SprintTask];
   'drag-end': [item: SprintTask, sort: string];
@@ -175,6 +176,7 @@ const handleStartCreateTask = (index: number) => {
                   @delete-task="$emit('delete-task', $event)"
                   @edit-task="$emit('edit-task', $event)"
                   @move-task="$emit('move-task', $event)"
+                  @move-to-backlog="$emit('move-to-backlog', $event)"
                 />
               </div>
             </Transition>
