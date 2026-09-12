@@ -41,6 +41,7 @@ const emit = defineEmits<{
   'drag-over': [string, number, number, DragEvent];
   'edit-task': [number, SprintTask];
   'move-task': [];
+  'move-to-backlog': [SprintTask];
   'start-drag': [number, DragEvent];
   'toggle-archive': [];
   'add-story': [number];
@@ -254,6 +255,7 @@ const dropDownItems = (task: SprintTask): AlexDropdownItem[] => {
     addTask: getDropDownAction('addTask', task.id, task),
     delete: getDropDownAction('delete', task.id, task),
     details: getDropDownAction('details', task.id, task),
+    moveToBacklog: getDropDownAction('moveToBacklog', task.id, task),
   };
 
   switch (task.organization) {
@@ -266,9 +268,11 @@ const dropDownItems = (task: SprintTask): AlexDropdownItem[] => {
         (action): action is AlexDropdownItem => action !== undefined,
       );
     default:
-      return [actions.details, props.edit ? actions.delete : undefined].filter(
-        (action): action is AlexDropdownItem => action !== undefined,
-      );
+      return [
+        actions.details,
+        props.edit && props.group !== 'backlog' ? actions.moveToBacklog : undefined,
+        props.edit ? actions.delete : undefined,
+      ].filter((action): action is AlexDropdownItem => action !== undefined);
   }
 };
 
@@ -304,6 +308,10 @@ const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDr
       onClick: () => {
         emit('add-task', task);
       },
+    },
+    moveToBacklog: {
+      text: t('pages.projects.tasks.dropdown_move_to_backlog'),
+      onClick: () => emit('move-to-backlog', task),
     },
   };
 

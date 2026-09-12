@@ -635,6 +635,21 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
   }
 };
 
+const handleMoveToBacklog = async (task: SprintTask) => {
+  if (task.kanban_column_task?.kanban_column?.status_type === 'done' || task.status === 'finished') {
+    setMessage(t(`${i18dir}.already_done`), 'warning', true);
+    return;
+  }
+
+  try {
+    await update('tasks', task.id, { sprint: null });
+    await refetchSprints();
+    setMessage(t(`${i18dir}.moved`, { item: t('pages.projects.tasks.backlog') }), 'success', true);
+  } catch {
+    setMessage(t(`${i18dir}.moved_fail`), 'error', true);
+  }
+};
+
 const handleDeleteSprint = async (sprintId?: number) => {
   if (!sprintId) return;
   await deleteSprint(sprintId);
@@ -883,6 +898,7 @@ onBeforeUnmount(() => {
                     "
                     @delete-task="handleDeleteTask"
                     @move-task="handleMoveTask"
+                    @move-to-backlog="handleMoveToBacklog"
                     @move-to-parent="handleMoveToParent"
                     @edit-task="(_id, task: SprintTask) => (editTask = task)"
                   />
@@ -1055,6 +1071,7 @@ onBeforeUnmount(() => {
                     @drop="(sprint) => {}"
                     @delete-task="(index) => handleDeleteTask(index, i)"
                     @move-task="handleMoveTask"
+                    @move-to-backlog="handleMoveToBacklog"
                     @move-to-parent="handleMoveToParent"
                     @edit-task="(_id, task) => (editTask = task)"
                   />

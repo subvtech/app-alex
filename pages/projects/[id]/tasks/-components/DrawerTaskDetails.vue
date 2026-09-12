@@ -251,7 +251,7 @@ const tabs = [
 ];
 
 const selectedEpic = ref<TaskSimple | null>(null);
-const selectedSprint = ref<SprintSimple>();
+const selectedSprint = ref<SprintSimple | undefined>();
 const selectedHistory = ref<TaskSimple | null>(null);
 const selectedParent = ref<TaskSimple | null | undefined>(undefined);
 const description = ref<string>('');
@@ -418,9 +418,13 @@ const endDateComp = ref<{
 } | null>(null);
 
 // Computed
-const sprintOptions = computed(() =>
-  props.sprints.map((sprint) => ({ text: sprint.title, onClick: () => (selectedSprint.value = sprint) })),
-);
+const sprintOptions = computed(() => [
+  {
+    text: 'Backlog',
+    onClick: () => (selectedSprint.value = undefined),
+  },
+  ...props.sprints.map((sprint) => ({ text: sprint.title, onClick: () => (selectedSprint.value = sprint) })),
+]);
 
 // methods
 const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
@@ -522,20 +526,25 @@ watch(tags, (tags) => {
 });
 
 watch(selectedSprint, (sprint, oldSprint) => {
-  if (isFirstTimeOpened.value || !props.task?.id || !selectedSprint.value) {
+  if (isFirstTimeOpened.value || !props.task?.id || sprint === oldSprint) {
     return;
   }
-  status.value = props.task.kanban_column_task?.kanban_column ?? null;
+  status.value = sprint ? props.task.kanban_column_task?.kanban_column ?? null : null;
   strapiClient(`/tasks/${props.task.id}/update-kanban-task`, {
     method: 'PUT',
     body: {
       data: {
-        sprint: selectedSprint.value.id,
+        sprint: sprint?.id ?? null,
       },
     },
   })
     .then(() => {
-      emit('moved', t('pages.projects.tasks.actions.moved', { item: sprint?.title }));
+      emit(
+        'moved',
+        sprint
+          ? t('pages.projects.tasks.actions.moved', { item: sprint.title })
+          : t('pages.projects.tasks.actions.moved', { item: 'Backlog' }),
+      );
       // getParentOptions();
     })
     .catch(() => setMessage(t('pages.projects.tasks.actions.moved_fail'), 'error', true));
