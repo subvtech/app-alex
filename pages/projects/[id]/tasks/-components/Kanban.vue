@@ -2,7 +2,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { SlickItem, SlickList } from 'vue-slicksort';
 import { generateGroup } from '~/utils';
-import { useCreateKanbanTask } from '../-composables/useCreateTask';
+import { useCreateKanbanTask, useDeleteTask } from '../-composables/useCreateTask';
 import {
   BoardsResponse,
   useCreateColumn,
@@ -52,6 +52,7 @@ const { mutateAsync: createColumn, isPending: isCreatingColumn } = useCreateColu
 const { mutateAsync: createKanban } = useCreateKanban();
 const { mutateAsync: updateColumn } = useUpdateColumn();
 const { mutateAsync: deleteColumn } = useDeleteColumn();
+const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient, useMessageStore().setMessage, t);
 const { mutateAsync: reorderColumns } = useReorderColumns();
 const { mutateAsync: createTask, isPending: isCreatingTask } = useCreateKanbanTask(learninplanId, queryClient);
 const { mutateAsync: reorderTasks } = useReorderColumnTasks();
@@ -64,6 +65,19 @@ const editTask = ref<TaskSimple>();
 const selectedColumnToDelete = ref<Column<KanbanColumnTask> | null>(null);
 const isCreatingTaskColumnId = ref<number | null>(null);
 const socket = useSocket();
+
+const handleDeleteTask = async (task: {
+  title: string;
+  id: number;
+  sprintId?: number;
+  hasChildren?: boolean;
+  organization: 'standard' | 'story' | 'epic';
+}) => {
+  await deleteTask(task);
+  await refetchKanban();
+  editTask.value = undefined;
+};
+
 const getDeleteColumnTexts = (column: Column<KanbanColumnTask> | null) => {
   if (requiredStatusColumn.includes(column?.status_type || '')) {
     return {
@@ -400,6 +414,7 @@ defineExpose({ canDrag, setCanDrag });
         :sprints="sprints.sprints"
         :can-edit="!isGuest"
         @update-value="refetchKanban"
+        @delete-task="handleDeleteTask"
       />
     </template>
   </div>

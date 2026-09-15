@@ -124,6 +124,7 @@
     "dropdown_rename": "Renomear",
     "dropdown_add_story": "Adicionar história",
     "dropdown_add_task": "Adicionar tarefa",
+    "dropdown_move_to_backlog": "Voltar para o backlog",
     "editError": "editar",
     "editSuccess": "editada",
     "error_message": "Ocorreu um erro ao tentar {action} a tarefa, tente novamente!",

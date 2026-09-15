@@ -333,7 +333,9 @@ onMounted(async () => {
     <alex-project-dialogs-sprint
       v-model="createSprintDialog"
       :project-id="learningPlanStore.learningPlan.id"
+      :project-start-date="learningPlanStore.learningPlan.start_date"
       :project-end-date="learningPlanStore.learningPlan.end_date"
+      :sprints-length="sprints.length"
     />
   </div>
 </template>

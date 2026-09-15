@@ -48,6 +48,9 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
     },
   },
   sort: 'id:desc',
+  pagination: {
+    pageSize: 100,
+  },
 });
 const getLearningPlanFn = (type: LearningPlanType, userID: number) => {
   const { find } = useStrapiUtils();

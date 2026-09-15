@@ -124,6 +124,7 @@
     "dropdown_rename": "Rename",
     "dropdown_add_story": "Add story",
     "dropdown_add_task": "Add task",
+    "dropdown_move_to_backlog": "Move back to backlog",
     "editError": "edit",
     "editSuccess": "edited",
     "error_message": "An error occurred while trying to {action} the task, please try again!",

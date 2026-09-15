@@ -85,6 +85,7 @@ const totalValue = computed(() =>
   >
     <VisSingleContainer :style="{ height: isMounted ? '100%' : 'auto' }" :margin="{ left: 20, right: 20 }" :data="data">
       <ChartSingleTooltip
+        v-if="showTooltip"
         :selector="Donut.selectors.segment"
         :index="category"
         :items="legendItems"
