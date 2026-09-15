@@ -17,7 +17,6 @@
           :colors="chartColors"
           type="donut"
           :show-legend="false"
-          :show-tooltip="false"
           class="tw-w-32 tw-h-32"
         />
       </div>

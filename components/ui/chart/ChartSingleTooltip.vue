@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { VisTooltip } from '@unovis/vue';
 import type { BulletLegendItemInterface } from '@unovis/ts';
-import { omit } from '@unovis/ts';
+import { VisTooltip } from '@unovis/vue';
 import { type Component, createApp } from 'vue';
 import { ChartTooltip } from '.';
 
@@ -21,49 +20,32 @@ const props = withDefaults(
 // Use weakmap to store reference to each datapoint for Tooltip
 const wm = new WeakMap();
 function template(d: any, i: number, elements: (HTMLElement | SVGElement)[]) {
-  if (props.index in d) {
-    if (wm.has(d)) {
-      return wm.get(d);
-    } else {
-      const componentDiv = document.createElement('div');
-      const omittedData = Object.entries(omit(d, [props.index])).map(
-        ([key, value]) => {
-          const legendReference = props.items?.find((i) => i.name === key);
-          return { ...legendReference, value: props.valueFormatter(value) };
-        },
-      );
-      const TooltipComponent = props.customTooltip ?? ChartTooltip;
-      createApp(TooltipComponent, {
-        title: d[props.index],
-        data: omittedData,
-      }).mount(componentDiv);
-      wm.set(d, componentDiv.innerHTML);
-      return componentDiv.innerHTML;
-    }
-  } else {
-    const data = d.data;
+  const data = d?.data && typeof d.data === 'object' ? d.data : d;
+  const label = data?.[props.index];
+  const valueEntry = Object.entries(data ?? {}).find(
+    ([key, value]) => key !== props.index && (typeof value === 'number' || typeof value === 'string'),
+  );
+  const value = valueEntry?.[1] ?? '';
 
-    if (wm.has(data)) {
-      return wm.get(data);
-    } else {
-      const style = getComputedStyle(elements[i]);
-      const omittedData = [
-        {
-          name: data.name,
-          value: props.valueFormatter(data[props.index]),
-          color: style.fill,
-        },
-      ];
-      const componentDiv = document.createElement('div');
-      const TooltipComponent = props.customTooltip ?? ChartTooltip;
-      createApp(TooltipComponent, {
-        title: d[props.index],
-        data: omittedData,
-      }).mount(componentDiv);
-      wm.set(d, componentDiv.innerHTML);
-      return componentDiv.innerHTML;
-    }
+  if (wm.has(data)) {
+    return wm.get(data);
   }
+
+  const style = elements[i] ? getComputedStyle(elements[i]) : undefined;
+  const legendReference = props.items?.find((item) => item.name === label);
+  const componentDiv = document.createElement('div');
+  const TooltipComponent = props.customTooltip ?? ChartTooltip;
+  const tooltipProps: Record<string, unknown> = { title: label };
+  tooltipProps.data = [
+    {
+      name: label,
+      value: props.valueFormatter(value),
+      color: legendReference?.color ?? style?.fill ?? 'transparent',
+    },
+  ];
+  createApp(TooltipComponent, tooltipProps).mount(componentDiv);
+  wm.set(data, componentDiv.innerHTML);
+  return componentDiv.innerHTML;
 }
 </script>
 
