@@ -12,8 +12,8 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card class="card card-acesso d-flex justify-center">
-        <div class="form d-flex flex-column" style="max-width: 400px">
+      <v-card class="card card-acesso d-flex tw-items-center justify-center">
+        <div class="flex flex-col items-center content-center justify-center" style="max-width: 400px">
           <div class="d-flex flex-column">
             <v-card-title class="text-white text-h3 text-center text-bold mt-16 !tw-hidden md:!tw-block">
               {{ $t('pages.login.welcome') }}
@@ -72,14 +72,14 @@
               {{ $t('pages.login.submit') }}
             </alex-custom-button>
           </v-form>
-          <v-card-text class="create-account text-white text-center font-weight-bold text-body-2">
+          <v-card-text class="create-account mt-4 text-white text-center font-weight-bold text-body-2">
             {{ $t('pages.login.noAccount') }}
 
             <nuxt-link to="/register" class="blue-label text-decoration-none">
               {{ $t('pages.login.register') }}
             </nuxt-link>
           </v-card-text>
-          <div class="sign-divider d-flex align-center text-white">
+          <div class="sign-divider py-4 d-flex align-center text-white">
             <v-divider color="secondary" :thickness="1" class="border-opacity-100"></v-divider>
             <p class="mx-4">{{ $t('pages.login.divider') }}</p>
             <v-divider color="secondary" :thickness="1" class="border-opacity-100"></v-divider>
