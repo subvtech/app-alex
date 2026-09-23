@@ -41,6 +41,167 @@ const props = defineProps({
 
 const videoPlayer = ref(null);
 let player;
+let captionsPoll;
+
+const CAPTIONS_BUTTON = 'YoutubeCaptionsButton';
+
+const registerCaptionsButton = () => {
+  if (videojs.getComponent(CAPTIONS_BUTTON)) return;
+
+  const MenuButton = videojs.getComponent('MenuButton');
+  const MenuItem = videojs.getComponent('MenuItem');
+
+  class YoutubeCaptionItem extends MenuItem {
+    constructor(parentPlayer, options) {
+      super(parentPlayer, { ...options, selectable: true, multiSelectable: false });
+    }
+
+    handleClick() {
+      this.options_.onSelect(this.options_.languageCode);
+    }
+  }
+
+  class YoutubeCaptionsButton extends MenuButton {
+    constructor(parentPlayer, options) {
+      super(parentPlayer, options);
+      this.controlText('Legendas');
+      this.hide();
+    }
+
+    buildCSSClass() {
+      return `vjs-subs-caps-button ${super.buildCSSClass()}`;
+    }
+
+    buildWrapperCSSClass() {
+      return `vjs-subs-caps-button ${super.buildWrapperCSSClass()}`;
+    }
+
+    createItems() {
+      const tracks = this.options_.getTracks();
+      if (!tracks.length) return [];
+
+      const current = this.options_.getCurrent();
+      const makeItem = (label, languageCode) =>
+        new YoutubeCaptionItem(this.player_, {
+          label,
+          languageCode,
+          selected: current === languageCode,
+          onSelect: this.options_.onSelect,
+        });
+
+      return [
+        makeItem('Desativadas', null),
+        ...tracks.map((track) =>
+          makeItem(track.displayName || track.languageName || track.languageCode, track.languageCode),
+        ),
+      ];
+    }
+  }
+
+  videojs.registerComponent(CAPTIONS_BUTTON, YoutubeCaptionsButton);
+};
+
+const setupYoutubeCaptions = (activePlayer) => {
+  registerCaptionsButton();
+
+  let tracks = [];
+  let current = null;
+  let captionsModule = 'captions';
+
+  const getYtPlayer = () => {
+    const tech = activePlayer.tech({ IWillNotUseThisInPlugins: true });
+    return tech && tech.ytPlayer;
+  };
+
+  const readCaptionsState = () => {
+    const yt = getYtPlayer();
+    if (!yt || typeof yt.getOption !== 'function') return { list: [], active: null };
+
+    for (const name of ['captions', 'cc']) {
+      try {
+        yt.loadModule(name);
+        const list = yt.getOption(name, 'tracklist') || [];
+        const active = yt.getOption(name, 'track') || null;
+        if (list.length || (active && active.languageCode)) {
+          captionsModule = name;
+          return { list, active };
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+    return { list: [], active: null };
+  };
+
+  const selectTrack = (languageCode) => {
+    const yt = getYtPlayer();
+    if (!yt || typeof yt.setOption !== 'function') return;
+
+    try {
+      yt.setOption(captionsModule, 'track', languageCode ? { languageCode } : {});
+      current = languageCode;
+    } catch (error) {
+      current = null;
+    }
+    button.update();
+  };
+
+  const controlBar = activePlayer.controlBar;
+  const fullscreen = controlBar.getChild('fullscreenToggle');
+  const position = fullscreen ? controlBar.children().indexOf(fullscreen) : undefined;
+
+  const button = controlBar.addChild(
+    CAPTIONS_BUTTON,
+    {
+      getTracks: () => tracks,
+      getCurrent: () => current,
+      onSelect: selectTrack,
+    },
+    position,
+  );
+
+  const refresh = () => {
+    const { list, active } = readCaptionsState();
+    const activeCode = active && active.languageCode;
+
+    let resolved = list;
+    if (!resolved.length && activeCode) {
+      resolved = [
+        {
+          languageCode: activeCode,
+          displayName: `Automática (${activeCode})`,
+        },
+      ];
+    }
+
+    if (!resolved.length) return false;
+
+    tracks = resolved;
+    current = activeCode || null;
+    button.update();
+    button.show();
+    return true;
+  };
+
+  const startPolling = () => {
+    if (captionsPoll) {
+      clearInterval(captionsPoll);
+      captionsPoll = null;
+    }
+
+    let attempts = 0;
+    captionsPoll = setInterval(() => {
+      attempts += 1;
+      if (refresh() || attempts >= 20) {
+        clearInterval(captionsPoll);
+        captionsPoll = null;
+      }
+    }, 1000);
+  };
+
+  activePlayer.on(['play', 'playing', 'loadedmetadata'], startPolling);
+  startPolling();
+};
 
 watch(
   videoPlayer,
@@ -48,12 +209,22 @@ watch(
     if (video) {
       const options = props.options;
       player = videojs(video, options);
+
+      player.ready(() => {
+        if (player.techName_ === 'Youtube') {
+          setupYoutubeCaptions(player);
+        }
+      });
     }
   },
   { immediate: true },
 );
 
 onUnmounted(() => {
+  if (captionsPoll) {
+    clearInterval(captionsPoll);
+    captionsPoll = null;
+  }
   if (player) {
     player.dispose();
   }
