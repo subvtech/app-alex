@@ -160,7 +160,7 @@
     "unarchive": "Desarquivar",
     "unarchiveError": "desarquivar",
     "unarchiveSuccess": "unarchived",
-    "delete_confirm_text": "Apagar",
+    "delete_confirm_text": "Excluir",
     "delete_cancel_text": "Cancelar",
     "actions": {
       "moved": "Tarefa movida para {item}",

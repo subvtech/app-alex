@@ -120,6 +120,7 @@
       :end-date="taskStore.task.finish_at"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
+      :show-delete="effectiveUserIsFacilitator"
       :members="taskStore.task.task_members"
       @change-values="handleChangeValues"
       @change-description="handleChangeDescription"
@@ -128,6 +129,7 @@
       @change-members="taskStore.updateTaskMembers(taskId)"
       @change-title="handleChangeTitle"
       @change-can-alter-from-review="handleChangeAlterFromReview"
+      @delete-task="handleDeleteTask"
     />
   </section>
 </template>
@@ -209,6 +211,17 @@ const handleChangeAlterFromReview = (val: boolean) => {
   if (!taskStore.task) return;
 
   taskStore.task.can_change_from_review = val;
+};
+const handleDeleteTask = async () => {
+  const deletedTaskTitle = taskStore.task?.title || t('components.courses.tasks.noTitle');
+
+  try {
+    await strapi.delete('tasks', taskId.value);
+    setMessage(t('pages.task.crud.deleteSuccessWithTask', { task: deletedTaskTitle }), 'success', true);
+    await navigateTo(`/courses/${id}/tasks`);
+  } catch (error) {
+    setMessage(t('pages.task.crud.deleteError'), 'error', true);
+  }
 };
 const handleUpdateStatus = async (newIndex: number, item: Task, newStatus: string, emitEvt = false) => {
   if (!kanban.value) {

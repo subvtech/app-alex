@@ -24,7 +24,18 @@
 
     <div>
       <!-- Tags -->
-      <alex-learningplan-task-tags v-model="tags" :edit="editable" :task-id="taskId" />
+      <div class="d-flex align-center justify-space-between mt-2 mb-4">
+        <alex-learningplan-task-tags v-model="tags" :edit="editable" :task-id="taskId" />
+        <alex-custom-button
+          v-if="showDelete"
+          color="error"
+          prepend-icon="mdi-delete-outline"
+          variant="text"
+          @click="deleteModal = true"
+        >
+          {{ $t('pages.task.table.dropdown.delete') }}
+        </alex-custom-button>
+      </div>
 
       <!-- Informações -->
       <alex-inputs-editable-text
@@ -288,6 +299,17 @@
       </v-window>
     </div>
   </v-navigation-drawer>
+  <alex-custom-confirm-dialog
+    v-model="deleteModal"
+    variant="error"
+    :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+    :title="t('pages.task.deleteModal.titleWithTask', { task: title })"
+    :subtitle="t('pages.task.deleteModal.subtitle')"
+    :submit-button-text="t('pages.task.deleteModal.delete')"
+    :cancel-button-text="t('pages.task.deleteModal.cancel')"
+    no-input-confirmation
+    @submit="emit('delete-task')"
+  />
 </template>
 
 <script setup lang="ts">
@@ -334,6 +356,7 @@ interface TaskTeacherDrawerProps {
   endDate?: string | null;
   members?: TaskMember[];
   individualJourney?: boolean;
+  showDelete?: boolean;
 }
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
@@ -361,6 +384,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   submissionDescription: '',
   members: () => [],
   individualJourney: false,
+  showDelete: false,
 });
 
 const description = ref<string | any | undefined>(props.description);
@@ -378,6 +402,7 @@ const taskLearningGoals = computed(() => {
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 const model = defineModel({ default: false });
+const deleteModal = ref(false);
 const openResources = ref<boolean>(false);
 const members = toRef(props, 'members');
 const type = ref<TaskType | null>(props.type);
@@ -542,6 +567,7 @@ type Emits = {
   'change-members': [];
   'change-kanban-status': [value: string];
   'change-date': [id: number | undefined, startDate: any, endDate: any];
+  'delete-task': [];
 };
 const emit = defineEmits<Emits>();
 
