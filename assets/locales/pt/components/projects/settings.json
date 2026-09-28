@@ -1,0 +1,29 @@
+{
+  "title": "Configurações do projeto",
+  "general": {
+    "title": "Informações Gerais",
+    "name": "Nome do projeto",
+    "description": "Descrição do projeto",
+    "startDate": "Início",
+    "endDate": "Término",
+    "identifier": {
+      "label": "Identificador do projeto",
+      "unique": "Identificador não disponível",
+      "tooltip": "O identificador diferencia seu projeto dos demais e permite acessá-lo pela URL."
+    },
+    "save": "Salvar alterações",
+    "update": "Informações gerais do projeto atualizadas com sucesso"
+  },
+  "delete": {
+    "title": "Excluir projeto",
+    "warning": "Ao excluir o projeto, os conteúdos vinculados a ele deixarão de ficar disponíveis. Esta ação não poderá ser desfeita.",
+    "button": "Excluir projeto",
+    "confirmation": "Realmente deseja excluir o projeto?",
+    "label": "Digite a palavra:",
+    "placeholder": "Digite a palavra",
+    "word": "Excluir",
+    "cancel": "Cancelar",
+    "matchError": "A palavra digitada não corresponde a Excluir",
+    "update": "Projeto excluído com sucesso"
+  }
+}
