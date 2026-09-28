@@ -4,7 +4,7 @@ import Kanban from './-components/Kanban.vue';
 import TaskFilterDrawer from './-components/TaskFilterDrawer.vue';
 import TaskList from './-components/TaskList.vue';
 import { useGetSprints } from './-composables/useKanban';
-import { SprintSimple } from '#imports';
+import type { SprintSimple } from '~/models/simple/sprint.model';
 import { Sprint } from './-composables/useSprints';
 
 type FilterType = {

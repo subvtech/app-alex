@@ -16,7 +16,7 @@
 
     <alex-documentation-playground :data="listProps">
       <template #component="{ props }">
-        <alex-profile-forms-social
+        <alex-profile-forms-edit-social
           :url="props.url"
           :index="props.index"
           :name="props.name"
@@ -31,7 +31,7 @@
 import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
 import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
 import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
-import { SocialFormComponentType } from '~/components/alex/profile/forms/Social.vue';
+import { SocialFormComponentType } from '~/components/alex/profile/forms/EditSocial.vue';
 
 definePageMeta({
   layout: 'components',

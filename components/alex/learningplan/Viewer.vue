@@ -260,7 +260,7 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { PropType } from 'nuxt/dist/app/compat/capi';
+import type { PropType } from 'vue';
 import 'viewerjs/dist/viewer.css';
 import { User } from '~/models/user.model';
 import { Block } from '~/models/block.model';

@@ -39,6 +39,7 @@
     "nuxt-vitest": "^0.10.4",
     "playwright-core": "^1.41.2",
     "prettier": "^3.0.0",
+    "sass-embedded": "^1.105.0",
     "shadcn-nuxt": "^0.10.4",
     "typescript": "^5.1.6",
     "unplugin-auto-import": "^0.16.7",

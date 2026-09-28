@@ -6,7 +6,7 @@ import enUS from 'date-fns/locale/en-US';
 import { pt, en } from 'vuetify/locale';
 import { createVuetify } from 'vuetify';
 import { mdi } from 'vuetify/iconsets/mdi';
-import { alexIcons } from 'assets/icons';
+import { alexIcons } from '~/assets/icons';
 import DateFnsAdapter from '@date-io/date-fns';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
 
