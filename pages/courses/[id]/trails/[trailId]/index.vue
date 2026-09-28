@@ -186,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 import Tiptap from '~/components/TipTap/index.vue';
 
@@ -314,6 +314,8 @@ const loadEditor = () => {
         comp.setContent(contribution.contribution);
       }
     });
+
+    refreshSections();
   }, 300);
 };
 
@@ -334,8 +336,7 @@ const toggleReadOnly = (mode?: string) => {
       if (editor.value) {
         editor.value.setContent(tiptapContent.value);
       }
-      setSections();
-      setObserver();
+      refreshSections();
     }, 300);
   }
 };
@@ -348,8 +349,7 @@ const resetData = () => {
     if (editor.value) {
       editor.value.setContent(tiptapContent.value);
     }
-    setSections();
-    setObserver();
+    refreshSections();
   }, 300);
 };
 
@@ -412,6 +412,40 @@ const setSections = () => {
   });
 
   sections.value = newSections;
+};
+
+const tagSectionElements = () => {
+  document.querySelectorAll('[section]:not([section="0"])').forEach((element) => {
+    element.removeAttribute('section');
+  });
+
+  let sectionIndex = 1;
+
+  const editorRoot = document.querySelector('#editor-container .tiptap.ProseMirror');
+  if (editorRoot) {
+    const headings = editorRoot.querySelectorAll(
+      ':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6',
+    );
+    headings.forEach((heading) => {
+      heading.setAttribute('section', String(sectionIndex));
+      sectionIndex += 1;
+    });
+  }
+
+  highlightedContributions.value?.forEach((contribution) => {
+    const element = document.getElementById(`${contribution.title}-${contribution.id}`);
+    if (element) {
+      element.setAttribute('section', String(sectionIndex));
+    }
+    sectionIndex += 1;
+  });
+};
+
+const refreshSections = async () => {
+  setSections();
+  await nextTick();
+  tagSectionElements();
+  setObserver();
 };
 
 const navigateToSection = (index: number) => {
