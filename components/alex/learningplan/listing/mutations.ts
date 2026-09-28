@@ -9,7 +9,7 @@ export interface LearningPlanData {
 }
 type LearningPlanType = LearningPlanSimple['type'];
 
-const queryConfig = (userID: number, type: LearningPlanType) => ({
+const queryConfig = (userID: number, type: LearningPlanType, page: number) => ({
   filters: {
     members: {
       $and: [{ user: { id: { $eq: userID } } }, { status: { $eq: 'joined' } }],
@@ -27,9 +27,7 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
     ],
     archived_at: { $notNull: false },
     type: {
-      ...(type !== 'course'
-        ? { $in: ['project', 'course_project'] }
-        : { $in: ['course'] }),
+      ...(type !== 'course' ? { $in: ['project', 'course_project'] } : { $in: ['course'] }),
     },
   },
   populate: {
@@ -49,12 +47,37 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
   },
   sort: 'id:desc',
   pagination: {
-    pageSize: 100,
+    page,
+    pageSize: 25,
   },
 });
-const getLearningPlanFn = (type: LearningPlanType, userID: number) => {
+const getLearningPlanFn = async (type: LearningPlanType, userID: number) => {
   const { find } = useStrapiUtils();
-  return find<LearningPlanSimple>('learningplans', queryConfig(userID, type));
+
+  let page = 1;
+  let pageCount = 1;
+  const data: LearningPlanSimple[] = [];
+
+  do {
+    const response = await find<LearningPlanSimple>('learningplans', queryConfig(userID, type, page));
+
+    data.push(...response.data);
+
+    pageCount = response.meta.pagination.pageCount;
+    page++;
+  } while (page <= pageCount);
+
+  return {
+    data,
+    meta: {
+      pagination: {
+        page: 1,
+        pageSize: data.length,
+        pageCount: 1,
+        total: data.length,
+      },
+    },
+  };
 };
 export const getFacilitator = (members: LearningPlanMemberSimple[]) => {
   return members.find((m) => m.role === MemberRoles.FACILITATOR);
@@ -63,27 +86,24 @@ export const getLeader = (members: LearningPlanMemberSimple[]) => {
   return members.find((m) => m.role === MemberRoles.LEADER);
 };
 const countTrails = (learningPlan: LearningPlanSimple) =>
-  learningPlan.learning_structures.flatMap((structure) => structure.trails)
-    .length;
+  learningPlan.learning_structures.flatMap((structure) => structure.trails).length;
 // Querys
 export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
   useQuery({
-    queryKey: [`my-${type}s`],
+    queryKey: [`my-${type}s`, userId],
     queryFn: async () => {
       if (!userId) {
         return { meta: {}, data: [] };
       }
       const learningPlans = await getLearningPlanFn(type, userId);
-      const mappedLearningPlans: LearningPlanData[] = learningPlans.data.map(
-        (learningPlan) => ({
-          learningPlan,
-          facilitator: getFacilitator(learningPlan.members),
-          leader: getLeader(learningPlan.members),
-          trails: {
-            count: countTrails(learningPlan),
-          },
-        }),
-      );
+      const mappedLearningPlans: LearningPlanData[] = learningPlans.data.map((learningPlan) => ({
+        learningPlan,
+        facilitator: getFacilitator(learningPlan.members),
+        leader: getLeader(learningPlan.members),
+        trails: {
+          count: countTrails(learningPlan),
+        },
+      }));
       return { meta: {}, data: mappedLearningPlans };
     },
     initialData: {
@@ -95,11 +115,7 @@ export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
 // Mutations
 export const useUpdateVisibility = () => {
   return useMutation({
-    mutationFn: async (variables: {
-      value: boolean;
-      learninplanId: number;
-      type: LearningPlanType;
-    }) => {
+    mutationFn: async (variables: { value: boolean; learninplanId: number; type: LearningPlanType }) => {
       const { update } = useStrapi();
       await update('learningPlans', variables.learninplanId, {
         hidden: variables.value,
@@ -107,41 +123,23 @@ export const useUpdateVisibility = () => {
     },
     onMutate: ({ value, learninplanId, type }) => {
       const { $queryClient } = useNuxtApp();
-      $queryClient.setQueryData(
-        [`my-${type}s`],
-        (projectValue: { meta: Object; data: LearningPlanData[] }) => {
-          const updatedData = updateProjectVisibility(
-            projectValue.data,
-            learninplanId,
-            value,
-          );
-          return { ...projectValue, data: updatedData };
-        },
-      );
+      $queryClient.setQueryData([`my-${type}s`], (projectValue: { meta: Object; data: LearningPlanData[] }) => {
+        const updatedData = updateProjectVisibility(projectValue.data, learninplanId, value);
+        return { ...projectValue, data: updatedData };
+      });
     },
     onError: (_, { value, learninplanId, type }) => {
       const { $queryClient } = useNuxtApp();
       const { setMessage } = useMessageStore();
-      $queryClient.setQueryData(
-        [`my-${type}s`],
-        (projectValue: { meta: Object; data: LearningPlanData[] }) => {
-          const updatedData = updateProjectVisibility(
-            projectValue.data,
-            learninplanId,
-            !value,
-          );
-          return { ...projectValue, data: updatedData };
-        },
-      );
+      $queryClient.setQueryData([`my-${type}s`], (projectValue: { meta: Object; data: LearningPlanData[] }) => {
+        const updatedData = updateProjectVisibility(projectValue.data, learninplanId, !value);
+        return { ...projectValue, data: updatedData };
+      });
       setMessage('Erro ao atualizar a visibilidade do projeto', 'error', true);
     },
   });
 };
-const updateProjectVisibility = (
-  data: LearningPlanData[],
-  learninplanId: number,
-  value: boolean,
-) => {
+const updateProjectVisibility = (data: LearningPlanData[], learninplanId: number, value: boolean) => {
   return data.map((item) => {
     if (item.learningPlan.id === learninplanId) {
       return {
