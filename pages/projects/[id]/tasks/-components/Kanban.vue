@@ -323,10 +323,12 @@ const refreshKanbanFromSocket = async () => {
 
 onMounted(() => {
   socket.on('tasks:update', refreshKanbanFromSocket);
+  socket.on('sprints:update', refreshKanbanFromSocket);
 });
 
 onBeforeUnmount(() => {
   socket.off('tasks:update', refreshKanbanFromSocket);
+  socket.off('sprints:update', refreshKanbanFromSocket);
 });
 defineExpose({ canDrag, setCanDrag });
 </script>
