@@ -754,10 +754,12 @@ const refreshTasksFromSocket = async () => {
 
 onMounted(() => {
   socket.on('tasks:update', refreshTasksFromSocket);
+  socket.on('sprints:update', refreshTasksFromSocket);
 });
 
 onBeforeUnmount(() => {
   socket.off('tasks:update', refreshTasksFromSocket);
+  socket.off('sprints:update', refreshTasksFromSocket);
 });
 </script>
 
