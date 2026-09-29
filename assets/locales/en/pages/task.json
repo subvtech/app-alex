@@ -71,6 +71,7 @@
     "unarchiveError": "unarchive",
     "editError": "edit",
     "deleteError": "delete",
+    "deleteSuccessWithTask": "{task} deleted successfully!",
     "moveSuccess": "moved",
     "moveError": "move",
     "errorMessage": "Error while trying to {action} task, please try again!",
@@ -82,6 +83,7 @@
   },
   "deleteModal": {
     "title": "Do you really want to delete this Task?",
+    "titleWithTask": "Do you really want to delete this {task}?",
     "subtitle": "When deleting a task, all content created within it will also be deleted.",
     "cancel": "Cancel",
     "delete": "Delete"

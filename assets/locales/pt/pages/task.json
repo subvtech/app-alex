@@ -71,6 +71,7 @@
     "unarchiveError": "desarquivar",
     "editError": "editar",
     "deleteError": "excluir",
+    "deleteSuccessWithTask": "{task} excluída com sucesso!",
     "moveSuccess": "movida",
     "moveError": "mover",
     "errorMessage": "Ocorreu um erro ao tentar {action} a tarefa, tente novamente!",
@@ -82,6 +83,7 @@
   },
   "deleteModal": {
     "title": "Realmente deseja excluir essa Tarefa?",
+    "titleWithTask": "Deseja mesmo excluir {task}?",
     "subtitle": "Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído.",
     "cancel": "Cancelar",
     "delete": "Excluir"
