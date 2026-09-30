@@ -7,7 +7,7 @@
       >
         <img
           class="w-50 pa-6"
-          src="https://alexproject.nyc3.digitaloceanspaces.com/strapi-test/30363f52492aae3f8cf7f931688e7199.png"
+          src="https://storage.projetoalex.cc/alexproject/strapi-test/30363f52492aae3f8cf7f931688e7199.png"
         />
       </div>
       <div

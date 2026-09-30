@@ -131,6 +131,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'projects/create',
     'projects/sprint',
     'projects/individual_learning',
+    'projects/settings',
   ]);
   const layouts = await useImportLanguages('layouts', lang, ['default', 'error']);
   i18n.global.setLocaleMessage(lang, {
