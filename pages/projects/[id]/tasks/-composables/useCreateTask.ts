@@ -10,6 +10,8 @@ type CreateTaskPayload = {
   position: number;
   title: string;
   organization: TaskSimple['organization'];
+  startAt?: string;
+  finishAt?: string;
   parentTask?: number;
   sprint?: SprintSimple;
   group?: boolean;
@@ -30,7 +32,16 @@ export const useCreateTask = (
   t: Function,
 ) =>
   useMutation({
-    async mutationFn({ learningPlanId, position, title, organization, parentTask, sprint }: CreateTaskPayload) {
+    async mutationFn({
+      learningPlanId,
+      position,
+      title,
+      organization,
+      startAt,
+      finishAt,
+      parentTask,
+      sprint,
+    }: CreateTaskPayload) {
       const task = await create<CreateTaskResponse>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
@@ -42,6 +53,8 @@ export const useCreateTask = (
         submission_description: '',
         submission_required: false,
         title,
+        start_at: startAt,
+        finish_at: finishAt,
         parent_task: parentTask,
         sprint: sprint?.id || undefined,
         organization,
@@ -178,6 +191,8 @@ type CreateSprintTaskPayload = {
   position: number;
   title: string;
   organization: TaskSimple['organization'];
+  startAt?: string;
+  finishAt?: string;
   parentTask?: number;
   sprintId: number;
   kanbanColumnId: number;
@@ -189,6 +204,8 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
       position,
       title,
       organization,
+      startAt,
+      finishAt,
       parentTask,
       sprintId,
       kanbanColumnId,
@@ -203,6 +220,8 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
         submission_description: '',
         submission_required: false,
         title,
+        start_at: startAt,
+        finish_at: finishAt,
         parent_task: parentTask,
         organization,
         sprint: sprintId,
