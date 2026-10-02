@@ -136,7 +136,22 @@
       "emptyTitle": "It looks like there are no trails created",
       "emptySubtitle": "To select learning resources, you need to create and select a trail.",
       "updateError": "Error updating learning resources, try again later",
-      "invalidTrail": "This trail has no content. Please select another trail or add content to this trail."
+      "invalidTrail": "This trail has no content. Please select another trail or add content to this trail.",
+      "types": {
+        "heading": "Heading",
+        "paragraph": "Paragraph",
+        "image": "Image",
+        "video": "Video",
+        "carousel": "Gallery",
+        "fileSet": "Document",
+        "bookmark": "Link",
+        "table": "Table",
+        "codeBlock": "Code",
+        "bulletList": "List",
+        "orderedList": "Numbered list",
+        "blockquote": "Quote",
+        "horizontalRule": "Divider"
+      }
     },
     "tags": {
       "subtitle": "Enter a tag",
