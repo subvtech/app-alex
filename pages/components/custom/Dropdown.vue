@@ -408,8 +408,6 @@ import type { AlexDropdownItem } from '@/components/alex/custom/Dropdown.vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
-definePageMeta({ layout: 'components' });
-
 definePageMeta({
   layout: 'components',
   middleware: 'auth',

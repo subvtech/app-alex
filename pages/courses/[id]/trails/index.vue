@@ -195,7 +195,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { TrailSimple } from '@/models/simple/trailSimple.model';
-import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
+import CreateDialog from '@/components/alex/learningplan/trails/dialogs/Create.vue';
 
 const router = useRouter();
 const route = useRoute();

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import { Kanban, KanbanColumn, KanbanStatusType, SprintTask } from '../-types';
-import { SprintSimple } from '#imports';
+import type { SprintSimple } from '~/models/simple/sprint.model';
 
 export type BoardsResponse = {
   boards: KanbanColumn[];

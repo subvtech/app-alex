@@ -170,7 +170,7 @@
 
 <script setup lang="ts">
 import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { MemberRoles } from '#imports';
+import { MemberRoles } from '~/models/simple/learningPlanMemberSimple.model';
 
 interface MembersProps {
   listGroupMembers?: boolean;

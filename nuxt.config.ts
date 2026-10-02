@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import type { NuxtPage } from 'nuxt/schema';
 
 const {
@@ -14,6 +15,10 @@ const {
 } = process.env;
 
 export default defineNuxtConfig({
+  alias: {
+    '@nuxtjs/strapi/dist/runtime/types': fileURLToPath(new URL('./types/strapi-runtime-types.ts', import.meta.url)),
+    '@nuxtjs/strapi/dist/runtime/types/v4': fileURLToPath(new URL('./types/strapi-runtime-types.ts', import.meta.url)),
+  },
   pages: true,
   ssr: false,
   devtools: { enabled: true },
@@ -24,6 +29,18 @@ export default defineNuxtConfig({
     },
   },
   css: ['vuetify/lib/styles/main.sass', 'plyr/dist/plyr.css', '@mdi/font/css/materialdesignicons.min.css'],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        sass: {
+          api: 'modern-compiler',
+        },
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
+    },
+  },
   build: {
     transpile: ['vue-sonner', 'vuetify'],
   },
