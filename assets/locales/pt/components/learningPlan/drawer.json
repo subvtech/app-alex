@@ -133,7 +133,22 @@
       "emptyTitle": "Parece que não há trilhas criadas",
       "emptySubtitle": "Para selecionar os recursos de aprendizagem é necessário criar e selecionar uma trilha.",
       "updateError": "Erro ao atualizar os recursos de aprendizagem, tente novamente mais tarde.",
-      "invalidTrail": "Esta trilha não possui nenhum conteúdo. Selecione outra trilha ou adicione conteúdo a esta trilha."
+      "invalidTrail": "Esta trilha não possui nenhum conteúdo. Selecione outra trilha ou adicione conteúdo a esta trilha.",
+      "types": {
+        "heading": "Título",
+        "paragraph": "Parágrafo",
+        "image": "Imagem",
+        "video": "Vídeo",
+        "carousel": "Galeria",
+        "fileSet": "Documento",
+        "bookmark": "Link",
+        "table": "Tabela",
+        "codeBlock": "Código",
+        "bulletList": "Lista",
+        "orderedList": "Lista numerada",
+        "blockquote": "Citação",
+        "horizontalRule": "Separador"
+      }
     },
     "tags": {
       "subtitle": "Informe um marcador",
