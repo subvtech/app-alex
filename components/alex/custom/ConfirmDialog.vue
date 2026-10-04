@@ -78,7 +78,7 @@
   This component standardises usages of alex-custom-dialog, mostly used on /courses
 */
 import * as yup from 'yup';
-import { ButtonProps } from './Button.vue';
+import type { ButtonProps } from './Button.vue';
 
 const emit = defineEmits(['submit', 'cancel']);
 interface AlertDialogProps {

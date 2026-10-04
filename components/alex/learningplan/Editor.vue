@@ -115,9 +115,9 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Tag } from '~/models/tag.model';
-import { LearningPlan } from '~/models/learningPlan.model';
+import type { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Tag } from '~/models/tag.model';
+import type { LearningPlan } from '~/models/learningPlan.model';
 const { requiredRule, min5CharactersRule } = formRules;
 
 const i18n = useI18n();

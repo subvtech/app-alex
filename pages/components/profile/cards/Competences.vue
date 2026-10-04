@@ -34,10 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
-import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
-import { CompetencesComponentType } from '~/components/alex/profile/cards/Competences.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
+import type { CompetencesComponentType } from '~/components/alex/profile/cards/Competences.vue';
 
 definePageMeta({
   layout: 'components',

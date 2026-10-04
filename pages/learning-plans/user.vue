@@ -3,9 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { authorLearningPlans } from '~/assets/queries';
-import { LearningPlan } from '@/models/learningPlan.model';
+import type { LearningPlan } from '@/models/learningPlan.model';
 
 definePageMeta({
   middleware: 'auth',

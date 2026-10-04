@@ -23,10 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
-import { HighlighterComponentType } from '~/components/alex/documentation/prism/Highlighter.vue';
-import { InstitutionComponentType } from '~/components/alex/profile/InstitutionItem.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { HighlighterComponentType } from '~/components/alex/documentation/prism/Highlighter.vue';
+import type { InstitutionComponentType } from '~/components/alex/profile/InstitutionItem.vue';
 
 definePageMeta({
   layout: 'components',

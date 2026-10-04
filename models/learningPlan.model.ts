@@ -1,4 +1,4 @@
-import {
+import type {
   Strapi4ResponseMany,
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
@@ -38,3 +38,6 @@ export interface LearningPlan {
   hidden: boolean;
   details: any;
 }
+
+// Runtime shim for Vite ESM compatibility
+export const LearningPlan = {} as any;

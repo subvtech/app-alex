@@ -4,3 +4,5 @@ export interface TaskMemberStudent {
   task_member: TaskMember;
   student_member: LearningPlanMemberSimple;
 }
+
+export const TaskMemberStudent = {};

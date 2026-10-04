@@ -6,3 +6,5 @@ export interface BlockSimple {
   tunes: any;
   structure: StructureSimple;
 }
+
+export const BlockSimple = {};

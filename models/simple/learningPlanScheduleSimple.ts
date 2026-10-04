@@ -1,6 +1,6 @@
-import { ClassSimple } from './classSimple.model';
+import type { ClassSimple } from './classSimple.model';
 
-import { LearningPlanSimple } from './learningPlanSimple.model';
+import type { LearningPlanSimple } from './learningPlanSimple.model';
 
 // export interface LearningPlanScheduleSimple {
 
@@ -25,3 +25,5 @@ interface OnlineLearningPlanScheduleSimple {
 }
 export type LearningPlanScheduleSimple = DefaultLearningPlanScheduleSimple &
   (OnsiteLearningPlanScheduleSimple | OnlineLearningPlanScheduleSimple);
+export const LearningPlanScheduleSimple = {};
+

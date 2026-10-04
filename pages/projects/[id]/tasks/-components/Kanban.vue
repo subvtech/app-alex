@@ -4,7 +4,6 @@ import { SlickItem, SlickList } from 'vue-slicksort';
 import { generateGroup } from '~/utils';
 import { useCreateKanbanTask, useDeleteTask } from '../-composables/useCreateTask';
 import {
-  BoardsResponse,
   useCreateColumn,
   useCreateKanban,
   useDeleteColumn,
@@ -13,12 +12,13 @@ import {
   useReorderColumnTasks,
   useUpdateColumn,
 } from '../-composables/useKanban';
+import type { BoardsResponse } from '../-composables/useKanban';
 import { useGetSprints } from '../-composables/useSprints';
-import { Droppable, KanbanColumnTask, KanbanStatusType } from '../-types';
+import { KanbanStatusType, type Droppable, type KanbanColumnTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
 import KanbanAddColumn from './KanbanAddColumn.vue';
 import KanbanColumn from './KanbanColumn.vue';
-import { Colors } from './KanbanColumnHeader.vue';
+import type { Colors } from './KanbanColumnHeader.vue';
 import TaskCard from './TaskCard.vue';
 
 export interface Column<U extends { id: number }> {

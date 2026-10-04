@@ -55,6 +55,11 @@ export interface GanttProps {
   sprints?: GanttSprint[];
   maxHeight?: number | string;
 }
+
+export const GanttInstance = {};
+export const GanttItem = {};
+export const GanttSprint = {};
+export const GanttProps = {};
 </script>
 
 <script setup lang="ts">

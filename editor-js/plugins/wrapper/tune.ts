@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { BlockToolConstructorOptions, BlockAPI } from '@editorjs/editorjs';
+import type { BlockToolConstructorOptions, BlockAPI } from '@editorjs/editorjs';
 import selectBlock from './selectBlock.vue';
 import { vuetify } from '@/plugins/vuetify';
 

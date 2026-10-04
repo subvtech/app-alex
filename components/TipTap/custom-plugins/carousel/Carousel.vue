@@ -192,7 +192,7 @@
 </template>
 
 <script setup lang="ts">
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
+import { NodeViewWrapper, type NodeViewProps } from '@tiptap/vue-3';
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
 import VideoPlayer from '../VideoJS.vue';

@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
 import {
   DragHandle,
-  DragHandleOptions,
 } from '@tiptap-pro/extension-drag-handle';
+import type { DragHandleOptions } from '@tiptap-pro/extension-drag-handle';
 import { VueNodeViewRenderer, Editor } from '@tiptap/vue-3';
 import { Node } from '@tiptap/pm/model';
 import Component from './Component.vue';

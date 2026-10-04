@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
+import { NodeViewWrapper, type NodeViewProps } from '@tiptap/vue-3';
 import VideoPlayer from '../VideoJS.vue';
 import UploadModal from './FileUploader.vue';
 import ImageMenu from './ImageMenu.vue';

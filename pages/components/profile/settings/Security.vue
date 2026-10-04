@@ -23,10 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
-import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
-import { SecurityComponentType } from '~/components/alex/profile/settings/Security.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
+import type { SecurityComponentType } from '~/components/alex/profile/settings/Security.vue';
 
 definePageMeta({
   layout: 'components',

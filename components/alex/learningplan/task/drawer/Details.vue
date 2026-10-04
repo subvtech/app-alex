@@ -195,9 +195,9 @@
 
 <script setup lang="ts">
 import type { WritableComputedRef } from 'vue';
-import { RestrictionValue } from '../Restrictions.vue';
-import { TaskStudent } from '../kanban/index.vue';
-import { TaskMemberStatus } from '~/models/simple/taskSimple.model';
+import type { RestrictionValue } from '../Restrictions.vue';
+import type { TaskStudent } from '../kanban/index.vue';
+import type { TaskMemberStatus } from '~/models/simple/taskSimple.model';
 import { learningPlanGroupMemberRoles } from '~/models/learningPlanGroupMember.model';
 
 const model = defineModel<boolean>({ required: true });

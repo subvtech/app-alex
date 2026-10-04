@@ -5,3 +5,5 @@ export interface ProductSimple {
   isPublic: boolean;
   learningplans?: LearningPlanSimple;
 }
+
+export const ProductSimple = {};

@@ -54,14 +54,19 @@
   </v-card>
 </template>
 
+<script lang="ts">
+export const MeetingVariantType = {};
+export const MeetingType = {};
+export const MeetingPropsType = {};
+</script>
+
 <script setup lang="ts">
 // eslint-disable-next-line import/no-duplicates
 import { format, isValid } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { pt } from 'date-fns/locale';
-import { AlexDropdownItem } from '../custom/Dropdown.vue';
+import type { AlexDropdownItem } from '../custom/Dropdown.vue';
 import { capitalize } from '@/utils';
-import date from '~/pages/components/inputs/date.vue';
 export type MeetingVariantType = 'editing' | 'default';
 export type MeetingType = 'onsite' | 'online';
 export interface MeetingPropsType {

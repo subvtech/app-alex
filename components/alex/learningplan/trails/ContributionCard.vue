@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+import type { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 const emits = defineEmits(['edit', 'delete', 'highlight', 'block', 'show']);
 const { t } = useI18n();
 

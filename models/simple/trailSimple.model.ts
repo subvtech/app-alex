@@ -11,3 +11,5 @@ export interface TrailSimple {
   structures: StructureSimple[];
   tasks: any[];
 }
+
+export const TrailSimple = {};

@@ -116,7 +116,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskStatus } from '~/models/simple/taskSimple.model';
 
 interface HeaderProps {
   id: number;

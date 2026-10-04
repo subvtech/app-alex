@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends { title: string }">
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface CompProps {
   items?: AlexDropdownItem[];

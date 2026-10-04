@@ -1,6 +1,6 @@
-import { DocumentCategory } from './documentCategory';
-import { DocumentTemplate } from './documentTemplate';
-import { DocumentFolder } from './documentFolder';
+import type { DocumentCategory } from './documentCategory';
+import type { DocumentTemplate } from './documentTemplate';
+import type { DocumentFolder } from './documentFolder';
 
 export interface Document {
   id: number;

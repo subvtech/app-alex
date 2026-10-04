@@ -7,6 +7,7 @@ export interface LearningPlanData {
     count: number;
   };
 }
+export const LearningPlanData = {};
 type LearningPlanType = LearningPlanSimple['type'];
 
 const queryConfig = (userID: number, type: LearningPlanType, page: number) => ({

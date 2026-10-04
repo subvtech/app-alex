@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TabType } from '~/components/alex/custom/Tabs.vue';
+import type { TabType } from '~/components/alex/custom/Tabs.vue';
 
 definePageMeta({
   middleware: ['auth'],

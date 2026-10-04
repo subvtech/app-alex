@@ -96,13 +96,17 @@
   />
 </template>
 
+<script lang="ts">
+export const Accept = {};
+</script>
+
 <script
   setup
   lang="ts"
   generic="T extends { id: number; status: string; task?: TaskSimple }"
 >
 import { SlickList, SlickItem } from 'vue-slicksort';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskStatus } from '~/models/simple/taskSimple.model';
 export type Accept<T> =
   | true
   | string[]

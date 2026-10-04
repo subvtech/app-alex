@@ -259,12 +259,12 @@
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import type { PropType } from 'vue';
 import 'viewerjs/dist/viewer.css';
-import { User } from '~/models/user.model';
-import { Block } from '~/models/block.model';
-import { Structure } from '~/models/structure.model';
+import type { User } from '~/models/user.model';
+import type { Block } from '~/models/block.model';
+import type { Structure } from '~/models/structure.model';
 
 const props = defineProps({
   hasPermission: Boolean,

@@ -1,5 +1,5 @@
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
-import { learningPlanMember } from './learningPlanMember.model';
+import type { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import type { learningPlanMember } from './learningPlanMember.model';
 
 export interface TrailContribuition {
   id: number;
@@ -7,3 +7,5 @@ export interface TrailContribuition {
   student_member: Strapi4ResponseMany<learningPlanMember>;
   contribuition: any;
 }
+export const TrailContribuition = {};
+

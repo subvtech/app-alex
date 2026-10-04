@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { TrailSimple } from '@/models/simple/trailSimple.model';
+import type { TrailSimple } from '@/models/simple/trailSimple.model';
 
 export const useTrailStore = defineStore('trail', () => {
   const { findOne } = useStrapiUtils();

@@ -10,6 +10,11 @@ export type SprintsResponse = {
   backlog: TaskSimple[];
   sprints: Sprint[];
 };
+
+// Runtime shims for Vite ESM compatibility
+export const Sprint = {} as any;
+export const SprintsResponse = {} as any;
+
 export const useGetSprints = (learninplanId: Ref<number>) =>
   useQuery({
     queryKey: ['sprints', learninplanId],

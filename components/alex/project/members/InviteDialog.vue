@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '../../custom/Dropdown.vue';
+import type { AlexDropdownItem } from '../../custom/Dropdown.vue';
 import { MemberRoles } from '~/models/simple/learningPlanMemberSimple.model';
 import type { UserSimple } from '~/models/simple/userSimple.model';
 

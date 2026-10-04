@@ -1,4 +1,4 @@
-import { TaskStatus, TaskType } from '@/models/simple/taskSimple.model';
+import type { TaskStatus, TaskType } from '@/models/simple/taskSimple.model';
 
 interface Deliverable {
   completed: number;
@@ -62,3 +62,10 @@ export interface Kanban {
   version: number;
   kanban_columns: KanbanColumn[];
 }
+
+// Runtime shims for Vite ESM compatibility
+export const SprintTask = {} as any;
+export const Droppable = {} as any;
+export const KanbanColumnTask = {} as any;
+export const KanbanColumn = {} as any;
+export const Kanban = {} as any;
