@@ -268,8 +268,6 @@ const handleAddItem = async (columnId: number, _group: string, title: string) =>
     organization: 'standard',
     position: lastIndex,
     sprintId: selectedSprint.value?.id,
-    startAt: selectedSprint.value?.start_at,
-    finishAt: selectedSprint.value?.end_at,
     title,
   });
   refetchKanban();
