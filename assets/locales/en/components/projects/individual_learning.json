@@ -45,6 +45,8 @@
     "tasks": "Tasks",
 
     "addTask": "Add Task",
+    "addAllClassStudents": "Add all students in the class",
+    "selectClass": "Select a class",
 
     "inputs": {
       "search": "Search task",
