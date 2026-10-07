@@ -37,8 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import { MeetingVariantType } from '../Meeting.vue';
-import { LearningClassType } from '../dialogs/create/index.vue';
+import type { MeetingVariantType } from '../Meeting.vue';
+import type { LearningClassType } from '../dialogs/create/index.vue';
 type ClassMeetingsProps = {
   variant: MeetingVariantType;
 };

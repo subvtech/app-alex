@@ -46,6 +46,10 @@
   </v-row>
 </template>
 
+<script lang="ts">
+export const SectionCardHeaderProps = {};
+</script>
+
 <script setup lang="ts">
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 

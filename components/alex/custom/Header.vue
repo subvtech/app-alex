@@ -57,6 +57,9 @@
     </div>
   </div>
 </template>
+<script lang="ts">
+export const HeaderComponentType = {};
+</script>
 <script setup lang="ts">
 interface itemType {
   title: string;
@@ -73,9 +76,9 @@ export interface HeaderComponentType {
   buttonSize?: 'default' | 'large' | 'small';
   secondaryButtonIcon?: string;
   secondaryButtonText?: string;
-  noBackArrow: boolean;
+  noBackArrow?: boolean;
   loading?: boolean;
-  items: itemType[];
+  items?: itemType[];
 }
 
 withDefaults(defineProps<HeaderComponentType>(), {

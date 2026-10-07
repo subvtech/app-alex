@@ -10,3 +10,5 @@ export interface LearningPlanStructureSimple {
   learningplan: LearningPlan;
   trails: TrailSimple[];
 }
+
+export const LearningPlanStructureSimple = {};

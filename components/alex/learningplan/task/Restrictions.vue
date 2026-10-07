@@ -40,8 +40,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export const RestrictionValue = {};
+</script>
+
 <script setup lang="ts">
-import { AlexDropdownItem } from '../../custom/Dropdown.vue';
+import type { AlexDropdownItem } from '../../custom/Dropdown.vue';
 
 interface CompProps {
   edit?: boolean;

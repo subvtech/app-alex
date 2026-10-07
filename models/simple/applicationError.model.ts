@@ -10,3 +10,5 @@ export interface ApplicationError<T = Object> {
     };
   };
 }
+
+export const ApplicationError = {};

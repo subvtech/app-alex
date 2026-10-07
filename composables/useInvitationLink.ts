@@ -1,4 +1,4 @@
-import { MemberRoles } from '#imports';
+import { MemberRoles } from '~/models/simple/learningPlanMemberSimple.model';
 
 export const useInvitationLink = () => {
   const { create, delete: _delete } = useStrapi();

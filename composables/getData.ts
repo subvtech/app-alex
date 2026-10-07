@@ -1,12 +1,12 @@
-import {
+import type {
   Strapi4ResponseData,
   Strapi4ResponseMany,
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
 import * as queries from '~/assets/queries';
-import { User } from '@/models/user.model';
-import { LearningPlan } from '../models/learningPlan.model';
-import { Class } from '../models/class.model';
+import type { User } from '@/models/user.model';
+import type { LearningPlan } from '../models/learningPlan.model';
+import type { Class } from '../models/class.model';
 
 export const useGetData = () => {
   const user = useStrapiUser<User>();

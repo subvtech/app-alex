@@ -1,8 +1,8 @@
-import { InvitationLinkSimple } from './InvitationLinkSimple.model';
-import { LearningPlanGroupSimple } from './learningPlanGroupSimple.model';
-import { LearningPlanMemberSimple } from './learningPlanMemberSimple.model';
-import { LearningPlanScheduleSimple } from './learningPlanScheduleSimple';
-import { LearningPlanSimple } from './learningPlanSimple.model';
+import type { InvitationLinkSimple } from './InvitationLinkSimple.model';
+import type { LearningPlanGroupSimple } from './learningPlanGroupSimple.model';
+import type { LearningPlanMemberSimple } from './learningPlanMemberSimple.model';
+import type { LearningPlanScheduleSimple } from './learningPlanScheduleSimple';
+import type { LearningPlanSimple } from './learningPlanSimple.model';
 
 export interface ClassSimple {
   id: number;
@@ -14,3 +14,5 @@ export interface ClassSimple {
   learning_plan_groups?: LearningPlanGroupSimple[];
   meeting_schedules?: LearningPlanScheduleSimple[];
 }
+export const ClassSimple = {};
+

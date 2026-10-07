@@ -1,8 +1,12 @@
+<script lang="ts">
+export const TaskItem = {};
+</script>
+
 <script setup lang="ts">
 import { useMultipleDragDrop } from '@/composables/useMultipleDragDrop';
-import { ApplicationError } from '@/models/simple/applicationError.model';
-import { TaskStatus, TaskType } from '@/models/simple/taskSimple.model';
-import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
+import type { ApplicationError } from '@/models/simple/applicationError.model';
+import type { TaskStatus, TaskType } from '@/models/simple/taskSimple.model';
+import type { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
 
 export interface TaskItem {

@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/named
-import { AsyncDataOptions } from 'nuxt/dist/app/composables';
+import type { AsyncDataOptions } from '#app';
 type KeysOf<T> = Array<
   T extends T ? (keyof T extends string ? keyof T : never) : never
 >;

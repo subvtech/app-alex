@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
-import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
-import { AddSocialComponentType } from '~/components/alex/profile/dialogs/AddSocial.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
+import type { AddSocialComponentType } from '~/components/alex/profile/dialogs/AddSocial.vue';
 const i18n = useI18n();
 definePageMeta({
   layout: 'components',

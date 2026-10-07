@@ -5,3 +5,5 @@ export interface StructureSimple {
   trail: TrailSimple;
   blocks: BlockSimple[];
 }
+
+export const StructureSimple = {};

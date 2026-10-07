@@ -46,8 +46,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { TabType } from '@/components/alex/custom/Tabs.vue';
-import { HighlighterItemType } from '@/components/alex/documentation/prism/Highlighter.vue';
+import type { TabType } from '@/components/alex/custom/Tabs.vue';
+import type { HighlighterItemType } from '@/components/alex/documentation/prism/Highlighter.vue';
 
 export interface ExampleItemType extends HighlighterItemType {
   label: string;

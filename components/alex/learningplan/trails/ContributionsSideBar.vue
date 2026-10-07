@@ -84,7 +84,7 @@
 </template>
 <script setup lang="ts">
 import { useDragDrop } from '@/composables/useDragDrop';
-import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+import type { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 const { t } = useI18n();
 const dropdownHover = ref(false);
 

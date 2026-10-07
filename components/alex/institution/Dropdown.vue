@@ -36,7 +36,7 @@
   
   <script setup lang="ts">
   import { ref, computed, useSlots } from 'vue';
-  import { ButtonProps } from '@/components/alex/custom/Button.vue';
+  import type { ButtonProps } from '@/components/alex/custom/Button.vue';
   
   interface DropdownProps {
     theme?: 'light' | 'dark';

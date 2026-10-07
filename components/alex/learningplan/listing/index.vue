@@ -4,7 +4,7 @@
       v-if="
         customDataLoading !== undefined
           ? customDataRef?.courseProjects?.length === 0
-          : query.data?.value.data.length === 0
+          : query.data?.value?.data?.length === 0
       "
       class="tw-flex-1 d-flex align-center justify-center flex-column pa-6"
     >
@@ -109,7 +109,7 @@
               class="tw-w-full"
               :type="type"
               :title="item.learningPlan.title"
-              :options="item.facilitator?.user.id === user?.id"
+              :options="item.facilitator?.user?.id === user?.id"
               :description="item.learningPlan.description"
               :image="{
                 url: item.learningPlan.cover_image?.url || '',
@@ -125,7 +125,7 @@
                   imageURL: item.leader?.user?.avatar?.url,
                 }
               "
-              :members="getUrlNameMembers(item.learningPlan.members)"
+              :members="getUrlNameMembers(item.learningPlan?.members || [])"
               :hide="item.learningPlan.hidden"
               :unavailable="!isAvailable(item.learningPlan.id)"
               :trails-count="item.learningPlan.type === 'course' ? item.trails.count : undefined"
@@ -186,7 +186,7 @@
                 <td class="text-overflow max-width-[596px]">
                   {{ item.learningPlan.type === 'course' ? item.trails.count : item.learningPlan.product?.text }}
                 </td>
-                <td v-if="item.facilitator?.user.id === user.id">
+                <td v-if="item.facilitator?.user?.id === user?.id">
                   <alex-custom-dropdown :items="dropdownItems(item.learningPlan.hidden, item.learningPlan.id)">
                     <template #activator="{ props: propsMenu }">
                       <v-tooltip
@@ -247,8 +247,8 @@
 </template>
 
 <script setup lang="ts">
-import { LearningPlanFilter } from '../Filter.vue';
-import { LearningPlanData, useGetMyLearningPlan, useUpdateVisibility } from './mutations';
+import type { LearningPlanFilter } from '../Filter.vue';
+import { type LearningPlanData, useGetMyLearningPlan, useUpdateVisibility } from './mutations';
 
 interface DataTableHeader<T> {
   title: string;
@@ -330,11 +330,11 @@ const hasFilters = computed(() => {
 });
 //      Filters
 const filteredByFacilitator = computed(() => {
-  const data = customDataRef.value ? customDataRef.value?.courseProjects : query.data?.value.data || [];
+  const data = customDataRef.value ? customDataRef.value?.courseProjects : query.data?.value?.data || [];
 
   return (
     data?.filter((data) =>
-      filters.value.facilitator.value?.id ? data?.facilitator?.user.id === filters.value.facilitator.value?.id : true,
+      filters.value.facilitator.value?.id ? data?.facilitator?.user?.id === filters.value.facilitator.value?.id : true,
     ) || []
   );
 });
@@ -383,7 +383,7 @@ const filteredByLeader = computed(() =>
     if (!filters.value.leader.value) {
       return true;
     }
-    return data.leader?.user.id === filters.value.leader.value.id;
+    return data.leader?.user?.id === filters.value.leader.value.id;
   }),
 );
 
@@ -509,11 +509,11 @@ const showingData = (groupedItems: any, items: Array<any>) => {
   }
   return message;
 };
-const getUrlNameMembers = (members: LearningPlanMemberSimple[]) =>
-  members.map((member) => ({
+const getUrlNameMembers = (members: LearningPlanMemberSimple[] = []) =>
+  (members || []).map((member) => ({
     name: member?.user?.fullname || 'Nome',
-    ...(member.user?.avatar?.url && {
-      image: { url: member.user?.avatar?.url },
+    ...(member?.user?.avatar?.url && {
+      image: { url: member?.user?.avatar?.url },
     }),
   }));
 //    Filters

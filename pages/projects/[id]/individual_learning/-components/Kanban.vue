@@ -139,7 +139,7 @@
 <script setup lang="ts" generic="T extends 'professor' | 'student'">
 import { useMouse } from '@vueuse/core';
 import { isWithinInterval, isBefore, isAfter, isEqual } from 'date-fns';
-import { TaskMemberStatus, TaskSimple, TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskMemberStatus, TaskSimple, TaskStatus } from '~/models/simple/taskSimple.model';
 import KanbanColumn, { Accept } from './KanbanColumn.vue';
 
 // Types

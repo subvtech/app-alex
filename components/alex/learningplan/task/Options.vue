@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '../../custom/Dropdown.vue';
+import type { AlexDropdownItem } from '../../custom/Dropdown.vue';
 
 interface CompProps {
   items?: AlexDropdownItem[];

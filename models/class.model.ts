@@ -1,5 +1,5 @@
-import { ClassesLearningPlan } from './classesLearningPlan.model';
-import { ClassesUser } from './classesUser.model';
+import type { ClassesLearningPlan } from './classesLearningPlan.model';
+import type { ClassesUser } from './classesUser.model';
 
 export interface Class {
   id: number;
@@ -12,3 +12,6 @@ export interface Class {
   classes_learning_plans: ClassesLearningPlan[];
   classes_users: ClassesUser[];
 }
+
+// Runtime shim for Vite ESM compatibility
+export const Class = {} as any;

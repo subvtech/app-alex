@@ -16,7 +16,7 @@
 
     <alex-documentation-playground :data="listProps">
       <template #component="{ props }">
-        <alex-profile-forms-social
+        <alex-profile-forms-edit-social
           :url="props.url"
           :index="props.index"
           :name="props.name"
@@ -28,10 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
-import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
-import { SocialFormComponentType } from '~/components/alex/profile/forms/Social.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
+import type { SocialFormComponentType } from '~/components/alex/profile/forms/EditSocial.vue';
 
 definePageMeta({
   layout: 'components',

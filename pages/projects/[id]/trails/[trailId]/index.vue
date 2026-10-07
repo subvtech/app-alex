@@ -191,7 +191,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { contributionType } from '~/pages/projects/[id]/trails/[trailId]/contributions.vue';
+import type { contributionType } from '~/pages/projects/[id]/trails/[trailId]/contributions.vue';
 import Tiptap from '~/components/TipTap/index.vue';
 
 definePageMeta({

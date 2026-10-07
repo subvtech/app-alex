@@ -1,4 +1,4 @@
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 export interface Block {
   id: number;
   type: string;
@@ -7,3 +7,6 @@ export interface Block {
   tunes: any;
   structure: Strapi4ResponseMany<Structure>;
 }
+
+// Runtime shim for Vite ESM compatibility
+export const Block = {} as any;

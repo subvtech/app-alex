@@ -49,6 +49,10 @@
   </div>
 </template>
 
+<script lang="ts">
+export const User = {};
+</script>
+
 <script setup lang="ts">
 import { useField } from 'vee-validate';
 export type User = {

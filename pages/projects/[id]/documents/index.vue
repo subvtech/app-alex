@@ -165,8 +165,8 @@
 </template>
 
 <script setup lang="ts">
-import { Document } from '@/models/document';
-import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
+import type { Document } from '@/models/document';
+import type { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 
 const learningPlanStore = useLearningPlanStore();
 // const headerStore = usePageHeaderStore();

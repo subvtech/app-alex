@@ -136,8 +136,8 @@
 </template>
 
 <script setup lang="ts">
-import { TaskItem } from './List.vue';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskItem } from './List.vue';
+import type { TaskStatus } from '~/models/simple/taskSimple.model';
 import TreeView from '~/components/alex/custom/treeview/index.vue';
 
 interface sortType {

@@ -194,11 +194,11 @@
 </template>
 
 <script setup lang="ts">
-import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
-import { RestrictionValue } from '../Restrictions.vue';
-import { TaskStudent } from '../kanban/index.vue';
-import { TaskMemberStatus } from '~/models/simple/taskSimple.model';
-import { learningPlanGroupMemberRoles } from '#imports';
+import type { WritableComputedRef } from 'vue';
+import type { RestrictionValue } from '../Restrictions.vue';
+import type { TaskStudent } from '../kanban/index.vue';
+import type { TaskMemberStatus } from '~/models/simple/taskSimple.model';
+import { learningPlanGroupMemberRoles } from '~/models/learningPlanGroupMember.model';
 
 const model = defineModel<boolean>({ required: true });
 

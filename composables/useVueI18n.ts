@@ -1,4 +1,4 @@
-import type { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
+import type { WritableComputedRef } from 'vue';
 import { createI18n } from 'vue-i18n';
 import { type ElementType, literalArray } from '../utils';
 import { useImportLanguages } from './useImportedLanguages';

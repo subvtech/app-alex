@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { LearningClassType } from './create/index.vue';
+import type { LearningClassType } from './create/index.vue';
 type ClassDialogProps = {
   noSelectUsers?: boolean;
   closeDialogOnSubmit?: boolean;

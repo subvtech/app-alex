@@ -1,4 +1,4 @@
-import { LearningPlanGoalSimple } from './learningPlanGoalSimple.model';
+import type { LearningPlanGoalSimple } from './learningPlanGoalSimple.model';
 
 export type TaskStatus = 'published' | 'draft' | 'finished' | (string & {});
 export type TaskType = 'individual' | 'group';
@@ -31,3 +31,8 @@ export interface TaskSimple {
   sprint?: SprintSimple;
   kanban_column_task: KanbanColumnTask;
 }
+
+export const TaskStatus = {};
+export const TaskType = {};
+export const TaskMemberStatus = {};
+export const TaskSimple = {};

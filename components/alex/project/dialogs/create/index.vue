@@ -191,7 +191,7 @@
 </template>
 
 <script setup lang="ts">
-import { MemberRoles } from '#imports';
+import { MemberRoles } from '~/models/simple/learningPlanMemberSimple.model';
 
 type FieldSimpleOptionalId = Omit<FieldSimple, 'id'> & { id?: number };
 type ProductSimpleOptionalId = Omit<ProductSimple, 'id'> & { id?: number };

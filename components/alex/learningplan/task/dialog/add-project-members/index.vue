@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { User } from '@/components/alex/inputs/UsersAutocomplete.vue';
+import type { User } from '@/components/alex/inputs/UsersAutocomplete.vue';
 
 interface classItem {
   id: number;

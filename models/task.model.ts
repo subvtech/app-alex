@@ -1,8 +1,8 @@
-import {
+import type {
   Strapi4ResponseSingle,
   Strapi4ResponseMany,
 } from '@nuxtjs/strapi/dist/runtime/types';
-import { ValueOf } from './learningPlan.model';
+import type { ValueOf } from './learningPlan.model';
 
 export const TaskStatus = {
   DRAFT: 'draft',
@@ -32,3 +32,5 @@ export interface Task {
   deliverable_description: any;
   task_members: Strapi4ResponseMany<TaskMember>;
 }
+export const Task = {};
+

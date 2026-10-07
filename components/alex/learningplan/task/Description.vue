@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
+import type { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 
 interface DescriptionProps {
   edit?: boolean;

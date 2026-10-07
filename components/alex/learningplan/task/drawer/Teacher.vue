@@ -315,7 +315,7 @@
 <script setup lang="ts">
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isAfter, isBefore } from 'date-fns';
-import type { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
+import type { WritableComputedRef } from 'vue';
 import type { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import type { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';

@@ -6,3 +6,5 @@ export interface FieldSimple {
   verified_by?: number;
   learningplans?: LearningPlanSimple;
 }
+
+export const FieldSimple = {};

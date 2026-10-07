@@ -53,6 +53,9 @@
     :student-id="learningPlanStore.userLearningMember!.id!"
   />
 </template>
+<script lang="ts">
+export const filterType = {};
+</script>
 <script setup lang="ts">
 import { MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
 

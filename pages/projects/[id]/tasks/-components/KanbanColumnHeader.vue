@@ -1,5 +1,9 @@
+<script lang="ts">
+// Runtime shim for Vite ESM compatibility
+export const Colors = {} as any;
+</script>
 <script setup lang="ts">
-import { AlexDropdownItem as DropdownItem } from '@/components/alex/custom/Dropdown.vue';
+import type { AlexDropdownItem as DropdownItem } from '@/components/alex/custom/Dropdown.vue';
 import { AlexThemeColors } from '@/config/themes';
 export type Colors = keyof typeof AlexThemeColors;
 
