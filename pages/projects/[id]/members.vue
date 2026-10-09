@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { FilterItemProps } from '~/components/alex/project/members/Drawer.vue';
+import type { FilterItemProps } from '~/components/alex/project/members/Drawer.vue';
 import { isEnumValue } from '~/utils';
 import { contains } from '~/utils/contains';
-import { LearningPlanMemberSimple, MemberRoles } from '#imports';
+import {
+  MemberRoles,
+  MemberStatus,
+  type LearningPlanMemberSimple,
+} from '~/models/simple/learningPlanMemberSimple.model';
 
 definePageMeta({
   middleware: 'auth',

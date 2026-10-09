@@ -1,8 +1,12 @@
+<script lang="ts">
+// Runtime shim for Vite ESM compatibility
+export const Sprint = {} as any;
+</script>
 <script setup lang="ts">
 import { format } from 'date-fns/esm';
 import { enUS, ptBR } from 'date-fns/locale';
 import { useCreateTask } from '../-composables/useCreateTask';
-import { Droppable, SprintTask } from '../-types';
+import type { Droppable, SprintTask } from '../-types';
 import TaskTable from './TaskTable.vue';
 
 export interface Sprint {

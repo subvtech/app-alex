@@ -1,7 +1,8 @@
 <script setup lang="ts" generic="T extends Droppable<{ id: number }>">
 import { DragHandle, SlickItem, SlickList } from 'vue-slicksort';
-import { Droppable } from '../-types';
-import KanbanColumnHeader, { Colors } from './KanbanColumnHeader.vue';
+import type { Droppable } from '../-types';
+import KanbanColumnHeader from './KanbanColumnHeader.vue';
+import type { Colors } from './KanbanColumnHeader.vue';
 
 type AcceptFunction<T> = (params: { dest: HTMLElement; payload: T; source: HTMLElement }) => boolean;
 

@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { MemberRoles } from '#imports';
+import { MemberRoles } from '~/models/simple/learningPlanMemberSimple.model';
 const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link', 'link:expired']);
 

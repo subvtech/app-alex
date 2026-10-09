@@ -1,4 +1,4 @@
-import { LearningPlanMemberSimple } from './learningPlanMemberSimple.model';
+import type { LearningPlanMemberSimple } from './learningPlanMemberSimple.model';
 
 export enum learningPlanGroupMemberRolesSimple {
   STANDARD = 'standard',
@@ -11,3 +11,5 @@ export interface LearningPlanGroupMemberSimple {
   student_member: LearningPlanMemberSimple;
   role: learningPlanGroupMemberRolesSimple;
 }
+export const LearningPlanGroupMemberSimple = {};
+

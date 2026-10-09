@@ -158,12 +158,12 @@
 
 <script setup lang="ts">
 import { isAfter, isBefore } from 'date-fns';
-import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
+import type { WritableComputedRef } from 'vue';
 // import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
-import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
+import type { MentionUserPropsArray } from '~/components/TipTap/index.vue';
+import type { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { orderEvents } from '~/utils';
-import { RestrictionValue } from '../../Restrictions.vue';
+import type { RestrictionValue } from '../../Restrictions.vue';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 

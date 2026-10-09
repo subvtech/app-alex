@@ -130,8 +130,8 @@
 </template>
 
 <script setup lang="ts">
-import { TaskItem } from './Container.vue';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskItem } from './Container.vue';
+import type { TaskStatus } from '~/models/simple/taskSimple.model';
 
 interface sortType {
   key: string;

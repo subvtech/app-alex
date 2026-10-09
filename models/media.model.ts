@@ -1,5 +1,5 @@
-import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
-import { ValueOf } from './learningPlan.model';
+import type { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
+import type { ValueOf } from './learningPlan.model';
 
 export const MediaTypes = {
   YOUTUBE: 'youtube',

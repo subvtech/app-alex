@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
-import { WalletComponentType } from '~/components/alex/profile/settings/Wallet.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
+import type { WalletComponentType } from '~/components/alex/profile/settings/Wallet.vue';
 
 definePageMeta({
   layout: 'components',

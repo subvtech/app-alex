@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '../../inputs/Dropdown.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface FolderProps {
   id: number;

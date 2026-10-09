@@ -31,9 +31,9 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
-import { TooltipButtonComponentType } from '~/components/alex/documentation/buttons/Tooltip.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { TooltipButtonComponentType } from '~/components/alex/documentation/buttons/Tooltip.vue';
 
 definePageMeta({
   layout: 'components',

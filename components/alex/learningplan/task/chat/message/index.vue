@@ -58,7 +58,7 @@
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { ptBR, enIN } from 'date-fns/locale';
-import { Message } from '@/models/simple/learninplanTaskMemberMessage';
+import type { Message } from '@/models/simple/learninplanTaskMemberMessage';
 type MessageProps = Message & {
   align?: 'left' | 'right';
 };

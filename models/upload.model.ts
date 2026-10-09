@@ -33,3 +33,6 @@ export interface Upload {
   url: string;
   width?: number;
 }
+
+export const Upload = {};
+export default Upload;

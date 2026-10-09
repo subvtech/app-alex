@@ -58,6 +58,10 @@
   </v-navigation-drawer>
 </template>
 
+<script lang="ts">
+// Runtime shim for Vite ESM compatibility
+export const FilterItemProps = {} as any;
+</script>
 <script setup lang="ts">
 export interface FilterItemProps {
   items: string[];

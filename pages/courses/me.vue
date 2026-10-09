@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { useQueryClient, UseQueryDefinedReturnType } from '@tanstack/vue-query';
-import { LearningPlanData } from '~/components/alex/learningplan/listing/mutations';
+import { useQueryClient, type UseQueryDefinedReturnType } from '@tanstack/vue-query';
+import type { LearningPlanData } from '~/components/alex/learningplan/listing/mutations';
 definePageMeta({
   middleware: 'auth',
 });

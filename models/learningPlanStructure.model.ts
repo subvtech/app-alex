@@ -1,4 +1,4 @@
-import {
+import type {
   Strapi4ResponseSingle,
   Strapi4ResponseMany,
 } from '@nuxtjs/strapi/dist/runtime/types';

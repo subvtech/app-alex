@@ -116,8 +116,11 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '../../custom/Dropdown.vue';
-import { MemberRoles } from '#imports';
+import type { AlexDropdownItem } from '../../custom/Dropdown.vue';
+import {
+  MemberRoles,
+  type LearningPlanMemberSimple,
+} from '~/models/simple/learningPlanMemberSimple.model';
 
 export interface TableCardProps {
   showPositions?: boolean;

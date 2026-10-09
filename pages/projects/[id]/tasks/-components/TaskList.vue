@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useMultipleDragDrop } from '@/composables/useMultipleDragDrop';
-import { ApplicationError } from '@/models/simple/applicationError.model';
-import { TaskSimple } from '@/models/simple/taskSimple.model';
-import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
+import type { ApplicationError } from '@/models/simple/applicationError.model';
+import type { TaskSimple } from '@/models/simple/taskSimple.model';
+import type { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
 import { useQueryClient } from '@tanstack/vue-query';
 // eslint-disable-next-line import/no-duplicates
@@ -10,10 +10,12 @@ import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
 import { useCreateTask, useDeleteTask, useUpdateTask, useUpdateTaskStatus } from '../-composables/useCreateTask';
-import { SprintsResponse, useDeleteSprint, useGetSprints, useMoveSprint } from '../-composables/useSprints';
-import { Droppable, SprintTask } from '../-types';
+import { useDeleteSprint, useGetSprints, useMoveSprint } from '../-composables/useSprints';
+import type { SprintsResponse } from '../-composables/useSprints';
+import type { Droppable, SprintTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
-import TaskSprint, { Sprint } from './TaskSprint.vue';
+import TaskSprint from './TaskSprint.vue';
+import type { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
 
 interface DropdownItem {

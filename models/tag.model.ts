@@ -1,4 +1,4 @@
-import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
 
 export interface Tag {
   id: number;
@@ -10,3 +10,5 @@ export interface Tag {
   isGeneral: boolean;
   learningplans: Strapi4ResponseSingle<LearningPlan>;
 }
+export const Tag = {};
+

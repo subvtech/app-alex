@@ -4,8 +4,8 @@ import Kanban from './-components/Kanban.vue';
 import TaskFilterDrawer from './-components/TaskFilterDrawer.vue';
 import TaskList from './-components/TaskList.vue';
 import { useGetSprints } from './-composables/useKanban';
-import { SprintSimple } from '#imports';
-import { Sprint } from './-composables/useSprints';
+import type { SprintSimple } from '~/models/simple/sprint.model';
+import type { Sprint } from './-composables/useSprints';
 
 type FilterType = {
   finalDate?: { start: string | null; end: string | null };

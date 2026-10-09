@@ -40,8 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { LearningPlan } from '~/models/learningPlan.model';
+import type { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import type { LearningPlan } from '~/models/learningPlan.model';
 
 const emit = defineEmits(['updated']);
 

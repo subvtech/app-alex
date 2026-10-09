@@ -1,4 +1,4 @@
-import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
 
 export interface LearningPlanMeeting {
   date: Date;

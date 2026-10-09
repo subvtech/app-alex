@@ -126,7 +126,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 import enUS from 'date-fns/locale/en-US';
 // eslint-disable-next-line import/no-duplicates
 import { format } from 'date-fns';
-import { TaskItem } from './List.vue';
+import type { TaskItem } from './List.vue';
 import { useCreateTask } from './mutations';
 export interface PanelItem<T> {
   group: string;

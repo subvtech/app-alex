@@ -1,4 +1,4 @@
-import { HorizontalBarMenuItemType } from '~/components/alex/custom/horizontalBar.vue';
+import type { HorizontalBarMenuItemType } from '~/components/alex/custom/horizontalBar.vue';
 
 export const useMainHorizontalBar = () => {
   const { logout } = useStrapiAuth();

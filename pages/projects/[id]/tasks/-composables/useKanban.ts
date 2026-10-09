@@ -1,10 +1,13 @@
 import { useMutation, useQuery } from '@tanstack/vue-query';
-import { Kanban, KanbanColumn, KanbanStatusType, SprintTask } from '../-types';
-import { SprintSimple } from '#imports';
+import { KanbanStatusType, type Kanban, type KanbanColumn, type SprintTask } from '../-types';
+import type { SprintSimple } from '~/models/simple/sprint.model';
 
 export type BoardsResponse = {
   boards: KanbanColumn[];
 } & Kanban;
+
+// Runtime shim for Vite ESM compatibility
+export const BoardsResponse = {} as any;
 
 const strapiClient = useStrapiClient();
 const { create } = useStrapiUtils();

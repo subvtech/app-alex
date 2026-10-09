@@ -65,7 +65,8 @@
 
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { MemberItem, useGetProjectMembers } from '../../-composables/useMember';
+import { useGetProjectMembers } from '../../-composables/useMember';
+import type { MemberItem } from '../../-composables/useMember';
 import Card from './Card.vue';
 
 interface AddMemberDialog {

@@ -1,7 +1,7 @@
 import Paragraph from '@editorjs/paragraph';
-import { OpenAI, OpenAIError } from 'openai';
+import { OpenAI } from 'openai';
 import { createApp } from 'vue';
-import {
+import type {
   TAITextCSS,
   TAITextCallback,
   TAITextConstructor,
