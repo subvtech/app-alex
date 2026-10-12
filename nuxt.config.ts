@@ -15,6 +15,7 @@ const {
 } = process.env;
 
 export default defineNuxtConfig({
+  compatibilityDate: '2025-01-01',
   alias: {
     '@nuxtjs/strapi/dist/runtime/types': fileURLToPath(new URL('./types/strapi-runtime-types.ts', import.meta.url)),
     '@nuxtjs/strapi/dist/runtime/types/v4': fileURLToPath(new URL('./types/strapi-runtime-types.ts', import.meta.url)),
@@ -54,7 +55,7 @@ export default defineNuxtConfig({
   ],
   testUtils: {},
   pinia: {
-    autoImports: ['defineStore', 'storeToRefs'],
+    storesDirs: ['./stores/**'],
   },
   image: {
     strapi: {
