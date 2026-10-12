@@ -16,7 +16,7 @@
         :width="6"
       ></v-progress-circular>
       <div v-else>
-        <img class="emptyProjects-img" src="public/images/emptyCourses.svg" alt="Empty Projects" />
+        <img class="emptyProjects-img" src="/images/emptyCourses.svg" alt="Empty Projects" />
         <p class="text-h3 text-gray-600 text-center">
           {{
             $t('pages.courses.emptyStateText', {
@@ -230,7 +230,7 @@
         </template>
         <template #no-data>
           <div class="tw-flex tw-flex-grow tw-justify-center tw-items-center tw-flex-col">
-            <img class="emptyProjects-img" src="public/images/emptyCourses.svg" alt="Empty Projects" />
+            <img class="emptyProjects-img" src="/images/emptyCourses.svg" alt="Empty Projects" />
             <p class="text-h3 text-gray-600 text-center">
               {{
                 $t('pages.classes.noData', {

@@ -83,7 +83,7 @@
           </div>
         </div>
         <div v-else>
-          <img src="public/images/emptyTrail.svg" />
+          <img src="/images/emptyTrail.svg" />
           <p class="text-gray-400 text-h3 empty-state-text text-center">
             {{ $t('pages.trailId.overview.emptyState') }}
           </p>

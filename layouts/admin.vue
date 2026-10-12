@@ -13,8 +13,8 @@
         <div class="my-4 w-100 d-flex" :class="clipped ? '' : 'justify-center'" style="max-height: 28px">
           <div>
             <NuxtLink to="/">
-              <img v-if="clipped" src="public/images/alex-mini.svg" height="28" width="43" />
-              <img v-else src="public/images/alex.svg" height="28" width="84" />
+              <img v-if="clipped" src="/images/alex-mini.svg" height="28" width="43" />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
             </NuxtLink>
           </div>
         </div>

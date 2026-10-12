@@ -5,7 +5,7 @@
         <div class="tw-flex tw-justify-center tw-items-center tw-h-full tw-border-yellow-200">
           <img
             :alt="$t('pages.login.alt')"
-            src="public/images/imagem_login.png"
+            src="/images/imagem_login.png"
             class="card-imagem-imagem my-5 tw-bg-contain"
           />
         </div>
@@ -91,7 +91,7 @@
               class="mx-auto w-[306px] max-w-full [&>div]:flex [&>div]:justify-center [&>iframe]:!block [&>iframe]:!h-[40px] [&>iframe]:!rounded-md"
             ></div>
             <v-btn block class="card-btn metamask d-flex" :loading="logging2" @click="metalogin">
-              <img src="public/images/metamask.png" alt="" />
+              <img src="/images/metamask.png" alt="" />
               <span>{{ $t('pages.login.metamask.btn') }}</span>
             </v-btn>
           </div>
