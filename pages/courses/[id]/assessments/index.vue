@@ -186,7 +186,7 @@ const dropdownItems = (assessments: assessment) => [
       v-else-if="!assessments?.length"
       class="d-flex align-center justify-center flex-column tw-h-full tw-min-h-[400px]"
     >
-      <img src="public/svg/emptyAssessments.svg" alt="Empty trails" />
+      <img src="/svg/emptyAssessments.svg" alt="Empty trails" />
       <p class="text-center text-gray-400 text-h3 mt-4">{{ $t('pages.assessments.emptyStateText') }}</p>
     </div>
     <div v-else>
