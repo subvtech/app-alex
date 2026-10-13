@@ -1,5 +1,5 @@
-import { Colors } from './column/Header.vue';
-import { Accept } from './column/index.vue';
+import type { Colors } from './column/Header.vue';
+import type { Accept } from './column/index.vue';
 
 export interface GenericItem<U> {
   group: string;
@@ -13,3 +13,7 @@ export interface Column<U = object> {
   accept?: Accept<GenericItem<U>> | null;
   disable?: boolean;
 }
+
+// Runtime shims for Vite ESM compatibility
+export const GenericItem = {} as any;
+export const Column = {} as any;

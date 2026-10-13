@@ -1,7 +1,7 @@
-import { InvitationLinkSimple } from './InvitationLinkSimple.model';
-import { ClassSimple } from './classSimple.model';
+import type { InvitationLinkSimple } from './InvitationLinkSimple.model';
+import type { ClassSimple } from './classSimple.model';
 
-const LearningPlanType = {
+export const LearningPlanType = {
   COURSE: 'course',
   PROJECT: 'project',
   COURSE_PROJECT: 'course_project',
@@ -48,3 +48,5 @@ export interface LearningPlanSimple {
   trails?: number;
   userIsFacilitator?: boolean;
 }
+export const LearningPlanSimple = {};
+

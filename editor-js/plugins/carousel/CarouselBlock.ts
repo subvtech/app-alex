@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { BlockToolConstructorOptions } from '@editorjs/editorjs';
+import type { BlockToolConstructorOptions } from '@editorjs/editorjs';
 import Carousel from './Carousel.vue';
 import { vuetify } from '@/plugins/vuetify';
 

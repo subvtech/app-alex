@@ -39,7 +39,7 @@ import Paragraph from '@editorjs/paragraph';
 import Warning from '@editorjs/warning';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
-import { Upload } from '../models/upload.model';
+import type { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
 import Fileset from '../editor-js/plugins/fileset/filesetBlock';

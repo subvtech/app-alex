@@ -1,4 +1,4 @@
-import type { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
+import type { WritableComputedRef } from 'vue';
 import { createI18n } from 'vue-i18n';
 import { type ElementType, literalArray } from '../utils';
 import { useImportLanguages } from './useImportedLanguages';
@@ -131,6 +131,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'projects/create',
     'projects/sprint',
     'projects/individual_learning',
+    'projects/settings',
   ]);
   const layouts = await useImportLanguages('layouts', lang, ['default', 'error']);
   i18n.global.setLocaleMessage(lang, {

@@ -1,4 +1,4 @@
-import { Strapi4RequestParams } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4RequestParams } from '@nuxtjs/strapi/dist/runtime/types';
 
 export function formatResult<T>(result: any): T {
   const resultFormatted = { id: result.id, ...result.attributes };

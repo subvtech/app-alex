@@ -101,6 +101,10 @@
   </div>
 </template>
 
+<script lang="ts">
+export const contributionType = {};
+</script>
+
 <script setup lang="ts">
 interface editorData {
   time: number;

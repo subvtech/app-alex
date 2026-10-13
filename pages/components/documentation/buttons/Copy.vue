@@ -28,9 +28,9 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
-import { CopyButtonComponentType } from '~/components/alex/documentation/buttons/Copy.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { CopyButtonComponentType } from '~/components/alex/documentation/buttons/Copy.vue';
 
 definePageMeta({
   layout: 'components',

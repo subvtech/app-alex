@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TrailSimple } from '@/models/simple/trailSimple.model';
+import type { TrailSimple } from '@/models/simple/trailSimple.model';
 import EmptyState from './-components/EmptyState.vue';
 import Loader from './-components/Loader.vue';
 

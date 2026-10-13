@@ -1,4 +1,4 @@
-import { TaskMemberStatus } from './taskSimple.model';
+import type { TaskMemberStatus } from './taskSimple.model';
 
 export interface RecentTask {
   id: number;
@@ -9,3 +9,5 @@ export interface RecentTask {
   parent_name?: string | null;
   tags: { id: number; text: string }[];
 }
+export const RecentTask = {};
+

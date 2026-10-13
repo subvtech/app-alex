@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { TabType } from '~/components/alex/custom/Tabs.vue';
+import type { TabType } from '~/components/alex/custom/Tabs.vue';
 const i18n = useI18n();
 const route = useRoute();
 const router = useRouter();

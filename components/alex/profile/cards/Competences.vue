@@ -65,6 +65,9 @@
   </alex-custom-card>
 </template>
 
+<script lang="ts">
+export const CompetencesComponentType = {} as any;
+</script>
 <script setup lang="ts">
 const { create, update } = useStrapi();
 const { find } = useStrapiUtils();

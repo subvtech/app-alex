@@ -1,13 +1,13 @@
-import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
 
-const TaskMemberStatus = {
+export const TaskMemberStatus = {
   TO_DO: 'to_do',
   IN_PROGRESS: 'in_progress',
   IN_REVIEW: 'in_review',
   DONE: 'done',
 } as const;
 
-const TaskMemberRole = {
+export const TaskMemberRole = {
   STANDARD: 'standard',
   IN_CHARGE: 'in_charge',
 } as const;
@@ -25,3 +25,5 @@ export interface TaskMember {
   in_review_at: Date;
   deliverable: any;
 }
+export const TaskMember = {};
+

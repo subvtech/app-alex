@@ -187,12 +187,12 @@
 <script setup lang="ts">
 import Options from '@/pages/projects/[id]/tasks/-components/Options.vue';
 import { isBefore } from 'date-fns';
-import { WritableComputedRef } from 'vue';
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { RestrictionValue } from '~/components/alex/learningplan/task/Restrictions.vue';
+import type { WritableComputedRef } from 'vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { RestrictionValue } from '~/components/alex/learningplan/task/Restrictions.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
-import { SprintTask } from '../-types';
+import type { SprintTask } from '../-types';
 import Members from './members/Index.vue';
 
 interface DrawerProjectProps {

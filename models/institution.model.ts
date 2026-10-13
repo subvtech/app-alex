@@ -14,3 +14,5 @@ export interface Institution {
   socialName: string;
   users?: User[];
 }
+export const Institution = {};
+

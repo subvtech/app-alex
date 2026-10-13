@@ -32,9 +32,13 @@
   </alex-custom-card>
 </template>
 
+<script lang="ts">
+export const OverviewComponentType = {};
+</script>
+
 <script setup lang="ts">
 import { Mask } from 'maska';
-import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
+import type { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 
 export interface OverviewComponentType {
   email?: string;

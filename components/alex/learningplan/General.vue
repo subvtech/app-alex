@@ -179,9 +179,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
-import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
-import { ClassSimple } from '@/models/simple/classSimple.model';
+import type { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
+import type { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import type { ClassSimple } from '@/models/simple/classSimple.model';
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;

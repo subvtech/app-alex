@@ -1,4 +1,4 @@
-import { SUPPORT_LOCALES_TYPE } from './useVueI18n';
+import type { SUPPORT_LOCALES_TYPE } from './useVueI18n';
 export const useImportLanguages = async (
   path: 'components' | 'layouts' | 'pages',
   lang: SUPPORT_LOCALES_TYPE,

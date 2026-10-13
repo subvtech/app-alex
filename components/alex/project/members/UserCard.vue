@@ -8,7 +8,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Upload } from '~/models/upload.model';
+import type { Upload } from '~/models/upload.model';
 
 export interface ProjectMemberUserCardProps {
   name: string;

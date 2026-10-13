@@ -1,6 +1,6 @@
 import { QueryClient, useMutation } from '@tanstack/vue-query';
-import { TaskSimple } from '~/models/simple/taskSimple.model';
-import { SprintsResponse } from './useSprints';
+import type { TaskSimple } from '~/models/simple/taskSimple.model';
+import type { SprintsResponse } from './useSprints';
 
 const { create } = useStrapiUtils();
 const strapi = useStrapi();

@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+import type { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 import Tiptap from '~/components/TipTap/index.vue';
 
 const props = defineProps<{ studentId?: number; trailId?: number }>();

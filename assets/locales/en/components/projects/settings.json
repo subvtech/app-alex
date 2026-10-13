@@ -1,0 +1,29 @@
+{
+  "title": "Project Settings",
+  "general": {
+    "title": "General Information",
+    "name": "Project name",
+    "description": "Project description",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "identifier": {
+      "label": "Project identifier",
+      "unique": "Identifier is unavailable",
+      "tooltip": "The identifier distinguishes your project from others and lets people access it through its URL."
+    },
+    "save": "Save changes",
+    "update": "Project information successfully updated"
+  },
+  "delete": {
+    "title": "Delete project",
+    "warning": "Deleting the project will make its associated content unavailable. This action cannot be undone.",
+    "button": "Delete project",
+    "confirmation": "Do you really wish to delete this project?",
+    "label": "Enter the word:",
+    "placeholder": "Enter the word",
+    "word": "Delete",
+    "cancel": "Cancel",
+    "matchError": "The entered word does not match Delete",
+    "update": "Project successfully deleted"
+  }
+}

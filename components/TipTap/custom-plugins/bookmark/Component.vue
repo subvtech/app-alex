@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
+import { NodeViewWrapper, type NodeViewProps } from '@tiptap/vue-3';
 
 interface urlRes {
   title: string;

@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { CardHeaderProps } from './Header.vue';
+import type { CardHeaderProps } from './Header.vue';
 
 export interface CardComponentType extends CardHeaderProps {
   alignContent?: 'align-center' | 'align-start' | 'align-end';

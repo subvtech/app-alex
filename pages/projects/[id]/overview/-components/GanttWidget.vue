@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import Gantt, { GanttInstance, GanttItem, GanttSprint, GanttViewType } from '@/components/Gantt.vue';
+import Gantt, {
+  type GanttInstance,
+  type GanttItem,
+  type GanttSprint,
+  GanttViewType,
+} from '@/components/Gantt.vue';
 
 export interface GanttWidgetProps {
   items: GanttItem[];

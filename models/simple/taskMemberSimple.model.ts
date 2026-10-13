@@ -11,3 +11,5 @@ export interface TaskMember {
   task?: TaskSimple;
   task_submissions?: TaskSubmissionSimple[];
 }
+
+export const TaskMember = {};

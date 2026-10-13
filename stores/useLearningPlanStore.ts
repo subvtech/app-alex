@@ -1,6 +1,7 @@
-import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
-import { LearningPlanMemberSimple, MemberStatus, MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
-import { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
+import type { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
+import { MemberStatus, MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
+import type { LearningPlanMemberSimple } from '@/models/simple/learningPlanMemberSimple.model';
+import type { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 

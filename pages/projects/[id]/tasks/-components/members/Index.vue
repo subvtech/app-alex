@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { MemberItem, useGetLearningGroup, useRemoveMember, useUpdateMember } from '../../-composables/useMember';
+import { useGetLearningGroup, useRemoveMember, useUpdateMember } from '../../-composables/useMember';
+import type { MemberItem } from '../../-composables/useMember';
 import AddMemberDialog from './AddMemberDialog.vue';
 import Card from './Card.vue';
 interface MembersProps {

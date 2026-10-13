@@ -21,6 +21,9 @@
     </div>
   </div>
 </template>
+<script lang="ts">
+export const BoxItemType = {};
+</script>
 <script setup lang="ts">
 export interface BoxItemType {
   label: 'courses' | 'students' | 'trails' | 'projects' | 'assignments';

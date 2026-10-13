@@ -85,6 +85,11 @@
   </v-expansion-panels>
 </template>
 
+<script lang="ts">
+export const AccordionItemType = {};
+export const AccordionComponentType = {};
+</script>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useDragDrop } from '@/composables/useDragDrop';

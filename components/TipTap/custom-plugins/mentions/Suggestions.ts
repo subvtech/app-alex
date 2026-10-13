@@ -1,7 +1,7 @@
 import { VueRenderer } from '@tiptap/vue-3';
 import tippy from 'tippy.js';
 
-import { MentionUserPropsArray } from '../../index.vue';
+import type { MentionUserPropsArray } from '../../index.vue';
 import MentionList from './MentionList.vue';
 
 export default {

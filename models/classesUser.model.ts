@@ -1,5 +1,5 @@
-import { Class } from './class.model';
-import { User } from './user.model';
+import type { Class } from './class.model';
+import type { User } from './user.model';
 
 export interface ClassesUser {
   id: number;

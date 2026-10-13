@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/vue-query';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskStatus } from '~/models/simple/taskSimple.model';
 
 export const useCreateTask = () =>
   useMutation({

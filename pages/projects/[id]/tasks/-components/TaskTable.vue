@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { avatar } from '@/components/alex/custom/AvatarGroup.vue';
+import type { avatar } from '@/components/alex/custom/AvatarGroup.vue';
 import TreeView from '@/components/alex/custom/treeview/index.vue';
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 // import { TaskStatus } from '~/models/simple/taskSimple.model';
-import { SprintTask } from '../-types';
+import type { SprintTask } from '../-types';
 import { colors } from '@unovis/ts';
 
 interface LocalSprintTask extends SprintTask {

@@ -114,6 +114,10 @@
   />
 </template>
 
+<script lang="ts">
+export const TaskItem = {};
+</script>
+
 <script setup lang="ts">
 import type { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';

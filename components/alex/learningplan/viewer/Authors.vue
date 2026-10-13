@@ -63,9 +63,9 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { User } from '~/models/user.model';
-import { Structure } from '~/models/structure.model';
+import type { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import type { User } from '~/models/user.model';
+import type { Structure } from '~/models/structure.model';
 
 const i18n = useI18n();
 

@@ -117,13 +117,13 @@
         :mandatory="false"
         :tabs="links"
         class="tabs"
-        @update:model-value="emit('select:option', selectedOption)"
+        @update:model-value="emit('select:option', $event)"
       />
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { TabType } from '@/components/alex/custom/Tabs.vue';
+import type { TabType } from '@/components/alex/custom/Tabs.vue';
 const emit = defineEmits(['select:option', 'display:settings', 'view-as-student']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();

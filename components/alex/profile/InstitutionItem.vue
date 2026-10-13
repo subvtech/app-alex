@@ -26,6 +26,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export const InstitutionComponentType = {};
+export const InstitutionItemEmits = {};
+</script>
+
 <script setup lang="ts">
 export interface InstitutionItemEmits {
   (e: 'delete:institution', value: number): void; // triggers when the user clicks on the delete button

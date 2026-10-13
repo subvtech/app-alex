@@ -44,6 +44,10 @@
   </v-menu>
 </template>
 
+<script lang="ts">
+export const AlexDropdownItem = {};
+</script>
+
 <script setup lang="ts">
 import type { ButtonProps } from '@/components/alex/custom/Button.vue';
 import type { AlexListItem } from '@/components/alex/custom/list-item/index.vue';

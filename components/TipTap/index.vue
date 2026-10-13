@@ -14,8 +14,12 @@
   </client-only>
 </template>
 
+<script lang="ts">
+export const MentionUserPropsArray = {};
+</script>
+
 <script setup lang="ts">
-import { Editor, EditorContent, AnyExtension } from '@tiptap/vue-3';
+import { Editor, EditorContent, type AnyExtension } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/extension-bubble-menu';
 import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';

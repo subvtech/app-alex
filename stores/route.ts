@@ -1,4 +1,4 @@
-import { UnwrapRef } from 'nuxt/dist/app/compat/capi';
+import type { UnwrapRef } from 'vue';
 import { defineStore } from 'pinia';
 import type { RoutesNamesList } from '@typed-router';
 

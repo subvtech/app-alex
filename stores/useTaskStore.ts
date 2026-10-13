@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { TaskSimple } from '@/models/simple/taskSimple.model';
+import type { TaskSimple } from '@/models/simple/taskSimple.model';
 export const useTaskStore = defineStore('task', () => {
   const { find } = useStrapiUtils();
   const task = ref<TaskSimple>();

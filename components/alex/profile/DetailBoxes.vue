@@ -13,8 +13,11 @@
     />
   </div>
 </template>
+<script lang="ts">
+export const DetailsComponentType = {};
+</script>
 <script setup lang="ts">
-import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
+import type { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 
 export interface DetailsComponentType {
   boxes: BoxItemType[];
