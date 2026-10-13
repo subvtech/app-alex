@@ -103,11 +103,14 @@ export const orderEvents = (events: TaskEvent[]) => {
         time: current.updatedAt,
         user: current?.learning_plan_member?.user?.fullname,
       };
+
       const group = eventsGroups.find((group) => isSameDay(currentDate, new Date(group.date)));
+
       if (group) {
         group.events.push(currentElement);
         return;
       }
+
       eventsGroups.push({
         date: currentDate,
         events: [currentElement],
