@@ -32,10 +32,7 @@ export function withTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   return Promise.race([promise, timeout]);
 }
 
-export function isEnumValue<T>(
-  enumObject: Record<string, T>,
-  value: string,
-): boolean {
+export function isEnumValue<T>(enumObject: Record<string, T>, value: string): boolean {
   return Object.values(enumObject).includes(value as T);
 }
 
@@ -104,7 +101,7 @@ export const orderEvents = (events: TaskEvent[]) => {
       const currentElement: EventProps = {
         action: current.event,
         time: current.updatedAt,
-        user: current.learning_plan_member.user.fullname,
+        user: current?.learning_plan_member?.user?.fullname,
       };
       const group = eventsGroups.find((group) => isSameDay(currentDate, new Date(group.date)));
       if (group) {
