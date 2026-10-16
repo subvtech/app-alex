@@ -1,19 +1,28 @@
 <template>
-  <alex-custom-dialog v-model="model" title="Adicionar grupos" no-footer>
-    <template #activator="{ isActive, props: activatorProps }">
-      <slot name="activator" :is-active="isActive" :props="activatorProps" />
-    </template>
-    <div class="tw-flex tw-gap-4">
-      <alex-inputs-text-field
-        v-model="search"
-        name="search"
-        placeholder="Buscar Grupos do curso"
-        class="tw-w-full"
-        density="comfortable"
-      />
+  <div class="inline-group-picker">
+    <div class="tw-flex tw-items-center tw-justify-between tw-gap-4 mb-3">
       <alex-custom-button size="large" variant="secondary" prepend-icon="mdi-plus" @click="handleOpenCreateGroup()">{{
         $t('components.learningPlan.drawer.task.dialog.newGroup')
       }}</alex-custom-button>
+      <div class="select-all-control">
+        <alex-inputs-checkbox
+          class="select-all-checkbox checkbox"
+          :model-value="selectAllStatus === 1"
+          :indeterminate="selectAllStatus === -1"
+          :disabled="!availableGroups.length || addingGroups"
+          @click.stop="toggleSelectAll"
+        />
+        <span class="text-body-3 text-gray-700 select-all-label">Selecionar todos</span>
+        <alex-custom-button
+          variant="secondary"
+          prepend-icon="mdi-plus"
+          :disabled="!selectedGroups.length || addingGroups"
+          :loading="addingGroups"
+          @click="addSelectedGroups"
+        >
+          Adicionar
+        </alex-custom-button>
+      </div>
     </div>
     <v-expansion-panels class="task-student-card group" multiple>
       <v-expansion-panel v-for="classValue in filteredClasses" :key="classValue.id">
@@ -27,7 +36,10 @@
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
             :group="group"
-            :unavailable="isUnvailable(group)"
+            :unavailable="isUnavailableForSelection(group)"
+            selectable
+            :selected="isGroupSelected(group)"
+            @toggle-select="toggleGroupSelection"
             @add-members="(member) => openDialog(member)"
           />
           <p v-if="!classValue.learning_plan_groups?.length" class="text-gray-500">
@@ -36,7 +48,7 @@
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
-  </alex-custom-dialog>
+  </div>
 
   <alex-learningplan-task-dialog-create-group
     v-model="addGroupDialog"
@@ -71,27 +83,35 @@ interface AddStudent {
   finishAt: string | null;
   canSubmitAfter: boolean;
   taskMembers?: TaskMember[];
+  search?: string;
 }
 
-const model = defineModel<boolean>({ required: true });
 const props = withDefaults(defineProps<AddStudent>(), {
   taskMembers: () => [],
+  search: '',
 });
 type Emits = {
   'add-group': [id: number];
 };
 const emit = defineEmits<Emits>();
 const strapi = useStrapiUtils();
-// const { setMessage } = useMessageStore();
-// const { t } = useI18n();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
 
 // Dialog
 const groupDialog = ref<boolean>(false);
 const addGroupDialog = ref<boolean>(false);
 const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
 const allGroups = ref<LearningPlanGroupSimple[]>([]);
-
-const search = ref('');
+const selectedGroups = ref<LearningPlanGroupSimple[]>([]);
+const addingGroups = ref(false);
+const search = computed(() =>
+  props.search
+    .normalize('NFD')
+    .replace(/[\u0300-\u036F]/g, '')
+    .toLowerCase()
+    .trim(),
+);
 
 const allMembers = computed(() => {
   const membersIds: number[] = [];
@@ -224,27 +244,124 @@ async function loadAllTaskGroups() {
 
 const filteredClasses = computed(() => {
   if (!search.value) return classes.value.data;
-  const lowerCaseSearch = search.value.toLowerCase();
 
   return classes.value.data.map((classValue) => ({
     ...classValue,
-    learning_plan_groups: classValue.learning_plan_groups?.filter((group) =>
-      group.title.toLowerCase().includes(lowerCaseSearch),
-    ),
+    learning_plan_groups: classValue.learning_plan_groups?.filter((group) => {
+      const matches = (value?: string | null) =>
+        (value ?? '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036F]/g, '')
+          .toLowerCase()
+          .includes(search.value);
+      return (
+        matches(group.title) ||
+        matches(classValue.name) ||
+        group.group_members.some(
+          (member) =>
+            matches(member.student_member.user.fullname) ||
+            matches(member.student_member.user.email) ||
+            matches(member.student_member.user.username),
+        )
+      );
+    }),
   }));
 });
-
-watch(model, (value) => {
-  if (value) {
-    execute();
-    loadAllTaskGroups();
+const groupMemberIds = (group: LearningPlanGroupSimple) =>
+  new Set(group.group_members.map((member) => member.student_member.id));
+const groupsOverlap = (left: LearningPlanGroupSimple, right: LearningPlanGroupSimple) => {
+  const leftMemberIds = groupMemberIds(left);
+  return right.group_members.some((member) => leftMemberIds.has(member.student_member.id));
+};
+const isUnavailableForSelection = (group: LearningPlanGroupSimple) =>
+  isUnvailable(group) ||
+  selectedGroups.value.some((selectedGroup) => selectedGroup.id !== group.id && groupsOverlap(selectedGroup, group));
+const availableGroups = computed(() =>
+  filteredClasses.value.flatMap((classValue) =>
+    (classValue.learning_plan_groups || []).filter((group) => !isUnavailableForSelection(group)),
+  ),
+);
+const isGroupSelected = (group: LearningPlanGroupSimple) =>
+  selectedGroups.value.some((selectedGroup) => selectedGroup.id === group.id);
+const selectAllStatus = computed(() => {
+  const selectedIds = new Set(selectedGroups.value.map((group) => group.id));
+  const selectedCount = availableGroups.value.filter((group) => selectedIds.has(group.id)).length;
+  if (!selectedCount) return 0;
+  return selectedCount === availableGroups.value.length ? 1 : -1;
+});
+const toggleGroupSelection = (group: LearningPlanGroupSimple) => {
+  if (isGroupSelected(group)) {
+    selectedGroups.value = selectedGroups.value.filter((selectedGroup) => selectedGroup.id !== group.id);
+  } else if (!isUnavailableForSelection(group)) {
+    selectedGroups.value = [...selectedGroups.value, group];
   }
+};
+const toggleSelectAll = () => {
+  const visibleIds = new Set(availableGroups.value.map((group) => group.id));
+  const selectedIds = new Set(selectedGroups.value.map((group) => group.id));
+  const allVisibleSelected =
+    availableGroups.value.length > 0 && availableGroups.value.every((group) => selectedIds.has(group.id));
+  if (allVisibleSelected) {
+    selectedGroups.value = selectedGroups.value.filter((group) => !visibleIds.has(group.id));
+    return;
+  }
+  const newGroups: LearningPlanGroupSimple[] = [];
+  for (const group of availableGroups.value) {
+    if (selectedIds.has(group.id)) continue;
+    if (newGroups.some((selectedGroup) => groupsOverlap(selectedGroup, group))) continue;
+    newGroups.push(group);
+  }
+  selectedGroups.value = [...selectedGroups.value, ...newGroups];
+};
+const addSelectedGroups = async () => {
+  if (!selectedGroups.value.length || addingGroups.value) return;
+  if (!props.startAt || !props.finishAt) {
+    setMessage(t('components.learningPlan.drawer.task.pleaseFillDates'), 'warning', true);
+    return;
+  }
+  addingGroups.value = true;
+  const addedGroupIds: number[] = [];
+  try {
+    for (const group of selectedGroups.value) {
+      if (isUnvailable(group)) continue;
+      await strapi.create('task-members', {
+        status: 'to_do',
+        can_submit_after_deadline: props.canSubmitAfter,
+        started_at: props.startAt,
+        finished_at: props.finishAt,
+        task: props.taskId,
+        learning_plan_group: group.id,
+      });
+      addedGroupIds.push(group.id);
+    }
+    selectedGroups.value = selectedGroups.value.filter((group) => !addedGroupIds.includes(group.id));
+    emit('add-group', 0);
+    await execute();
+    await loadAllTaskGroups();
+    if (addedGroupIds.length) {
+      setMessage(t('components.learningPlan.drawer.task.dialog.message.added'), 'success', true);
+    }
+  } catch (error) {
+    selectedGroups.value = selectedGroups.value.filter((group) => !addedGroupIds.includes(group.id));
+    if (addedGroupIds.length) {
+      emit('add-group', 0);
+      await execute();
+      await loadAllTaskGroups();
+      selectedGroups.value = selectedGroups.value.filter((group) => !isUnvailable(group));
+    }
+    setMessage(t('components.learningPlan.drawer.task.dialog.message.createError'), 'error', true);
+  } finally {
+    addingGroups.value = false;
+  }
+};
+
+onMounted(() => {
+  loadAllTaskGroups();
 });
 
 watch(
   () => props.taskMembers,
   () => {
-    if (!model.value) return;
     loadAllTaskGroups();
   },
 );
@@ -267,6 +384,19 @@ watch(
   min-height: 30px;
   justify-content: center;
   margin-bottom: 0 !important;
+}
+.select-all-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.select-all-checkbox.container {
+  width: 30px !important;
+  max-width: 30px !important;
+  gap: 0 !important;
+}
+.select-all-label {
+  margin-left: 0;
 }
 .task-student-card {
   box-shadow: none !important;
