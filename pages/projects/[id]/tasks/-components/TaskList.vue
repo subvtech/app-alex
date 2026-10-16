@@ -367,11 +367,14 @@ const findTaskById = (id) => {
 };
 
 const handleAddTask = (task?: SprintTask, sprintId?: number) => {
+  const sprint = sprintId ? sprintsValue.value.sprints.find((item) => item.id === sprintId) : undefined;
   const newTask = {
     id: Math.round(Math.random() * 123456),
     position: getHigherIndex(sprintId),
     status: 'draft',
     title: '',
+    start_at: sprint?.start_at,
+    finish_at: sprint?.end_at,
     organization: 'standard',
     type: 'group',
     local: true,
@@ -395,6 +398,13 @@ const handleAddTask = (task?: SprintTask, sprintId?: number) => {
     let newTasks: TaskSimple[] = [];
     if (!newTask.story && !newTask.epic) {
       newTasks = [...oldTasks, newTask];
+      if (isSprint) {
+        data.sprints[sprintIdx].tasks = newTasks;
+        return {
+          ...data,
+          sprints: data.sprints,
+        };
+      }
       return {
         ...data,
         backlog: newTasks,
@@ -501,20 +511,31 @@ const getSlideTransition = () => {
 };
 
 const handleCreateTask = async (index: number, sprint?: SprintSimple) => {
+  if (createdIndex.value === index) {
+    return;
+  }
+
   if (tasksTitles.value[index] && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
     createdIndex.value = index;
+    isCreatingTask.value = true;
     const learningPlanId = learningPlanStore.learningPlan.id;
-    const higherIndex = getHigherIndex();
-    await createTask({
-      title: tasksTitles.value[index],
-      learningPlanId,
-      position: higherIndex,
-      organization: 'standard',
-      sprint,
-    });
+    const higherIndex = getHigherIndex(sprint?.id);
+    try {
+      await createTask({
+        title: tasksTitles.value[index],
+        learningPlanId,
+        position: higherIndex,
+        organization: 'standard',
+        sprint,
+        startAt: sprint?.start_at,
+        finishAt: sprint?.end_at,
+      });
+    } finally {
+      createdIndex.value = undefined;
+      isCreatingTask.value = false;
+    }
   }
   tasksTitles.value[index] = '';
-  isCreatingTask.value = false;
 };
 
 const showErrorMessage = (message: string, err?: ApplicationError) => {
@@ -564,17 +585,22 @@ const createItem = async (task: {
   local: boolean;
   organization: 'standard' | 'story' | 'epic';
   position: number;
-  sprint: SprintSimple;
+  sprint: number | SprintSimple;
   story: number;
   title: string;
 }) => {
+  const sprintId = typeof task.sprint === 'number' ? task.sprint : task.sprint?.id;
+  const sprint = sprintsValue.value.sprints.find((item) => item.id === sprintId);
+
   await createTask({
     title: task.title,
     learningPlanId: learninplanId.value,
     organization: task.organization || 'standard',
     position: task.position,
     parentTask: task.story ? task.story : task.epic,
-    sprint: task.sprint,
+    sprint,
+    startAt: sprint?.start_at,
+    finishAt: sprint?.end_at,
   });
   queryClient.invalidateQueries({ queryKey: ['groupings', learninplanId] });
   await refetchSprints();
@@ -659,7 +685,7 @@ const handleDeleteSprint = async (sprintId?: number) => {
 };
 
 // OnDrop
-const onDrop = (item, __, e) => {
+const onDrop = async (item, __, e) => {
   if (!hoveredSprint.value) {
     hoveredSprint.value = sprintsValue.value.sprints.find(({ title }) => title === item?.title) ?? null;
   }
@@ -675,19 +701,17 @@ const onDrop = (item, __, e) => {
     return;
   }
 
-  updateStatusTask({ id: item.id, sprint: hoveredSprint.value.id });
-  update('tasks', Number(item.id), {
-    sprint: hoveredSprint.value?.id ?? null,
-  })
-    .then(() => {
-      setMessage(t(`${i18dir}.moved`, { item: hoveredSprint.value.title }), 'success', true);
-      refetchSprints();
-    })
-    .finally(() => {
-      hoveredSprint.value = null;
-    });
-
+  const targetSprint = hoveredSprint.value;
   dragDrop.dragEnd();
+  try {
+    await updateStatusTask({ id: item.id, sprint: targetSprint.id });
+    setMessage(t(`${i18dir}.moved`, { item: targetSprint.title }), 'success', true);
+    await refetchSprints();
+  } catch {
+    setMessage(t(`${i18dir}.moved_fail`), 'error', true);
+  } finally {
+    hoveredSprint.value = null;
+  }
 };
 
 const updateTable = async (message) => {
