@@ -15,10 +15,9 @@
     <div class="px-6 min-h-150">
       <alex-custom-skeleton v-if="isEditorLoading" class="w-100 height-150 bg-blue" color="gray-200" />
       <div v-else-if="isTiptapDocument && editMode" class="resource-list">
-        <div v-for="(node, index) in trailNodes" :key="nodeKey(node, index)" class="resource-item">
+        <div v-for="(node, index) in trailNodes" :key="nodeKey(node, index)" class="resource-item flex">
           <v-checkbox
             :model-value="selectedNodeIndexes.includes(index)"
-            :label="resourceLabel(node)"
             hide-details
             density="compact"
             @update:model-value="toggleNode(index, $event)"
@@ -27,14 +26,20 @@
         </div>
       </div>
       <div v-else-if="legacyBlocks.length && editMode" class="resource-list">
-        <div v-for="(block, index) in legacyBlocks" :key="block.id" class="resource-item">
-          <v-checkbox
-            :model-value="selectedLegacyIndexes.includes(index)"
-            :label="resourceLabel(block)"
-            hide-details
-            density="compact"
-            @update:model-value="toggleLegacyNode(index, $event)"
-          />
+        <div
+          v-for="(block, index) in legacyBlocks"
+          :key="block.id"
+          class="resource-item grid grid-cols-[auto_1fr] gap-4"
+        >
+          <div class="checkbox-container">
+            <v-checkbox
+              :model-value="selectedLegacyIndexes.includes(index)"
+              hide-details
+              density="compact"
+              class=""
+              @update:model-value="toggleLegacyNode(index, $event)"
+            />
+          </div>
           <AppEditor
             :key-id="`task-resource-${selectedTrail.id}-${block.id}`"
             :data="legacyBlockDocument(block)"
@@ -273,11 +278,23 @@ defineExpose({
   flex-direction: column;
   gap: 16px;
 }
+
 .resource-item {
   border: 1px solid rgb(var(--v-theme-gray-200));
   border-radius: 8px;
   padding: 8px 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
 }
+
+.resource-item:has(input[type='checkbox']:checked) {
+  border-color: #007bff;
+}
+
+.checkbox-container {
+  width: 28px;
+}
+
 .trail-img {
   background-position: center;
 }
