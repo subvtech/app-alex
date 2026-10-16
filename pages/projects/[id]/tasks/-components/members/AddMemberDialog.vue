@@ -1,27 +1,14 @@
 <template>
-  <alex-custom-dialog
-    v-model="model"
-    :title="$t('components.learningPlan.drawer.task.dialog.newMembers')"
-    :main-button-text="$t('components.learningPlan.drawer.task.dialog.add')"
-    :loading="loadingAdd"
-    @on-main-action="handleSubmit"
-    @on-secondary-action="model = false"
-  >
-    <template #activator="{ isActive, props: activatorProps }">
-      <slot name="activator" :is-active="isActive" :props="activatorProps" />
-    </template>
-    <alex-inputs-text-field
-      v-model="search"
-      name="search"
-      class="tw-mb-6"
-      :placeholder="$t('components.learningPlan.drawer.task.dialog.searchMembers')"
-      prepend-inner-icon="mdi-magnify"
-      density="comfortable"
-      hide-details
-    />
-    <p v-if="false" class="text-body-1 text-gray-400 text-center">
-      Parece que todos os alunos foram adicionados a esta tarefa.
-    </p>
+  <div class="inline-member-picker">
+    <div v-if="filteredMembers.length" class="select-all-control mb-2">
+      <alex-inputs-checkbox
+        class="select-all-checkbox checkbox"
+        :model-value="selectAllStatus === 1"
+        :indeterminate="selectAllStatus === -1"
+        @click.stop="toggleSelectAll"
+      />
+      <span class="text-body-3 text-gray-700 select-all-label">Selecionar todos</span>
+    </div>
     <template v-if="filteredMembers.length">
       <Card
         v-for="member in filteredMembers"
@@ -51,16 +38,16 @@
         </p>
       </div>
     </template>
-    <template #footer>
-      <alex-custom-dialog-footer
-        no-secondary-button
-        :main-button-text="'Adicionar'"
-        :main-button-disabled="!hasSelectedMembers || !hasResponsable"
-        @on-main-action="handleSubmit"
-        @on-secondary-action="model = false"
-      />
-    </template>
-  </alex-custom-dialog>
+    <alex-custom-button
+      class="tw-mt-4"
+      variant="secondary"
+      prepend-icon="mdi-plus"
+      :disabled="!hasSelectedMembers || !hasResponsable"
+      @click="handleSubmit"
+    >
+      {{ $t('components.learningPlan.drawer.task.dialog.add') }}
+    </alex-custom-button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -73,12 +60,13 @@ interface AddMemberDialog {
   learningplanId?: number;
   groupId?: number;
   defaultMembers?: LearningPlanGroupMemberSimple[];
+  search?: string;
 }
-const model = defineModel<boolean>({ required: true });
 const props = withDefaults(defineProps<AddMemberDialog>(), {
   learningplanId: undefined,
   groupId: undefined,
   defaultMembers: () => [],
+  search: '',
 });
 type Emits = {
   'add-click': [groupId: number, members: MemberItem[]];
@@ -87,8 +75,6 @@ const emit = defineEmits<Emits>();
 // refs
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
-const search = ref('');
-const loadingAdd = ref(false);
 const learningplanValue = toRef(props, 'learningplanId');
 const selectedMembers = ref<(MemberItem & { responsable: boolean })[]>([]);
 
@@ -110,8 +96,36 @@ const filteredAlreadyMembers = computed(
     }),
 );
 const filteredMembers = computed(
-  () => filteredAlreadyMembers.value?.filter((member) => contains(member.raw.user.fullname, search.value)),
+  () =>
+    filteredAlreadyMembers.value?.filter(
+      (member) =>
+        contains(member.raw.user.fullname, props.search) ||
+        contains(member.raw.user.email, props.search) ||
+        contains(member.raw.user.username, props.search),
+    ),
 );
+const selectAllStatus = computed(() => {
+  const selectedIds = new Set(selectedMembers.value.map((member) => member.id));
+  const selectedCount = filteredMembers.value?.filter((member) => selectedIds.has(member.id)).length || 0;
+  if (!selectedCount) return 0;
+  return selectedCount === filteredMembers.value.length ? 1 : -1;
+});
+const toggleSelectAll = () => {
+  const availableMembers = filteredMembers.value || [];
+  const visibleIds = new Set(availableMembers.map((member) => member.id));
+  const selectedIds = new Set(selectedMembers.value.map((member) => member.id));
+  const allVisibleSelected =
+    availableMembers.length > 0 && availableMembers.every((member) => selectedIds.has(member.id));
+
+  if (allVisibleSelected) {
+    selectedMembers.value = selectedMembers.value.filter((member) => !visibleIds.has(member.id));
+    return;
+  }
+  selectedMembers.value = [
+    ...selectedMembers.value,
+    ...availableMembers.filter((member) => !selectedIds.has(member.id)),
+  ];
+};
 //
 const { data: members } = useGetProjectMembers(learningplanValue, enabledGetMembers);
 const queryClient = useQueryClient();
@@ -152,9 +166,28 @@ const handleUpdateResponsible = (member: MemberItem | null, inCharge: boolean) =
     });
   });
 };
-watch(model, () => {
-  selectedMembers.value = [];
-});
+watch(
+  () => props.groupId,
+  () => {
+    selectedMembers.value = [];
+  },
+);
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.select-all-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.select-all-checkbox.container {
+  width: 30px !important;
+  max-width: 30px !important;
+  gap: 0 !important;
+}
+
+.select-all-label {
+  margin-left: 0;
+}
+</style>
