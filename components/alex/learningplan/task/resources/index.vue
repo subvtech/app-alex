@@ -80,8 +80,9 @@
       v-else-if="selectedTrail"
       ref="editor"
       :selected-trail="selectedTrail"
-      :blocks="blocks"
+      :blocks="resourceBlocks"
       :edit-mode="editMode"
+      :saved-trail-id="resourceTrailId"
     />
     <template v-if="paginationLength > 1 && !selectedTrail" #footer
       ><div class="border-top-gray-100 rounded-b-lg bg-white">
@@ -127,6 +128,8 @@ const props = withDefaults(defineProps<propsType>(), {
   project: false,
 });
 
+const resourceBlocks = ref<(BlockSimple | number)[]>(props.blocks || []);
+const resourceTrailId = ref<number | undefined>(props.trailId);
 const editMode = ref(props.edit);
 
 const learningStructure = computed(() => {
@@ -207,6 +210,8 @@ const trails = computed(() => {
 watch(
   () => props.taskId,
   (id) => {
+    resourceBlocks.value = props.blocks || [];
+    resourceTrailId.value = props.trailId;
     if (![0, -1].includes(id) && learningPlanStore.learningPlan) {
       taskStore.loadTaskData(id, learningPlanStore.learningPlan.id);
     } else {
@@ -216,7 +221,8 @@ watch(
 );
 
 const trail = computed(() => {
-  return trails.value?.find((trail) => trail.id === taskStore.task?.trail?.id);
+  const currentTrailId = resourceTrailId.value ?? taskStore.task?.trail?.id;
+  return trails.value?.find((trail) => trail.id === currentTrailId);
 });
 
 const handleTrailClick = (trail: TrailSimple) => {
@@ -264,7 +270,7 @@ const paginationLength = computed(() => {
   return Math.floor(length / paginationBlock) + (length % paginationBlock ? 1 : 0);
 });
 
-const updateBlocks = async (type: 'ADD' | 'REMOVE', selectedBlocks?: number[]) => {
+const updateBlocks = async (type: 'ADD' | 'REMOVE', selectedBlocks?: (BlockSimple | number)[]) => {
   try {
     isLoading.value = true;
     const blocks = selectedBlocks || (await editor.value?.getSelectedBlocks()) || [];
@@ -285,11 +291,14 @@ const updateBlocks = async (type: 'ADD' | 'REMOVE', selectedBlocks?: number[]) =
 };
 
 const updateTask = async (blocks: (BlockSimple | number)[], type: 'ADD' | 'REMOVE') => {
-  const payload: { trail: number | null; blocks?: BlockSimple[] | number[] } = {
+  const payload: { trail: number | null; blocks: BlockSimple[] | number[] } = {
     trail: type === 'ADD' ? selectedTrail.value?.id || null : null,
+    blocks: type === 'ADD' ? blocks.map((block) => (typeof block === 'number' ? block : block.id)) : [],
   };
-  if (type === 'REMOVE' || blocks.length) payload.blocks = type === 'ADD' ? blocks : [];
   await update('tasks', props.taskId, payload);
+
+  resourceBlocks.value = type === 'ADD' ? blocks : [];
+  resourceTrailId.value = type === 'ADD' ? selectedTrail.value?.id : undefined;
 
   if (taskStore.task?.id === props.taskId) {
     taskStore.task.trail = type === 'ADD' ? selectedTrail.value : undefined;
