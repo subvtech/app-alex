@@ -25,6 +25,7 @@ export interface TaskSimple {
   submission_description: string;
   learning_goals?: LearningPlanGoalSimple[];
   task_members?: TaskMember[];
+  assignment_class?: number | { id: number } | null;
   task_events?: TaskEvent[];
   tasks?: TaskSimple[];
   parent_task?: TaskSimple;

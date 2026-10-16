@@ -19,6 +19,18 @@
       density="comfortable"
       hide-details
     />
+    <v-select
+      v-if="availableClasses.length"
+      v-model="selectedClassId"
+      :items="availableClasses"
+      item-title="name"
+      item-value="id"
+      :label="$t('components.learningPlan.drawer.task.dialog.addAllClassMembers')"
+      density="comfortable"
+      hide-details
+      clearable
+      class="tw-mb-4"
+    />
     <p v-if="false" class="text-body-1 text-gray-400 text-center">
       Parece que todos os alunos foram adicionados a esta tarefa.
     </p>
@@ -55,7 +67,7 @@
       <alex-custom-dialog-footer
         no-secondary-button
         :main-button-text="'Adicionar'"
-        :main-button-disabled="!hasSelectedMembers || !hasResponsable"
+        :main-button-disabled="(!hasSelectedMembers && !selectedClassId) || (hasSelectedMembers && !hasResponsable)"
         @on-main-action="handleSubmit"
         @on-secondary-action="model = false"
       />
@@ -64,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import { ClassSimple } from '@/models/simple/classSimple.model';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useGetProjectMembers } from '../../-composables/useMember';
 import type { MemberItem } from '../../-composables/useMember';
@@ -72,16 +85,18 @@ import Card from './Card.vue';
 interface AddMemberDialog {
   learningplanId?: number;
   groupId?: number;
+  availableClasses?: ClassSimple[];
   defaultMembers?: LearningPlanGroupMemberSimple[];
 }
 const model = defineModel<boolean>({ required: true });
 const props = withDefaults(defineProps<AddMemberDialog>(), {
   learningplanId: undefined,
   groupId: undefined,
+  availableClasses: () => [],
   defaultMembers: () => [],
 });
 type Emits = {
-  'add-click': [groupId: number, members: MemberItem[]];
+  'add-click': [groupId: number, members: MemberItem[], classId: number | null];
 };
 const emit = defineEmits<Emits>();
 // refs
@@ -91,6 +106,7 @@ const search = ref('');
 const loadingAdd = ref(false);
 const learningplanValue = toRef(props, 'learningplanId');
 const selectedMembers = ref<(MemberItem & { responsable: boolean })[]>([]);
+const selectedClassId = ref<number | null>(null);
 
 // computed
 const enabledGetMembers = computed(() => !!learningplanValue.value);
@@ -122,8 +138,9 @@ const handleSubmit = () => {
     setMessage(t('components.learningPlan.drawer.task.errors.missingDefaultGroup'), 'error', true);
     return;
   }
-  emit('add-click', props.groupId, selectedMembers.value);
+  emit('add-click', props.groupId, selectedMembers.value, selectedClassId.value);
   selectedMembers.value = [];
+  selectedClassId.value = null;
   queryClient.setQueryData<MemberItem[]>(['project-members', learningplanValue], (oldData) => {
     if (!oldData) {
       return oldData;
@@ -154,6 +171,7 @@ const handleUpdateResponsible = (member: MemberItem | null, inCharge: boolean) =
 };
 watch(model, () => {
   selectedMembers.value = [];
+  selectedClassId.value = null;
 });
 </script>
 

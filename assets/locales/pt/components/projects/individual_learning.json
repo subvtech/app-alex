@@ -45,6 +45,8 @@
     "tasks": "Tarefas",
 
     "addTask": "Adicionar tarefa",
+    "addAllClassStudents": "Adicionar todos os alunos da turma",
+    "selectClass": "Selecione uma turma",
 
     "inputs": {
       "search": "Encontrar tarefa",

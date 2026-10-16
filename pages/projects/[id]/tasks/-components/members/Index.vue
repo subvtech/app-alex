@@ -34,6 +34,7 @@ const addMemberDialog = ref(false);
 const page = ref<number>(1);
 const search = ref('');
 const strapi = useStrapi();
+const learningPlanStore = useLearningPlanStore();
 
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
@@ -62,7 +63,7 @@ const showingData = (items: any[], pageItems: any[], search: string, pageCount: 
   return message;
 };
 
-const addMember = async (groupId: number, newMembers: MemberItem[]) => {
+const addMember = async (groupId: number, newMembers: MemberItem[], classId: number | null) => {
   try {
     const newMembersValue = newMembers.map((member) => ({ member_id: member.id, role: member.role }));
     const newResponsable = newMembersValue.find((member) => member.role === 'in_charge');
@@ -70,7 +71,10 @@ const addMember = async (groupId: number, newMembers: MemberItem[]) => {
       member_id: member.student_member.id,
       role: !newResponsable ? member.role : 'standard',
     }));
-    await strapi.update('/learnin-plan-groups', groupId, { members: oldMembers.concat(newMembersValue) });
+    await strapi.update('/learnin-plan-groups', groupId, {
+      ...(classId && { learning_class: classId }),
+      ...(newMembersValue.length && { members: oldMembers.concat(newMembersValue) }),
+    });
     queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
     emit('change-members');
   } catch (error) {
@@ -129,6 +133,7 @@ const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inChar
         <AddMemberDialog
           v-model="addMemberDialog"
           :learningplan-id="learningplanId"
+          :available-classes="learningPlanStore.learningPlan?.classes || []"
           :default-members="members"
           :group-id="group?.id"
           @add-click="addMember"
