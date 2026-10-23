@@ -30,7 +30,6 @@ type Emits = {
 const emit = defineEmits<Emits>();
 // refs
 const itemsPerPage = 12;
-const addMemberDialog = ref(false);
 const page = ref<number>(1);
 const search = ref('');
 const strapi = useStrapi();
@@ -78,9 +77,6 @@ const addMember = async (groupId: number, newMembers: MemberItem[]) => {
   }
 };
 
-const handleAddMember = () => {
-  addMemberDialog.value = true;
-};
 const handleRemoveMember = async (member: LearningPlanGroupMemberSimple) => {
   if (member.role === 'in_charge') {
     setMessage(t('pages.projects.tasks.cant_remove_in_charge'), 'error', true);
@@ -125,19 +121,16 @@ const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inChar
           density="compact"
           clearable
         />
-
-        <AddMemberDialog
-          v-model="addMemberDialog"
-          :learningplan-id="learningplanId"
-          :default-members="members"
-          :group-id="group?.id"
-          @add-click="addMember"
-        />
-
-        <alex-custom-button class="tw-ml-auto" variant="secondary" prepend-icon="mdi-plus" @click="handleAddMember">{{
-          $t('components.learningPlan.members.add.label')
-        }}</alex-custom-button>
       </div>
+      <AddMemberDialog
+        v-if="edit && group?.id"
+        class="px-2 pb-4"
+        :learningplan-id="learningplanId"
+        :default-members="members"
+        :group-id="group.id"
+        :search="search"
+        @add-click="addMember"
+      />
     </template>
     <!-- Cards -->
     <template #default="{ items }">

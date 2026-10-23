@@ -7,15 +7,16 @@
           {{ $t('components.learningPlan.drawer.task.dialog.responsible') }}
         </p>
         <h4 class="text-body-6 text-gray-900">
-          {{
-            getInChargeMember(group.group_members)?.student_member.user.fullname
-          }}
+          {{ getInChargeMember(group.group_members)?.student_member.user.fullname }}
         </h4>
       </div>
-      <alex-custom-avatar-group
-        class="tw-ml-2"
-        :avatar-items="getGroupMemberAvatars(group.group_members)"
+      <alex-inputs-checkbox
+        v-if="selectable && !unavailable"
+        :model-value="selected"
+        class="checkbox"
+        @click.stop="emit('toggle-select', group)"
       />
+      <alex-custom-avatar-group class="tw-ml-2" :avatar-items="getGroupMemberAvatars(group.group_members)" />
     </div>
 
     <alex-documentation-buttons-tooltip
@@ -48,6 +49,8 @@ interface GroupCard {
   group: LearningPlanGroupSimple;
   isAdded?: boolean;
   unavailable?: boolean;
+  selectable?: boolean;
+  selected?: boolean;
 }
 
 withDefaults(defineProps<GroupCard>(), {
@@ -56,6 +59,7 @@ withDefaults(defineProps<GroupCard>(), {
 
 type Emit = {
   'add-members': [group: LearningPlanGroupSimple];
+  'toggle-select': [group: LearningPlanGroupSimple];
 };
 
 const emit = defineEmits<Emit>();
