@@ -31,7 +31,7 @@ import List from '@editorjs/nested-list';
 import Marker from '@editorjs/marker';
 import Quote from '@editorjs/quote';
 import Table from '@editorjs/table';
-import Hyperlink from 'editorjs-hyperlink';
+import Hyperlink from '~/editor-js/plugins/hyperlink/index.js';
 import AlignmentBlockTune from 'editorjs-text-alignment-blocktune';
 import Code from '@editorjs/code';
 import Alert from 'editorjs-alert';
