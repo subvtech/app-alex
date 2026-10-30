@@ -4,7 +4,7 @@
     <img
       v-if="showIcon"
       class="pl-1 z-index-999"
-      src="public/svg/tooltip.svg"
+      src="/svg/tooltip.svg"
       width="24"
       height="24"
     />

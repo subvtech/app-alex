@@ -21,7 +21,7 @@
           />
         </v-btn>
         <v-btn icon color="grey" @click="emit('alert')">
-          <img v-if="isBellActive" src="public/svg/bell.svg" width="24" height="24" role="bell-active" />
+          <img v-if="isBellActive" src="/svg/bell.svg" width="24" height="24" role="bell-active" />
           <v-icon v-else color="#6E7A87">mdi-bell-outline</v-icon>
         </v-btn>
       </div>

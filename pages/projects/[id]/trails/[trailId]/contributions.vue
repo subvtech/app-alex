@@ -85,7 +85,7 @@
         <alex-custom-skeleton color="gray-200" class="w-100 height-75 mb-6" rounded="lg"></alex-custom-skeleton>
       </div>
       <div v-else class="d-flex align-center justify-center flex-column">
-        <img class="emptyProjects-img" src="public/images/emptyContributions.svg" alt="Empty Projects" />
+        <img class="emptyProjects-img" src="/images/emptyContributions.svg" alt="Empty Projects" />
         <p class="text-h3 text-gray-400 mt-4 text-center width-62" style="text-wrap: pretty">
           {{ $t('components.trails.contributions.emptyText') }}
         </p>

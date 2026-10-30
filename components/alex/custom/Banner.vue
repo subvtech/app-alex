@@ -14,7 +14,7 @@
         <img
           v-else
           class="cover"
-          src="public/images/alex-banner.svg"
+          src="/images/alex-banner.svg"
           role="default-cover"
         />
       </template>
@@ -30,7 +30,7 @@
           @click="removeCoverPicture"
         >
           <img
-            src="public/svg/trash-dark.svg"
+            src="/svg/trash-dark.svg"
             style="color: #6e7a87"
             width="24"
             height="24"

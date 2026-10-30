@@ -140,7 +140,8 @@
 import { useMouse } from '@vueuse/core';
 import { isWithinInterval, isBefore, isAfter, isEqual } from 'date-fns';
 import type { TaskMemberStatus, TaskSimple, TaskStatus } from '~/models/simple/taskSimple.model';
-import KanbanColumn, { Accept } from './KanbanColumn.vue';
+import KanbanColumn from './KanbanColumn.vue';
+import type { Accept } from './kanban.types';
 
 // Types
 export interface Task {

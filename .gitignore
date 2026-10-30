@@ -4,6 +4,7 @@
 .nitro
 .cache
 .husky
+.nuxtrc
 dist
 
 # Node dependencies

@@ -196,7 +196,7 @@ const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
 });
 const emit = defineEmits(['update:modelValue', 'submit']);
 const value = defineModel<boolean>({ required: true });
-const { create } = useStrapi4();
+const { create } = useStrapi();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { createCourseRules, classRules } = useFormRules();
