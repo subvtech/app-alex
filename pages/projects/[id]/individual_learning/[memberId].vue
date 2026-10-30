@@ -8,7 +8,7 @@ definePageMeta({
 
 const route = useRoute();
 const { t } = useI18n();
-const { findOne } = useStrapi4();
+const { findOne } = useStrapi();
 
 const loading = ref(true);
 const activeTab = ref(route.path.split('/').pop());
