@@ -25,3 +25,7 @@ export interface Kanban {
   version: number;
   kanban_columns: KanbanColumn[];
 }
+
+export const KanbanColumnTask = {};
+export const KanbanColumn = {};
+export const Kanban = {};

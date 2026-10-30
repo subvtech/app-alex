@@ -22,6 +22,11 @@ export const useGetLearningGroup = (taskId: Ref<number | undefined>, enabled?: R
   });
 export type Member = LearningPlanMemberSimple;
 export type MemberItem = { id: number; raw: Member; role: string };
+
+// Runtime shims for Vite ESM compatibility
+export const Member = {} as any;
+export const MemberItem = {} as any;
+
 export const useGetProjectMembers = (projectId: Ref<number | undefined>, enabled?: Ref<boolean>) =>
   useQuery({
     queryKey: ['project-members', projectId],

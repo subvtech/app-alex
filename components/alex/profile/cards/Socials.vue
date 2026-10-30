@@ -84,9 +84,14 @@
   </alex-custom-card>
 </template>
 
+<script lang="ts">
+export const SocialsEmits = {};
+export const SocialsComponentType = {};
+</script>
+
 <script setup lang="ts">
-import { SocialItemType } from '~/models/social.model';
-import { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
+import type { SocialItemType } from '~/models/social.model';
+import type { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
 
 export interface SocialsEmits {
   (e: 'update'): void;

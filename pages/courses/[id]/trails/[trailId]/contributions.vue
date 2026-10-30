@@ -153,7 +153,7 @@
       <div v-else class="d-flex align-center justify-center flex-column">
         <img
           class="emptyProjects-img"
-          src="public/images/emptyContributions.svg"
+          src="/images/emptyContributions.svg"
           alt="Empty Projects"
         />
         <p
@@ -173,6 +173,10 @@
     />
   </div>
 </template>
+
+<script lang="ts">
+export const contributionType = {};
+</script>
 
 <script setup lang="ts">
 interface editorData {

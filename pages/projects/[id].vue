@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TabType } from '~/components/alex/custom/Tabs.vue';
+import type { TabType } from '~/components/alex/custom/Tabs.vue';
 
 definePageMeta({
   middleware: ['auth'],
@@ -130,6 +130,14 @@ watch(
         disabled: /projects\/[0-9]+\/overview/.test(route.path),
       },
     ];
+
+    if (isSettingsRoute.value) {
+      headerStore.items.push({
+        title: t('components.projects.settings.title'),
+        to: `/projects/${projectId}/settings`,
+        disabled: true,
+      });
+    }
 
     ['documents', 'members', 'individual_learning', 'tasks'].forEach((path) => {
       if (new RegExp(`projects/[0-9]+/${path}`).test(route.path)) {

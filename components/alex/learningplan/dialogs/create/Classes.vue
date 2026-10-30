@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { LearningClassType } from './index.vue';
+import type { LearningClassType } from './index.vue';
 const classes = defineModel<LearningClassType[]>({ required: true });
 const editModal = defineModel<boolean>('editModal');
 const dataModel = defineModel<LearningClassType | null>('dataModel');

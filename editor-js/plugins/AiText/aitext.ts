@@ -1,4 +1,4 @@
-import { BlockToolData } from "@editorjs/editorjs";
+import type { BlockToolData } from "@editorjs/editorjs";
 
 export type TAITextApi = {
   i18n: {

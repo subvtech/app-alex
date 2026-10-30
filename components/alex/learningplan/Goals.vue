@@ -62,6 +62,9 @@
     </template>
   </alex-custom-card>
 </template>
+<script lang="ts">
+export const Goal = {};
+</script>
 <script setup lang="ts">
 const client = useStrapiClient();
 export type Goal = {

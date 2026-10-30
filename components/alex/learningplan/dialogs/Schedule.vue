@@ -110,8 +110,8 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { LearningClassType } from './create/index.vue';
-import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import type { LearningClassType } from './create/index.vue';
+import type { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
 
 interface ScheduleProps {
   modelValue: boolean;

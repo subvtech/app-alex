@@ -107,11 +107,16 @@
   </div>
 </template>
 
+<script lang="ts">
+export const Task = {};
+export const TaskStudent = {};
+</script>
+
 <script setup lang="ts" generic="T extends 'professor' | 'student'">
 import { isWithinInterval, isBefore, isAfter, isEqual } from 'date-fns';
 import { useMouse } from '@vueuse/core';
-import { Accept } from './column/index.vue';
-import {
+import type { Accept } from './column/index.vue';
+import type {
   TaskMemberStatus,
   TaskSimple,
   TaskStatus,

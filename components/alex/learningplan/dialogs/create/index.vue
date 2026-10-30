@@ -163,8 +163,13 @@
   </alex-custom-dialog>
 </template>
 
+<script lang="ts">
+export const LearningScheduleCriation = {};
+export const LearningClassType = {};
+</script>
+
 <script setup lang="ts">
-import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import type { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
 export type LearningScheduleCriation = {
   id: number;
   interval: 0 | 1 | 7 | 14 | 30;
@@ -185,12 +190,13 @@ export type LearningClassType = {
   schedules: LearningScheduleCriation[];
   learning_plan_members: LearningPlanMemberSimple[];
 };
+
 const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
 const emit = defineEmits(['update:modelValue', 'submit']);
 const value = defineModel<boolean>({ required: true });
-const { create } = useStrapi4();
+const { create } = useStrapi();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { createCourseRules, classRules } = useFormRules();

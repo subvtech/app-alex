@@ -89,8 +89,8 @@ import {
   Strapi4ResponseData,
   Strapi4ResponseMany,
 } from '@nuxtjs/strapi/dist/runtime/types';
-import { PropType } from 'nuxt/dist/app/compat/capi';
-import { Tag } from '~/models/tag.model';
+import type { PropType } from 'vue';
+import type { Tag } from '~/models/tag.model';
 import * as queries from '~/assets/queries';
 const { create } = useStrapi();
 const graphql = useStrapiGraphQL();

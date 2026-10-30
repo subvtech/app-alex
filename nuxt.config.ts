@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import type { NuxtPage } from 'nuxt/schema';
 
 const {
@@ -14,6 +15,11 @@ const {
 } = process.env;
 
 export default defineNuxtConfig({
+  compatibilityDate: '2025-01-01',
+  alias: {
+    '@nuxtjs/strapi/dist/runtime/types': fileURLToPath(new URL('./types/strapi-runtime-types.ts', import.meta.url)),
+    '@nuxtjs/strapi/dist/runtime/types/v4': fileURLToPath(new URL('./types/strapi-runtime-types.ts', import.meta.url)),
+  },
   pages: true,
   ssr: false,
   devtools: { enabled: true },
@@ -24,6 +30,31 @@ export default defineNuxtConfig({
     },
   },
   css: ['vuetify/lib/styles/main.sass', 'plyr/dist/plyr.css', '@mdi/font/css/materialdesignicons.min.css'],
+  postcss: {
+    plugins: {
+      'tailwindcss/nesting': false,
+    },
+  },
+  vite: {
+    css: {
+      preprocessorOptions: {
+        sass: {
+          api: 'modern-compiler',
+        },
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
+    },
+    optimizeDeps: {
+      exclude: ['editorjs-hyperlink'],
+    },
+    resolve: {
+      alias: {
+        'editorjs-hyperlink': fileURLToPath(new URL('./editor-js/plugins/hyperlink/index.js', import.meta.url)),
+      },
+    },
+  },
   build: {
     transpile: ['vue-sonner', 'vuetify'],
   },
@@ -37,7 +68,7 @@ export default defineNuxtConfig({
   ],
   testUtils: {},
   pinia: {
-    autoImports: ['defineStore', 'storeToRefs'],
+    storesDirs: ['./stores/**'],
   },
   image: {
     strapi: {

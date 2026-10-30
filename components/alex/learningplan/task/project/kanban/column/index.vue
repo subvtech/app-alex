@@ -58,9 +58,13 @@
   </div>
 </template>
 
+<script lang="ts">
+export const Accept = {};
+</script>
+
 <script setup lang="ts" generic="T extends { raw: { id: number } }">
 import { SlickList, SlickItem, DragHandle } from 'vue-slicksort';
-import { Colors } from './Header.vue';
+import type { Colors } from './Header.vue';
 export type Accept<T> =
   | true
   | string[]

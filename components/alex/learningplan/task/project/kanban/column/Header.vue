@@ -53,8 +53,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export const Colors = {};
+</script>
+
 <script setup lang="ts">
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 export type Colors = 'orange' | 'green' | 'blue' | 'gray' | 'gray-600';
 interface ColumnHeader {

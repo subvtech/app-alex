@@ -41,7 +41,7 @@
         </div>
       </div>
       <div v-else class="d-flex align-center justify-center flex-column">
-        <img class="emptyProjects-img" src="public/images/emptyTrails.svg" :alt="$t('pages.trails.emptyStateText')" />
+        <img class="emptyProjects-img" src="/images/emptyTrails.svg" :alt="$t('pages.trails.emptyStateText')" />
         <p class="text-h3 text-gray-400 mt-4">
           {{ $t('pages.trails.emptyStateText') }}
         </p>
@@ -194,8 +194,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TrailSimple } from '@/models/simple/trailSimple.model';
-import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
+import type { TrailSimple } from '@/models/simple/trailSimple.model';
+import CreateDialog from '@/components/alex/learningplan/trails/dialogs/Create.vue';
 
 const router = useRouter();
 const route = useRoute();

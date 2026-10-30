@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { Kanban } from '../-types';
+import type { Kanban } from '../-types';
 import KanbanColumnHeader from './KanbanColumnHeader.vue';
 type Emit = {
   'add-column': [title: string];

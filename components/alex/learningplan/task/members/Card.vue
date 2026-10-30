@@ -80,8 +80,6 @@
 </template>
 
 <script setup lang="ts">
-import { emit } from 'process';
-
 interface MemberProps {
   name?: string;
   avatarUrl?: string;

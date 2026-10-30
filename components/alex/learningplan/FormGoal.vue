@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { Goal } from './Goals.vue';
+import type { Goal } from './Goals.vue';
 const emit = defineEmits([
   'error:keyword',
   'error:description',

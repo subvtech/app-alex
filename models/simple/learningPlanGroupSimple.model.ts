@@ -1,5 +1,5 @@
-import { ClassSimple } from './classSimple.model';
-import { LearningPlanGroupMemberSimple } from './learningPlanGroupMemberSimple.model';
+import type { ClassSimple } from './classSimple.model';
+import type { LearningPlanGroupMemberSimple } from './learningPlanGroupMemberSimple.model';
 
 export interface LearningPlanGroupSimple {
   id: number;
@@ -10,3 +10,5 @@ export interface LearningPlanGroupSimple {
   task_members?: TaskMember[];
   learning_class?: ClassSimple;
 }
+export const LearningPlanGroupSimple = {};
+

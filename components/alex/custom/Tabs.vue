@@ -30,6 +30,10 @@
   </v-tabs>
 </template>
 
+<script lang="ts">
+export const TabType = {};
+</script>
+
 <script setup lang="ts">
 export type TabType = {
   label: string;

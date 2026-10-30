@@ -1,5 +1,5 @@
-import { LearningPlanSimple } from './learningPlanSimple.model';
-import { LearningPlanGoalVerbSimple } from './learningPlanGoalVerb.modal';
+import type { LearningPlanSimple } from './learningPlanSimple.model';
+import type { LearningPlanGoalVerbSimple } from './learningPlanGoalVerb.modal';
 
 export interface LearningPlanGoalSimple {
   id: number;
@@ -7,3 +7,5 @@ export interface LearningPlanGoalSimple {
   learningplan: LearningPlanSimple;
   verb: LearningPlanGoalVerbSimple;
 }
+export const LearningPlanGoalSimple = {};
+

@@ -59,7 +59,7 @@
   generic="T extends { id: number; position: number; status: string }"
 >
 import { SlickList, SlickItem } from 'vue-slicksort';
-import { Column, GenericItem } from './types';
+import type { Column, GenericItem } from './types';
 
 type Slot<U> = {
   card(props: { item: U }): any;

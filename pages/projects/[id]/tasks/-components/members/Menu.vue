@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface MenuProps {
   submitted?: boolean;

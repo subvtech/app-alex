@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { TaskType } from '~/models/simple/taskSimple.model';
+import type { TaskType } from '~/models/simple/taskSimple.model';
 
 interface Submissions {
   submitted: {

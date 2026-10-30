@@ -56,12 +56,17 @@
   </v-row>
 </template>
 
+<script lang="ts">
+export const PlaygroundItemType = {};
+export const PlaygroundComponentType = {};
+</script>
+
 <script setup lang="ts">
 /*
   This component is meant to test other components;
   This is a multiliner comment.
 */
-import { PropItemType } from '@/components/alex/documentation/accordions/PropsList.vue';
+import type { PropItemType } from '@/components/alex/documentation/accordions/PropsList.vue';
 
 export interface PlaygroundItemType extends PropItemType {
   initialValue: any;

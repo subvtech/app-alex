@@ -172,6 +172,28 @@ export const useFormRules = () => {
     ...descriptionRules,
   });
 
+  const generalProjectSchema = yup.object({
+    startDate: startDateUpdateRules,
+    endDate: endDateRules,
+    title: yup
+      .string()
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
+      .required(i18n.t('rules.title.required'))
+      .trim(),
+    description: yup
+      .string()
+      .required(i18n.t('rules.description.required'))
+      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
+      .trim(),
+    slug: yup
+      .string()
+      .required(i18n.t('rules.field.required'))
+      .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
+      .trim(),
+  });
+
   const registerStep1 = yup.object({
     ...fullnameRules,
     ...emailRules,
@@ -382,6 +404,7 @@ export const useFormRules = () => {
     createCourseRules,
     createTrailsScheme,
     generalTrailSchema,
+    generalProjectSchema,
     createGroupRules,
     emailRegex,
     scheduleRules,

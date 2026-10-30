@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { LearningClassType } from './dialogs/create/index.vue';
+import type { LearningClassType } from './dialogs/create/index.vue';
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const i18n = useI18n();

@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { Message } from '@/models/simple/learninplanTaskMemberMessage';
+import type { Message } from '@/models/simple/learninplanTaskMemberMessage';
 type ResponseProps = {
   message?: Message;
   submission?: AttachedSubmission;

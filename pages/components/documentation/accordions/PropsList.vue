@@ -25,13 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import type { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
+import type { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
 import {
   PropItemType,
   PropsListComponentType,
 } from '~/components/alex/documentation/accordions/PropsList.vue';
-import { InstitutionComponentType } from '~/components/alex/profile/InstitutionItem.vue';
+import type { InstitutionComponentType } from '~/components/alex/profile/InstitutionItem.vue';
 
 definePageMeta({
   layout: 'components',

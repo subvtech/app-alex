@@ -61,6 +61,11 @@
   </v-data-table>
 </template>
 
+<script lang="ts">
+export const PropItemType = {};
+export const PropsListComponentType = {};
+</script>
+
 <script setup lang="ts">
 export interface PropItemType {
   name: string;

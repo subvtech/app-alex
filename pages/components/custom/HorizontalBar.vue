@@ -325,7 +325,7 @@
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
-import { HorizontalBarMenuItemType } from '~/components/alex/custom/horizontalBar.vue';
+import type { HorizontalBarMenuItemType } from '~/components/alex/custom/horizontalBar.vue';
 
 definePageMeta({
   layout: 'components',

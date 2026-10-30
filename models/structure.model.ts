@@ -1,4 +1,4 @@
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 export interface Structure {
   id: number;
   time: Number;
@@ -6,3 +6,5 @@ export interface Structure {
   blocks: Strapi4ResponseMany<Block>;
   trails: Strapi4ResponseMany<Trail>;
 }
+export const Structure = {};
+

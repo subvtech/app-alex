@@ -1,15 +1,19 @@
 import { QueryClient, useMutation } from '@tanstack/vue-query';
-import { TaskSimple } from '~/models/simple/taskSimple.model';
-import { SprintsResponse } from './useSprints';
+import type { TaskSimple } from '~/models/simple/taskSimple.model';
+import type { SprintsResponse } from './useSprints';
 
 const { create } = useStrapiUtils();
 const strapi = useStrapi();
 const strapiClient = useStrapiClient();
+const toTaskDate = (date?: string) => date?.slice(0, 10);
+
 type CreateTaskPayload = {
   learningPlanId: number;
   position: number;
   title: string;
   organization: TaskSimple['organization'];
+  startAt?: string;
+  finishAt?: string;
   parentTask?: number;
   sprint?: SprintSimple;
   group?: boolean;
@@ -30,7 +34,18 @@ export const useCreateTask = (
   t: Function,
 ) =>
   useMutation({
-    async mutationFn({ learningPlanId, position, title, organization, parentTask, sprint }: CreateTaskPayload) {
+    async mutationFn({
+      learningPlanId,
+      position,
+      title,
+      organization,
+      startAt,
+      finishAt,
+      parentTask,
+      sprint,
+    }: CreateTaskPayload) {
+      const taskStartAt = startAt || sprint?.start_at;
+      const taskFinishAt = finishAt || sprint?.end_at;
       const task = await create<CreateTaskResponse>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
@@ -42,6 +57,8 @@ export const useCreateTask = (
         submission_description: '',
         submission_required: false,
         title,
+        start_at: toTaskDate(taskStartAt),
+        finish_at: toTaskDate(taskFinishAt),
         parent_task: parentTask,
         sprint: sprint?.id || undefined,
         organization,
@@ -64,20 +81,28 @@ export const useCreateTask = (
         if (data.sprint_id) {
           return {
             ...oldData,
+            backlog: oldData.backlog.filter((task) => task.id !== data.id),
             sprints: oldData.sprints.map((sprint) => {
               if (sprint.id === data.sprint_id) {
                 return {
                   ...sprint,
-                  tasks: [...sprint.tasks, data],
+                  tasks: sprint.tasks.some((task) => task.id === data.id) ? sprint.tasks : [...sprint.tasks, data],
                 };
               }
-              return sprint;
+              return {
+                ...sprint,
+                tasks: sprint.tasks.filter((task) => task.id !== data.id),
+              };
             }),
           };
         } else {
           return {
             ...oldData,
-            backlog: [...oldData.backlog, data],
+            sprints: oldData.sprints.map((sprint) => ({
+              ...sprint,
+              tasks: sprint.tasks.filter((task) => task.id !== data.id),
+            })),
+            backlog: oldData.backlog.some((task) => task.id === data.id) ? oldData.backlog : [...oldData.backlog, data],
           };
         }
       });
@@ -178,6 +203,8 @@ type CreateSprintTaskPayload = {
   position: number;
   title: string;
   organization: TaskSimple['organization'];
+  startAt?: string;
+  finishAt?: string;
   parentTask?: number;
   sprintId: number;
   kanbanColumnId: number;
@@ -189,10 +216,15 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
       position,
       title,
       organization,
+      startAt,
+      finishAt,
       parentTask,
       sprintId,
       kanbanColumnId,
     }: CreateSprintTaskPayload) {
+      const sprint = queryClient
+        .getQueryData<SprintsResponse>(['sprints', learninplanId])
+        ?.sprints.find((item) => item.id === sprintId);
       const task = await create<CreateTaskResponse>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
@@ -203,6 +235,8 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
         submission_description: '',
         submission_required: false,
         title,
+        start_at: toTaskDate(startAt || sprint?.start_at),
+        finish_at: toTaskDate(finishAt || sprint?.end_at),
         parent_task: parentTask,
         organization,
         sprint: sprintId,

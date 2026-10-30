@@ -40,7 +40,7 @@
   </node-view-wrapper>
 </template>
 <script setup lang="ts">
-import { NodeViewProps, NodeViewWrapper } from '@tiptap/vue-3';
+import { type NodeViewProps, NodeViewWrapper } from '@tiptap/vue-3';
 
 const props = defineProps({
   node: {

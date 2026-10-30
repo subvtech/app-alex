@@ -1,4 +1,4 @@
-import { ThemeDefinition } from 'vuetify';
+import type { ThemeDefinition } from 'vuetify';
 
 export const AlexThemeColors = {
   'primary--2': '#2E74B8',

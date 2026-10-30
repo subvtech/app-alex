@@ -42,13 +42,11 @@
 
 <script setup lang="ts" generic="T extends { id: number; status: string; task?: TaskSimple }">
 import { SlickItem, SlickList } from 'vue-slicksort';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskStatus } from '~/models/simple/taskSimple.model';
 import KanbanColumnHeader from './KanbanColumnHeader.vue';
 
-export type Accept<T> =
-  | true
-  | string[]
-  | (({ source, dest, payload }: { source: HTMLElement; dest: HTMLElement; payload: T }) => boolean);
+import type { Accept } from './kanban.types';
+
 interface ColumnProps {
   title: string;
   color: 'orange' | 'green' | 'blue' | 'gray';

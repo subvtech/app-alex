@@ -23,3 +23,7 @@ export interface Message {
   sentAt: Date;
   response?: Message | AttachedSubmission;
 }
+
+// Runtime shims for Vite ESM compatibility
+export const TaskMemberMessage = {} as any;
+export const Message = {} as any;

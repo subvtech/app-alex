@@ -61,9 +61,14 @@
   </alex-custom-card>
 </template>
 
+<script lang="ts">
+export const InstitutionsComponentType = {};
+export const InstitutionsEmits = {};
+</script>
+
 <script setup lang="ts">
 import draggable from 'vuedraggable';
-import { InstitutionComponentType } from '../InstitutionItem.vue';
+import type { InstitutionComponentType } from '../InstitutionItem.vue';
 
 export interface InstitutionsComponentType {
   institutions: InstitutionComponentType[];

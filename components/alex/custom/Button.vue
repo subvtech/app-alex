@@ -19,6 +19,10 @@
   </v-btn>
 </template>
 
+<script lang="ts">
+export const ButtonProps = {};
+</script>
+
 <script setup lang="ts">
 export interface ButtonProps {
   variant?:

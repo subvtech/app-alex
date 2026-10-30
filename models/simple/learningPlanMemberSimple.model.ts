@@ -1,4 +1,4 @@
-import { ClassSimple } from './classSimple.model';
+import type { ClassSimple } from './classSimple.model';
 
 export enum MemberRoles {
   STUDENT = 'student',
@@ -28,3 +28,5 @@ export interface LearningPlanMemberSimple {
   task_members: any[];
   learning_class?: ClassSimple;
 }
+export const LearningPlanMemberSimple = {};
+

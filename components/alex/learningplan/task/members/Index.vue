@@ -19,25 +19,14 @@
           clearable
         />
 
-        <alex-learningplan-task-dialog-add-member
-          v-if="type === 'individual' && kind === 'task'"
-          v-model="addMemberDialog"
-          :learningplan-id="props.learningplanId"
-          :task-id="props.taskId"
-          :members="members.data"
-          @add-click="addMember"
-        />
-        <alex-learningplan-task-dialog-add-group
-          v-else-if="type === 'group' && kind === 'task'"
-          v-model="addGroupDialog"
-          :learningplan-id="props.learningplanId"
-          :task-id="props.taskId"
-          :start-at="startAt"
-          :finish-at="finishAt"
-          :can-submit-after="props.sendAfterDeadline"
-          :task-members="members.data"
-          @add-group="handleAddGroup"
-        />
+        <alex-custom-dropdown v-if="kind === 'task' && !type && edit" :items="typeOptions" :disabled="false">
+          <template #activator="{ props: propsDropdown }">
+            <alex-custom-button v-bind="propsDropdown" class="tw-ml-auto" variant="secondary" prepend-icon="mdi-plus">
+              {{ $t('components.learningPlan.members.add.label') }}
+            </alex-custom-button>
+          </template>
+        </alex-custom-dropdown>
+
         <alex-learningplan-task-dialog-add-project-members
           v-if="kind === 'project'"
           v-model="addProjectMembersDialog"
@@ -46,7 +35,7 @@
           @invite="(members) => (projectStudents = members)"
         />
 
-        <alex-custom-dropdown :items="typeOptions" :disabled="!!type || kind === 'project'">
+        <alex-custom-dropdown v-if="kind === 'project'" :items="typeOptions" :disabled="!!type || kind === 'project'">
           <template #activator="{ props: propsDropdown }">
             <alex-custom-button
               v-bind="propsDropdown"
@@ -59,6 +48,27 @@
             >
           </template>
         </alex-custom-dropdown>
+      </div>
+      <div v-if="kind === 'task' && edit" class="px-2 pb-4">
+        <alex-learningplan-task-dialog-add-member
+          v-if="type === 'individual'"
+          :learningplan-id="props.learningplanId"
+          :task-id="props.taskId"
+          :members="members.data"
+          :search="search"
+          @add-click="addMember"
+        />
+        <alex-learningplan-task-dialog-add-group
+          v-else-if="type === 'group'"
+          :learningplan-id="props.learningplanId"
+          :task-id="props.taskId"
+          :start-at="startAt"
+          :finish-at="finishAt"
+          :can-submit-after="props.sendAfterDeadline"
+          :task-members="members.data"
+          :search="search"
+          @add-group="handleAddGroup"
+        />
       </div>
       <alex-learningplan-task-dialog-create-group
         v-if="kind === 'task'"
@@ -142,7 +152,7 @@
       <div class="d-flex align-center justify-center flex-column ga-4 text-center">
         <img
           class="no-members-svg"
-          src="public/svg/no-members.svg"
+          src="/svg/no-members.svg"
           :alt="$t('components.learningPlan.members.missing.member')"
           role="no-members"
         />
@@ -170,7 +180,7 @@
 
 <script setup lang="ts">
 import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { MemberRoles } from '#imports';
+import { MemberRoles } from '~/models/simple/learningPlanMemberSimple.model';
 
 interface MembersProps {
   listGroupMembers?: boolean;
@@ -233,13 +243,10 @@ const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const emit = defineEmits<Emits>();
-const addMemberDialog = ref(false);
-const addGroupDialog = ref(false);
 const addProjectMembersDialog = ref(false);
 const groupDialog = ref<boolean>(false);
 const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
 const allGroups = ref<LearningPlanGroupSimple[]>([]);
-const setTypeDropdown = ref<boolean>(false);
 const page = ref<number>(1);
 const itemsPerPage = 12;
 const search = ref('');
@@ -247,21 +254,11 @@ const client = useStrapiClient();
 const typeOptions: AlexDropdownItem[] = [
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
-    onClick: () => {
-      emit('set-type', 'individual');
-      if (props.startAt && props.finishAt) {
-        addMemberDialog.value = true;
-      }
-    },
+    onClick: () => emit('set-type', 'individual'),
   },
   {
     text: t('components.learningPlan.drawer.task.type.collective'),
-    onClick: () => {
-      emit('set-type', 'group');
-      if (props.startAt && props.finishAt) {
-        addGroupDialog.value = true;
-      }
-    },
+    onClick: () => emit('set-type', 'group'),
   },
 ];
 
@@ -484,16 +481,7 @@ const handleEditClick = (selectedGroup: LearningPlanGroupSimple, taskMembers: { 
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {
-  if (props.kind === 'project') {
-    addProjectMembersDialog.value = true;
-  }
-  if (!props.type || !checkHasFilledDates()) {
-    setTypeDropdown.value = true;
-  } else if (props.type === 'group') {
-    addGroupDialog.value = true;
-  } else {
-    addMemberDialog.value = true;
-  }
+  addProjectMembersDialog.value = true;
 };
 const getGroups = (learningplanId: number) =>
   strapiUtils.find<ClassSimple>('classes', {
@@ -518,8 +506,6 @@ watch(
   async () => {
     page.value = 1;
     search.value = '';
-    addMemberDialog.value = false;
-    addGroupDialog.value = false;
     groupDialog.value = false;
     if (shouldFetchMembers.value) {
       await nextTick();
@@ -527,12 +513,6 @@ watch(
     }
   },
 );
-
-watch(addGroupDialog, (value) => {
-  if (!value && shouldFetchMembers.value) {
-    refresh();
-  }
-});
 
 watch(projectFilteredMembers, () => {
   if (props.kind !== 'project') return;

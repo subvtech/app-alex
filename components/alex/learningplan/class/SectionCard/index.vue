@@ -85,7 +85,7 @@
   </alex-custom-card>
 </template>
 <script setup lang="ts">
-import { SectionCardHeaderProps } from './Header.vue';
+import type { SectionCardHeaderProps } from './Header.vue';
 
 const { t } = useI18n();
 const page = ref(1);

@@ -77,6 +77,8 @@
               variant="text"
               size="small"
               icon="mdi-cloud-download-outline"
+              :aria-label="$t('components.learningPlan.link.download')"
+              :title="$t('components.learningPlan.link.download')"
               @click="downloadFile(file.url, file.title, file.id)"
             >
             </v-btn>
@@ -97,9 +99,10 @@
 </template>
 
 <script setup lang="ts">
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
+import { NodeViewWrapper, type NodeViewProps } from '@tiptap/vue-3';
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
+const config = useRuntimeConfig();
 const fileInputRef = ref();
 const isLoading = ref(false);
 const fileDrop = ref(false);
@@ -207,30 +210,36 @@ const setFileBackground = (extension: string) => {
   return fileBackground[extension.toLocaleLowerCase()] || 'gray-blue';
 };
 
-const downloadFile = (url: string, title: string, id: string) => {
+const downloadFile = async (url: string, title: string, id: string) => {
   isDownloading.value.push(id);
-  if (!url.startsWith('http')) {
-    url = 'https://' + url;
+  try {
+    let downloadUrl = url;
+    if (url.startsWith('/')) {
+      downloadUrl = new URL(url, config.public.strapiUrl).toString();
+    } else if (!url.startsWith('http')) {
+      downloadUrl = `https://${url}`;
+    }
+    const response = await fetch(downloadUrl);
+    if (!response.ok) {
+      throw new Error(`File download failed with status ${response.status}`);
+    }
+
+    const objectUrl = URL.createObjectURL(await response.blob());
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = title;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  } catch {
+    setMessage(t('components.editorjs.fileSet.error.download'), 'error', true);
+  } finally {
+    const downloadingIndex = isDownloading.value.indexOf(id);
+    if (downloadingIndex !== -1) {
+      isDownloading.value.splice(downloadingIndex, 1);
+    }
   }
-  fetch(url)
-    .then((response) => {
-      return response.blob();
-    })
-    .then((blob) => {
-      const link = document.createElement('a');
-      link.setAttribute('download', title);
-      link.download = title;
-      const href = URL.createObjectURL(blob);
-      link.href = href;
-      link.click();
-      URL.revokeObjectURL(href);
-    })
-    .catch((_) => {
-      setMessage(t('components.editorjs.fileSet.error.download'), 'error', true);
-    })
-    .finally(() => {
-      isDownloading.value.splice(isDownloading.value.indexOf(id), 1);
-    });
 };
 
 const addFileFromDrop = (event: DragEvent) => {

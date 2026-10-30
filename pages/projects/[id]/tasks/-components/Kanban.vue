@@ -4,7 +4,6 @@ import { SlickItem, SlickList } from 'vue-slicksort';
 import { generateGroup } from '~/utils';
 import { useCreateKanbanTask, useDeleteTask } from '../-composables/useCreateTask';
 import {
-  BoardsResponse,
   useCreateColumn,
   useCreateKanban,
   useDeleteColumn,
@@ -13,12 +12,13 @@ import {
   useReorderColumnTasks,
   useUpdateColumn,
 } from '../-composables/useKanban';
+import type { BoardsResponse } from '../-composables/useKanban';
 import { useGetSprints } from '../-composables/useSprints';
-import { Droppable, KanbanColumnTask, KanbanStatusType } from '../-types';
+import { KanbanStatusType, type Droppable, type KanbanColumnTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
 import KanbanAddColumn from './KanbanAddColumn.vue';
 import KanbanColumn from './KanbanColumn.vue';
-import { Colors } from './KanbanColumnHeader.vue';
+import type { Colors } from './KanbanColumnHeader.vue';
 import TaskCard from './TaskCard.vue';
 
 export interface Column<U extends { id: number }> {
@@ -268,6 +268,8 @@ const handleAddItem = async (columnId: number, _group: string, title: string) =>
     organization: 'standard',
     position: lastIndex,
     sprintId: selectedSprint.value?.id,
+    startAt: selectedSprint.value?.start_at,
+    finishAt: selectedSprint.value?.end_at,
     title,
   });
   refetchKanban();
@@ -323,10 +325,12 @@ const refreshKanbanFromSocket = async () => {
 
 onMounted(() => {
   socket.on('tasks:update', refreshKanbanFromSocket);
+  socket.on('sprints:update', refreshKanbanFromSocket);
 });
 
 onBeforeUnmount(() => {
   socket.off('tasks:update', refreshKanbanFromSocket);
+  socket.off('sprints:update', refreshKanbanFromSocket);
 });
 defineExpose({ canDrag, setCanDrag });
 </script>
@@ -334,7 +338,7 @@ defineExpose({ canDrag, setCanDrag });
 <template>
   <div class="tw-flex-grow">
     <div v-if="!sprint" class="tw-flex tw-items-center tw-justify-center tw-h-full tw-flex-col">
-      <img src="public/svg/emptySprint.svg" class="mb-4 tw-h-40 tw-w-40" />
+      <img src="/svg/emptySprint.svg" class="mb-4 tw-h-40 tw-w-40" />
       <span class="text-gray-400">Nenhuma sprint selecionada</span>
     </div>
     <template v-else>

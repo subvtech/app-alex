@@ -83,7 +83,7 @@
           </div>
         </div>
         <div v-else>
-          <img src="public/images/emptyTrail.svg" />
+          <img src="/images/emptyTrail.svg" />
           <p class="text-gray-400 text-h3 empty-state-text text-center">
             {{ $t('pages.trailId.overview.emptyState') }}
           </p>
@@ -191,7 +191,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { contributionType } from '~/pages/projects/[id]/trails/[trailId]/contributions.vue';
+import type { contributionType } from '~/pages/projects/[id]/trails/[trailId]/contributions.vue';
 import Tiptap from '~/components/TipTap/index.vue';
 
 definePageMeta({

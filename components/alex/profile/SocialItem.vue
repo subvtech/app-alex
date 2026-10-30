@@ -16,8 +16,11 @@
     <v-icon class="ml-4" size="24px" icon="mdi-chevron-right" color="#8291A1" />
   </a>
 </template>
+<script lang="ts">
+export const SocialItemComponentType = {};
+</script>
 <script setup lang="ts">
-import { AccordionItemType } from '@/components/alex/custom/Accordion.vue';
+import type { AccordionItemType } from '@/components/alex/custom/Accordion.vue';
 
 export interface SocialItemComponentType extends AccordionItemType {}
 

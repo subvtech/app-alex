@@ -37,8 +37,8 @@
 
 <script setup lang="ts" generic="T extends Partial<LearningClassType>">
 import { useField } from 'vee-validate';
-import { MeetingPropsType } from '../../Meeting.vue';
-import { LearningClassType, LearningScheduleCriation } from './index.vue';
+import type { MeetingPropsType } from '../../Meeting.vue';
+import type { LearningClassType, LearningScheduleCriation } from './index.vue';
 
 type ClassScheduleProps = {
   titleHeader: string;

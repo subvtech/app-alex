@@ -1,4 +1,4 @@
-import { ClassSimple } from './classSimple.model';
+import type { ClassSimple } from './classSimple.model';
 
 const InvitationLinkRole = {
   STUDENT: 'student',
@@ -17,3 +17,5 @@ export interface InvitationLinkSimple {
   updatedAt?: string;
   learning_class?: ClassSimple;
 }
+export const InvitationLinkSimple = {};
+

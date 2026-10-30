@@ -13,7 +13,7 @@
       </div>
     </div>
     <div v-if="canEdit" class="d-flex align-center mr-3 options">
-      <img class="handle" src="public/svg/menu.svg" />
+      <img class="handle" src="/svg/menu.svg" />
       <alex-custom-button
         variant="text"
         class="remove"
@@ -25,6 +25,11 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+export const InstitutionComponentType = {};
+export const InstitutionItemEmits = {};
+</script>
 
 <script setup lang="ts">
 export interface InstitutionItemEmits {
