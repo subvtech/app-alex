@@ -46,6 +46,14 @@ export default defineNuxtConfig({
         },
       },
     },
+    optimizeDeps: {
+      exclude: ['editorjs-hyperlink'],
+    },
+    resolve: {
+      alias: {
+        'editorjs-hyperlink': fileURLToPath(new URL('./editor-js/plugins/hyperlink/index.js', import.meta.url)),
+      },
+    },
   },
   build: {
     transpile: ['vue-sonner', 'vuetify'],

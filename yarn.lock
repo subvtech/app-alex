@@ -6915,11 +6915,6 @@ editorjs-header-with-anchor@^2.6.0:
   resolved "https://registry.yarnpkg.com/editorjs-header-with-anchor/-/editorjs-header-with-anchor-2.6.0.tgz#f00aea06ce238b2d80b04cfda72a8b8bf730d5ac"
   integrity sha512-krI4GBxAJvgmS0R2RGnaN4QTDMuobu2Qcx1HZ5fJQohyIhEI4GD0uiOpVFZ7oFiDNRRvqn6e8lQin4W2rLOu9A==
 
-editorjs-hyperlink@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/editorjs-hyperlink/-/editorjs-hyperlink-1.0.6.tgz#f75ba7d3e8dab4527993ed165fd44cbfcae3a672"
-  integrity sha512-E8UZA9AM3jPwMTE40ul4eGCFzH3+XoUR5YRCy5O1+Yrl5UZQXeJppZ0IHHKaNmHAikDN9dUbKGLabxXZkPRi9w==
-
 editorjs-text-alignment-blocktune@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/editorjs-text-alignment-blocktune/-/editorjs-text-alignment-blocktune-1.0.3.tgz#7942fe2d3fbdbd7fcfd10fbb9b341c97ec3eb84f"
