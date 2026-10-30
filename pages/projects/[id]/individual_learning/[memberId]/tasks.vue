@@ -109,6 +109,14 @@
                 @kanban="isKanban = true"
               />
 
+              <v-checkbox
+                v-if="!isGuest && !isAddingTask && assignmentClassId"
+                v-model="addTaskToClass"
+                :label="$t(`${i18Dir}.addAllClassStudents`)"
+                density="compact"
+                hide-details
+                class="mb-2"
+              />
               <div
                 v-if="!isGuest"
                 :class="`${!isAddingTask && 'pa-4 tw-border-dashed'} d-flex align-center justify-center ga-2 tw-border
@@ -165,6 +173,8 @@
       :tags="taskDetails?.tags"
       :type="taskDetails?.type"
       :events="taskDetails?.task_events"
+      :assignment-class-id="taskAssignmentClassId"
+      :available-class-id="assignmentClassId"
       :goals="taskDetails?.learning_goals"
       :author-id="memberId"
       :members="taskDetails?.task_members"
@@ -180,6 +190,7 @@
       individual-journey
       @change-goals="handleChangeGoals"
       @change-values="handleChangeValues"
+      @change-assignment-class="handleChangeAssignmentClass"
       @change-description="handleChangeDescription"
       @change-submission-description="handleChangeSubmissionDescription"
       @change-tags="handleChangeTags"
@@ -296,6 +307,18 @@ const filters = ref<any>(null);
 // Add Task
 const isAddingTask = ref<boolean>(false);
 const newTaskTitle = ref<string>('');
+const addTaskToClass = ref(false);
+const assignmentClassId = computed(
+  () =>
+    learningPlanStore.learningPlan?.classes?.find(
+      (learningClass) =>
+        learningClass.learning_plan_members?.some((member) => member.user?.id === +route.params.memberId),
+    )?.id,
+);
+const taskAssignmentClassId = computed(() => {
+  const assignmentClass = taskDetails.value?.assignment_class;
+  return typeof assignmentClass === 'number' ? assignmentClass : assignmentClass?.id ?? null;
+});
 
 // Function
 const handleCreateTask = async (title: string, column) => {
@@ -324,27 +347,33 @@ const handleCreateTask = async (title: string, column) => {
     start_at: new Date(),
     finish_at: learningPlanStore.learningPlan?.end_date ?? null,
     type: 'individual',
+    ...(addTaskToClass.value && assignmentClassId.value && { assignment_class: assignmentClassId.value }),
   });
 
-  const newTaskMember = await strapi.create('task-members', {
-    task: newTask.data.id,
-    status: column.group,
-    start_at: new Date(),
-    finished_at: learningPlanStore.learningPlan?.end_date ?? null,
-    learning_plan_member: memberId,
-  });
+  if (addTaskToClass.value && assignmentClassId.value) {
+    await getStudentTasks();
+    addTaskToClass.value = false;
+  } else {
+    const newTaskMember = await strapi.create('task-members', {
+      task: newTask.data.id,
+      status: column.group,
+      start_at: new Date(),
+      finished_at: learningPlanStore.learningPlan?.end_date ?? null,
+      learning_plan_member: memberId,
+    });
 
-  const taskMember = {
-    id: newTaskMember.data.id,
-    ...newTaskMember.data.attributes,
+    const taskMember = {
+      id: newTaskMember.data.id,
+      ...newTaskMember.data.attributes,
 
-    task: {
-      id: newTask.data.id,
-      ...newTask.data.attributes,
-    },
-  };
+      task: {
+        id: newTask.data.id,
+        ...newTask.data.attributes,
+      },
+    };
 
-  tasks.value = [...tasks.value, formatTaskMember(taskMember)];
+    tasks.value = [...tasks.value, formatTaskMember(taskMember)];
+  }
   setMessage(t(`${i18Dir}.messages.taskCreated`), 'success', true);
 };
 
@@ -403,6 +432,7 @@ const getStudentTasks = async () => {
       'task.task_events.task_member.learning_plan_member.user.avatar',
       'task.task_events.learning_plan_member.user.avatar',
       'task.task_members.learning_plan_member.user.avatar',
+      'task.assignment_class',
       'task.task_members.learning_plan_group.group_members.student_member.user.avatar',
       'task.learning_goals.verb',
       'learning_plan_member.learning_class',
@@ -707,6 +737,17 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
   };
 
   // Ver atualizar task member
+  updateTaskFields();
+};
+
+const handleChangeAssignmentClass = (classId: number | null) => {
+  if (!taskDetails.value) return;
+
+  taskDetails.value = {
+    ...taskDetails.value,
+    assignment_class: classId,
+  };
+
   updateTaskFields();
 };
 
