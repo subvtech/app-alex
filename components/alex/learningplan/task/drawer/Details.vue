@@ -29,7 +29,7 @@
 
     <v-row class="mt-4 flex-0-0">
       <v-col cols="6" class="pb-1">
-        <alex-learningplan-task-state v-model="status" mode="student" />
+        <alex-learningplan-task-state v-model="status" mode="student" readonly />
       </v-col>
       <v-col cols="6" class="pb-1"
         ><p class="text-body-4 text-gray-800 mb-1">
@@ -62,6 +62,23 @@
         <alex-learningplan-task-date v-model="finalDate" />
       </v-col>
     </v-row>
+
+    <div v-if="status === 'in_progress' || status === 'in_review'" class="mt-3">
+      <alex-custom-button
+        size="small"
+        :variant="status === 'in_progress' ? 'warning' : 'outlined'"
+        @click="handleStatusAction"
+      >
+        <v-icon start :icon="status === 'in_progress' ? 'mdi-send-outline' : 'mdi-undo'" />
+        {{
+          $t(
+            status === 'in_progress'
+              ? 'components.courses.tasks.submission_modal.send_to_review_btn'
+              : 'components.courses.tasks.submission_modal.return_to_progress_btn',
+          )
+        }}
+      </alex-custom-button>
+    </div>
 
     <alex-learningplan-task-description v-model="description" class="mt-4" />
 
@@ -229,6 +246,7 @@ interface DetailsDrawerProps {
   docName?: string;
   description?: string;
   status?: TaskMemberStatus;
+  canChangeFromReview?: boolean;
   type?: string;
   startDate?: string;
   finalDate?: string;
@@ -244,6 +262,7 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   description: '',
   docName: '',
   status: 'to_do',
+  canChangeFromReview: false,
   type: undefined,
   startDate: undefined,
   finalDate: undefined,
@@ -491,18 +510,23 @@ watch(activeTab, (value) => {
   }
 });
 
+const handleStatusAction = () => {
+  if (status.value === 'in_review') {
+    if (!props.canChangeFromReview && !learningplanStore.userIsFacilitator) {
+      setMessage(t('components.learningPlan.drawer.task.status.move.warning'), 'warning', true);
+      return;
+    }
+
+    handleChangeStatus('in_progress');
+    return;
+  }
+
+  if (status.value === 'in_progress') {
+    handleChangeStatus('in_review');
+  }
+};
+
 const handleChangeStatus = (statusValue: TaskMemberStatus) => {
-  emit(
-    'update-status',
-    0,
-    {
-      id: props.taskMemberId,
-      title: props.title,
-      status: statusValue,
-      date: new Date(),
-    },
-    statusValue,
-  );
   status.value = statusValue;
 };
 

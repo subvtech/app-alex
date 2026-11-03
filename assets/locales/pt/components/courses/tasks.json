@@ -61,7 +61,8 @@
     "deliver_error": "Erro ao enviar submissão, tente novamente",
     "in_review": "A tarefa foi enviada para avaliação, não é possível editá-la.",
     "save_btn": "Salvar",
-    "send_to_review_btn": "Enviar para avaliação"
+    "send_to_review_btn": "Enviar para avaliação",
+    "return_to_progress_btn": "Voltar para fazendo"
   },
   "noType": "(Sem tipo)"
 }
