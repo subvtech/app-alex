@@ -58,6 +58,11 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vue-sonner', 'vuetify'],
   },
+  nitro: {
+    externals: {
+      inline: [/[\\/]node_modules[\\/]nuxt[\\/]dist[\\/]/],
+    },
+  },
   modules: [
     '@nuxt/image',
     '@nuxt/test-utils/module',

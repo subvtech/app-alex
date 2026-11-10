@@ -45,6 +45,7 @@
       :trail="selectedTask.task.trail"
       :group="selectedTask.group"
       :status="selectedTask.status"
+      :can-change-from-review="selectedTask.task.can_change_from_review"
       :blocks="selectedTask.task.blocks"
       :type="selectedTask.task.type || undefined"
       :start-date="selectedTask.task.start_at || undefined"
@@ -60,7 +61,7 @@
             }
           : undefined
       "
-      @update-status="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value, newStatus, true)"
+      @update-status="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value, newStatus)"
       @update-submission="execute()"
     />
   </div>

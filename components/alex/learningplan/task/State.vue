@@ -1,8 +1,11 @@
 <template>
-  <alex-custom-dropdown
-    :disabled="config[model]?.immutable"
-    :items="mode == 'teacher' ? filteredTeacher : filteredStudent"
-  >
+  <div v-if="readonly">
+    <p class="text-body-4 text-gray-800 mb-2">
+      {{ $t('components.learningPlan.drawer.task.status.label') }}
+    </p>
+    <alex-custom-chip :text="config[model]?.text" :status="config[model]?.status" :size="size" variant="tonal" />
+  </div>
+  <alex-custom-dropdown v-else :items="mode == 'teacher' ? filteredTeacher : filteredStudent">
     <template #activator="{ props: vMenuProps }">
       <p class="text-body-4 text-gray-800 mb-2">
         {{ $t('components.learningPlan.drawer.task.status.label') }}
@@ -129,10 +132,6 @@ const studentOptions: AlexDropdownItem[] = [
   {
     text: config.value.in_progress?.text,
     onClick: () => (model.value = 'in_progress'),
-  },
-  {
-    text: config.value.in_review?.text,
-    onClick: () => (model.value = 'in_review'),
   },
   {
     text: config.value.done.text,

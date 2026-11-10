@@ -61,7 +61,8 @@
     "deliver_error": "Error sending submission, please try again",
     "in_review": "This task has been sent for review, it is not possible to edit it.",
     "save_btn": "Save",
-    "send_to_review_btn": "Send to review"
+    "send_to_review_btn": "Send to review",
+    "return_to_progress_btn": "Back to in progress"
   },
   "noType": "(No type)"
 }
