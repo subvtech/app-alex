@@ -122,6 +122,26 @@
             :label="$t('components.learningPlan.drawer.task.status.canChangeFromReview')"
           />
         </v-col>
+        <v-col v-if="hasSubmission" class="pa-0 d-flex align-center" cols="6">
+          <alex-custom-switch
+            v-model="allowTrailContribution"
+            :label="$t('components.learningPlan.drawer.task.submission.trailContribution.allow')"
+          />
+        </v-col>
+        <v-col v-if="hasSubmission && allowTrailContribution" class="mt-4 pa-0" cols="12">
+          <alex-inputs-select
+            v-model="contributionTrailId"
+            name="contributionTrail"
+            :label="$t('components.learningPlan.drawer.task.submission.trailContribution.trailLabel')"
+            :placeholder="$t('components.learningPlan.drawer.task.submission.trailContribution.trailPlaceholder')"
+            :info="$t('components.learningPlan.drawer.task.submission.trailContribution.allowHint')"
+            :items="contributionTrailOptions"
+            :disabled="!editable"
+            item-title="title"
+            item-value="id"
+            required
+          />
+        </v-col>
         <v-col v-if="hasSubmission" class="mt-4 pa-0" cols="12">
           <alex-learningplan-task-restrictions v-model="restrictionsValue" :edit="editable" />
         </v-col>
@@ -349,6 +369,8 @@ interface TaskTeacherDrawerProps {
   restrictions?: string;
   editable?: boolean;
   hasSubmission?: boolean;
+  allowTrailContribution?: boolean;
+  contributionTrailId?: number;
   canChangeFromReview?: boolean;
   sendAfterDeadline?: boolean;
   kanbanButton?: boolean;
@@ -369,6 +391,8 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   trail: undefined,
   editable: true,
   hasSubmission: false,
+  allowTrailContribution: false,
+  contributionTrailId: undefined,
   canChangeFromReview: false,
   sendAfterDeadline: false,
   kanbanButton: false,
@@ -400,6 +424,12 @@ const taskLearningGoals = computed(() => {
   return goals.value.map((goal) => `${goal?.verb?.text ?? ''} ${goal?.description ?? ''}`.trim()).filter(Boolean);
 });
 const taskId = toRef(props, 'taskId');
+const allowTrailContribution = ref(props.allowTrailContribution);
+const contributionTrailId = ref<number | undefined>(props.contributionTrailId);
+const learningPlanStore = useLearningPlanStore();
+const contributionTrailOptions = computed(() =>
+  learningPlanStore.standardTrails.map((trail) => ({ id: trail.id, title: trail.title })),
+);
 const learningPlanId = toRef(props, 'learningPlanId');
 const model = defineModel({ default: false });
 const deleteModal = ref(false);
@@ -536,6 +566,8 @@ watch(model, (value) => {
     description.value = props.description;
     submissionDescription.value = props.submissionDescription;
     hasSubmission.value = props.hasSubmission;
+    allowTrailContribution.value = props.allowTrailContribution;
+    contributionTrailId.value = props.contributionTrailId;
     canChangeFromReview.value = props.canChangeFromReview;
     sendAfterDeadline.value = props.sendAfterDeadline;
     goals.value = props.goals;
@@ -685,6 +717,9 @@ const updateTaskValues = async (
       submission_required: hasSubmission.value,
       learning_goals: goals.value,
       allowed_editor_plugins: restrictions.value,
+      allow_trail_contribution: allowTrailContribution.value,
+      contribution_trail:
+        contributionTrailOptions.value.find((trail) => trail.id === contributionTrailId.value) ?? null,
     } as Partial<TaskSimple>;
     await strapi.update('tasks', taskId, values);
     emit('change-values', { ...valuesEmit, task_members: props.members });
@@ -821,6 +856,19 @@ watch(sendAfterDeadline, async (value) => {
 watch(hasSubmission, async (value) => {
   await updateTaskValues(taskId.value, {
     submission_required: value,
+  });
+});
+watch(allowTrailContribution, async (allow) => {
+  if (allow && !isFirstTimeOpened.value && !contributionTrailId.value && props.trail?.id) {
+    contributionTrailId.value = props.trail.id;
+  }
+  await updateTaskValues(taskId.value, {
+    allow_trail_contribution: allow,
+  });
+});
+watch(contributionTrailId, async (trailId) => {
+  await updateTaskValues(taskId.value, {
+    contribution_trail: trailId ?? null,
   });
 });
 watch(canChangeFromReview, async (value) => {

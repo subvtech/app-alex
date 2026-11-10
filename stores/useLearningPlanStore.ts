@@ -71,6 +71,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'blocks',
         'learning_goals',
         'trail',
+        'contribution_trail',
         'tags',
         'task_members.learning_plan_member.user.avatar',
         'task_members.learning_plan_group.group_members.student_member.user.avatar',

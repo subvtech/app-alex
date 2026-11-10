@@ -104,6 +104,8 @@
             :content="submissions.data[0]"
             :task-status="status"
             :doc-name="docName"
+            :allow-trail-contribution="allowTrailContribution"
+            :contribution-trail-id="contributionTrailId"
             @update-task-status="handleChangeStatus"
             @update-submission="$emit('update-submission')"
           />
@@ -234,6 +236,8 @@ interface DetailsDrawerProps {
   finalDate?: string;
   blocks?: BlockSimple[];
   trail?: TrailSimple;
+  allowTrailContribution?: boolean;
+  contributionTrailId?: number;
   restrictions?: string;
   taskEvents?: TaskEvent[];
 }
@@ -249,6 +253,8 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   finalDate: undefined,
   blocks: undefined,
   trail: undefined,
+  allowTrailContribution: false,
+  contributionTrailId: undefined,
   group: undefined,
   restrictions: '',
   taskEvents: () => [],

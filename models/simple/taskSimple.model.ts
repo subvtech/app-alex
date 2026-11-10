@@ -22,6 +22,8 @@ export interface TaskSimple {
   can_submit_after_deadline: boolean;
   can_change_from_review: boolean;
   allowed_editor_plugins: string; // 'string, string, string';
+  allow_trail_contribution?: boolean;
+  contribution_trail?: TrailSimple | null;
   submission_description: string;
   learning_goals?: LearningPlanGoalSimple[];
   task_members?: TaskMember[];

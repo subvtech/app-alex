@@ -95,6 +95,8 @@
     :description="taskDetails?.description || undefined"
     :submission-description="taskDetails?.submission_description"
     :has-submission="taskDetails?.submission_required"
+    :allow-trail-contribution="taskDetails?.allow_trail_contribution"
+    :contribution-trail-id="taskDetails?.contribution_trail?.id"
     :can-change-from-review="taskDetails?.can_change_from_review"
     :send-after-deadline="taskDetails?.can_submit_after_deadline"
     :start-date="taskDetails?.start_at"
@@ -530,6 +532,8 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.submission_required = values.submission_required!;
     task.can_submit_after_deadline = values.can_submit_after_deadline!;
     task.allowed_editor_plugins = values.allowed_editor_plugins!;
+    task.allow_trail_contribution = values.allow_trail_contribution;
+    task.contribution_trail = values.contribution_trail;
   }
 };
 
