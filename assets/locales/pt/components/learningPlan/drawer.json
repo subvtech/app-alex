@@ -102,7 +102,15 @@
         "label": "Descrição da entrega",
         "placeHolder": "Digite a descrição"
       },
-      "empty": "Nenhuma entrega realizada"
+      "empty": "Nenhuma entrega realizada",
+      "trailContribution": {
+        "allow": "Permitir contribuir na trilha",
+        "allowHint": "O aluno poderá enviar, pelo editor da entrega, uma contribuição para esta trilha.",
+        "button": "Contribuir na Trilha",
+        "trailLabel": "Trilha",
+        "success": "Contribuição enviada para a trilha!",
+        "trailPlaceholder": "Selecione a trilha"
+      }
     },
     "memberAlreadyInTask": "{member} já está na tarefa",
     "pleaseFillDates": "Por favor coloque uma data de inicio e término antes de adicionar",

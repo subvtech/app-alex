@@ -105,7 +105,15 @@
         "label": "Submission Description",
         "placeHolder": "Enter description"
       },
-      "empty": "No submission realized"
+      "empty": "No submission realized",
+      "trailContribution": {
+        "allow": "Allow trail contribution",
+        "allowHint": "The student will be able to send a contribution to this trail from the submission editor.",
+        "button": "Contribute to the Trail",
+        "trailLabel": "Trail",
+        "success": "Contribution sent to the trail!",
+        "trailPlaceholder": "Select the trail"
+      }
     },
     "memberAlreadyInTask": "{member} already in task",
     "pleaseFillDates": "Please fill start and finish dates before add",

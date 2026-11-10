@@ -41,6 +41,8 @@
     :group="group"
     :student="student"
     :studentClass="class"
+    :allow-trail-contribution="allowTrailContribution"
+    :contribution-trail-id="contributionTrailId"
     @update-task-status="(status) => $emit('update-task-status', status)"
     @update-submission="() => $emit('update-submission')"
   />
@@ -86,6 +88,8 @@ interface Submission {
   group?: LearningPlanGroupSimple;
   student?: Student;
   class?: string;
+  allowTrailContribution?: boolean;
+  contributionTrailId?: number;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';
@@ -111,6 +115,8 @@ const props = withDefaults(defineProps<SubimissionProps>(), {
   group: undefined,
   student: undefined,
   class: undefined,
+  allowTrailContribution: false,
+  contributionTrailId: undefined,
 });
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];

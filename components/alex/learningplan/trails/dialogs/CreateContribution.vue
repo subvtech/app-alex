@@ -76,7 +76,7 @@ import type { contributionType } from '~/pages/courses/[id]/trails/[trailId]/con
 import Tiptap from '~/components/TipTap/index.vue';
 
 const props = defineProps<{ studentId?: number; trailId?: number }>();
-const emits = defineEmits(['highlight', 'block']);
+const emits = defineEmits(['highlight', 'block', 'created']);
 const { t } = useI18n();
 const messageStore = useMessageStore();
 
@@ -139,7 +139,8 @@ const createContribution = async (editorValue: any) => {
     trail: props.trailId,
     student_member: props.studentId,
   });
-  if (trailStore.trail?.contributions !== undefined)
+  emits('created', res.data);
+  if (trailStore.trail?.contributions !== undefined && trailStore.trail.id === props.trailId)
     trailStore.trail.contributions.unshift({
       ...res.data.attributes,
       id: res.data.id,

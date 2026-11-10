@@ -43,6 +43,8 @@
       :tags="selectedTask.task.tags"
       :title="selectedTask.task.title"
       :trail="selectedTask.task.trail"
+      :allow-trail-contribution="selectedTask.task.allow_trail_contribution"
+      :contribution-trail-id="selectedTask.task.contribution_trail?.id"
       :group="selectedTask.group"
       :status="selectedTask.status"
       :can-change-from-review="selectedTask.task.can_change_from_review"
@@ -93,7 +95,7 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
       task: {
-        populate: ['tags', 'blocks', 'trail'],
+        populate: ['tags', 'blocks', 'trail', 'contribution_trail'],
       },
       task_events: {
         populate: {

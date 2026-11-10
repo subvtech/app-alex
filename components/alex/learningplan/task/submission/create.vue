@@ -11,12 +11,27 @@
     <template #header>
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
         <template #default>
-          <div class="ml-auto">
+          <div class="ml-auto d-flex align-center ga-2">
+            <alex-custom-button
+              v-if="canContributeToTrail"
+              :text="$t('components.learningPlan.drawer.task.submission.trailContribution.button')"
+              prepend-icon="mdi-map-marker-plus-outline"
+              variant="secondary"
+              size="small"
+              @click="openTrailContribution"
+            />
             <alex-learningplan-task-date-chip :date="deadline" :is-published="true" />
           </div>
         </template>
       </alex-custom-dialog-header>
     </template>
+    <alex-learningplan-trails-dialogs-create-contribution
+      v-if="canContributeToTrail"
+      ref="trailContributionDialog"
+      :student-id="learningPlanStore.userLearningMember?.id"
+      :trail-id="contributionTrailId"
+      @created="onTrailContributionCreated"
+    />
     <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 editor tw-max-w-full">
       <tip-tap
         v-model="editorContent"
@@ -263,6 +278,8 @@ interface submissionProps {
   group?: LearningPlanGroupSimple;
   student?: Student;
   studentClass?: string;
+  allowTrailContribution?: boolean;
+  contributionTrailId?: number;
 }
 
 type criterionType = {
@@ -306,7 +323,20 @@ const props = withDefaults(defineProps<submissionProps>(), {
   group: undefined,
   student: undefined,
   studentClass: '',
+  allowTrailContribution: false,
+  contributionTrailId: undefined,
 });
+
+const learningPlanStore = useLearningPlanStore();
+const trailContributionDialog = ref();
+const canContributeToTrail = computed(
+  () =>
+    props.allowTrailContribution &&
+    !!props.contributionTrailId &&
+    props.memberType === 'student' &&
+    !!learningPlanStore.userLearningMember,
+);
+const openTrailContribution = () => trailContributionDialog.value?.openDialog('create');
 
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
@@ -323,6 +353,8 @@ let saveInterval;
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
+const onTrailContributionCreated = () =>
+  setMessage(t('components.learningPlan.drawer.task.submission.trailContribution.success'), 'success', true);
 const dialog = ref(false);
 const fullscreen = ref(false);
 const prevEditorContent = ref('');
