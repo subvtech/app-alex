@@ -72,29 +72,6 @@
                   </alex-custom-button>
                 </div>
               </Transition>
-              <div
-                v-if="isCreatingTask && learningPlanStore.learningPlan?.classes?.length"
-                class="d-flex flex-column ga-2 mt-3"
-              >
-                <v-select
-                  v-model="newTaskAssignmentClassId"
-                  :items="learningPlanStore.learningPlan.classes"
-                  item-title="name"
-                  item-value="id"
-                  :label="$t('components.projects.individual_learning.tasks.selectClass')"
-                  density="comfortable"
-                  hide-details
-                  clearable
-                />
-                <v-checkbox
-                  v-model="newTaskAssignToClass"
-                  :label="$t('components.projects.individual_learning.tasks.addAllClassStudents')"
-                  density="compact"
-                  hide-details
-                  class="ma-0"
-                  :disabled="!newTaskAssignmentClassId"
-                />
-              </div>
             </div>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -112,8 +89,6 @@
     :learningplan-id="learningPlanStore.learningPlan?.id || 0"
     :tags="taskDetails?.tags"
     :type="taskDetails?.type"
-    :assignment-class-id="taskAssignmentClassId"
-    :available-classes="learningPlanStore.learningPlan?.classes || []"
     :events="taskDetails?.task_events"
     :goals="taskDetails?.learning_goals"
     :members="taskDetails?.task_members"
@@ -135,7 +110,6 @@
     @change-submission-description="handleChangeSubmissionDescription"
     @change-tags="handleChangeTags"
     @change-members="handleChangeMembers"
-    @change-assignment-class="handleChangeAssignmentClass"
     @change-title="handleChangeTitle"
     @change-can-alter-from-review="handleChangeAlterFromReview"
     @kanban-click="navigateTo(`tasks/${taskDetails?.id}`)"
@@ -195,13 +169,6 @@ const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const loader = ref(false);
-const newTaskAssignmentClassId = ref<number | null>(null);
-const newTaskAssignToClass = ref(false);
-watch(newTaskAssignmentClassId, (classId) => {
-  if (!classId) {
-    newTaskAssignToClass.value = false;
-  }
-});
 const { setMessage } = useMessageStore();
 const socket = useSocket();
 const learningPlanStore = useLearningPlanStore();
@@ -281,11 +248,6 @@ const handleCreateTask = async () => {
         submission_required: false,
         can_submit_after_deadline: false,
         can_change_from_review: false,
-        ...(newTaskAssignToClass.value &&
-          newTaskAssignmentClassId.value && {
-            type: 'individual' as TaskType,
-            assignment_class: newTaskAssignmentClassId.value,
-          }),
       });
       learningPlanStore.learningPlan?.tasks.push({
         id: res.data.id,
@@ -304,8 +266,6 @@ const handleCreateTask = async () => {
   }
   loader.value = false;
   taskTitle.value = '';
-  newTaskAssignmentClassId.value = null;
-  newTaskAssignToClass.value = false;
   isCreatingTask.value = false;
 };
 const toggleExpand = (index: number) => {
@@ -389,11 +349,6 @@ const taskDetails = computed(() => {
     return learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   }
   return null;
-});
-
-const taskAssignmentClassId = computed(() => {
-  const assignmentClass = taskDetails.value?.assignment_class;
-  return typeof assignmentClass === 'number' ? assignmentClass : assignmentClass?.id ?? null;
 });
 
 const filteredTasks = computed(() => {
@@ -579,13 +534,6 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.allowed_editor_plugins = values.allowed_editor_plugins!;
     task.allow_trail_contribution = values.allow_trail_contribution;
     task.contribution_trail = values.contribution_trail;
-  }
-};
-
-const handleChangeAssignmentClass = (classId: number | null) => {
-  const task = learningPlanStore.learningPlan?.tasks.find((item) => item.id === editTaskId.value);
-  if (task) {
-    task.assignment_class = classId;
   }
 };
 
