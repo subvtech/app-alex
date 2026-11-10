@@ -93,6 +93,26 @@
           />
         </v-col>
       </v-row>
+      <v-select
+        v-if="!individualJourney && availableClasses.length"
+        v-model="selectedAssignmentClassId"
+        :items="availableClasses"
+        item-title="name"
+        item-value="id"
+        :label="$t('components.projects.individual_learning.tasks.selectClass')"
+        density="comfortable"
+        hide-details
+        class="mb-4"
+      />
+      <v-checkbox
+        v-if="canAssignToClass"
+        v-model="assignToClass"
+        :label="$t('components.projects.individual_learning.tasks.addAllClassStudents')"
+        density="compact"
+        hide-details
+        class="mb-4"
+        :disabled="!individualJourney && (type !== 'individual' || !selectedAssignmentClassId)"
+      />
       <alex-learningplan-task-description v-model="description" :mention-users="mentionUsers" :edit="editable" />
 
       <!-- Objetivos de aprendizagem -->
@@ -356,6 +376,9 @@ interface TaskTeacherDrawerProps {
   endDate?: string | null;
   members?: TaskMember[];
   individualJourney?: boolean;
+  assignmentClassId?: number | { id: number } | null;
+  availableClassId?: number;
+  availableClasses?: { id: number; name: string }[];
   showDelete?: boolean;
 }
 
@@ -384,6 +407,9 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   submissionDescription: '',
   members: () => [],
   individualJourney: false,
+  assignmentClassId: null,
+  availableClassId: undefined,
+  availableClasses: () => [],
   showDelete: false,
 });
 
@@ -408,6 +434,15 @@ const members = toRef(props, 'members');
 const type = ref<TaskType | null>(props.type);
 const startDate = ref(props.startDate);
 const endDate = ref(props.endDate);
+const selectedAssignmentClassId = ref<number | null>(
+  typeof props.assignmentClassId === 'number' ? props.assignmentClassId : props.assignmentClassId?.id ?? null,
+);
+const assignToClass = ref(!!selectedAssignmentClassId.value);
+const canAssignToClass = computed(
+  () =>
+    (props.individualJourney && (!!props.availableClassId || assignToClass.value)) ||
+    (!props.individualJourney && !!props.availableClasses.length),
+);
 
 const hasAtLeastSubmission = computed(() => !!members.value.filter((member) => member.last_submission_at).length);
 const wasFilledMainInfo = computed(() => {
@@ -543,6 +578,9 @@ watch(model, (value) => {
     tags.value = props.tags;
     status.value = props.status;
     type.value = props.type || null;
+    selectedAssignmentClassId.value =
+      typeof props.assignmentClassId === 'number' ? props.assignmentClassId : props.assignmentClassId?.id ?? null;
+    assignToClass.value = !!selectedAssignmentClassId.value;
     startDate.value = props.startDate;
     endDate.value = props.endDate;
     restrictions.value = props.restrictions;
@@ -558,6 +596,7 @@ type Emits = {
   'kanban-click': [];
   'attached-trail-click': [];
   'change-values': [values: Partial<TaskSimple>];
+  'change-assignment-class': [classId: number | null];
   'change-description': [value: string];
   'change-submission-description': [value: string];
   'change-title': [value: string];
@@ -667,6 +706,48 @@ const notifyError = () => {
   setMessage(t('components.learningPlan.drawer.task.errors.genericSave'), 'error', true);
 };
 const strapi = useStrapi();
+watch(
+  () => props.assignmentClassId,
+  (value) => {
+    selectedAssignmentClassId.value = typeof value === 'number' ? value : value?.id ?? null;
+    assignToClass.value = !!selectedAssignmentClassId.value;
+  },
+);
+watch(assignToClass, async (value) => {
+  if (isFirstTimeOpened.value) {
+    return;
+  }
+
+  const classId = value ? (props.individualJourney ? props.availableClassId : selectedAssignmentClassId.value) : null;
+  if (value && !classId) {
+    assignToClass.value = false;
+    return;
+  }
+
+  try {
+    await strapi.update('tasks', props.taskId, {
+      assignment_class: classId,
+    });
+    emit('change-assignment-class', classId);
+  } catch {
+    assignToClass.value = !value;
+    notifyError();
+  }
+});
+watch(selectedAssignmentClassId, async (classId) => {
+  if (isFirstTimeOpened.value || !assignToClass.value || props.individualJourney) {
+    return;
+  }
+
+  try {
+    await strapi.update('tasks', props.taskId, {
+      assignment_class: classId,
+    });
+    emit('change-assignment-class', classId);
+  } catch {
+    notifyError();
+  }
+});
 const updateTaskValues = async (
   taskId: number,
   values: Partial<Record<keyof TaskSimple, string | number | boolean | null | undefined | Object>>,
