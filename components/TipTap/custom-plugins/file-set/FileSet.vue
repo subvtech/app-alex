@@ -48,58 +48,146 @@
           "
         />
       </v-btn>
-      <div
-        v-for="file in filesArray"
-        :key="file.title"
-        class="fileItem d-flex rounded-lg text-body-2 text-gray-800 width-60 h-62"
-      >
-        <v-img
-          v-if="setFileBackground(file.extension) === 'img'"
-          class="min-w-16 file-border"
-          cover
-          :src="file.url"
-        ></v-img>
-        <div
-          v-else
-          class="min-w-16 file-border d-flex justify-center align-center"
-          :class="`bg-${setFileBackground(file.extension)}`"
-        >
-          <span class="text-body-2 text-uppercase">{{ file.extension }}</span>
-        </div>
-        <div class="file-content d-flex ga-3 pa-3">
-          <div class="file-text d-flex flex-column min-w-0">
-            <span class="text-body-2 text-gray-900 ellipsis lines-1">{{ file.title }}</span>
-            <span class="text-body-5 text-gray-500">{{ formatFileSize(file.size) }}</span>
-          </div>
-          <div class="file-actions d-flex justify-center align-center">
-            <v-btn
-              :loading="isDownloading.includes(file.id)"
-              variant="text"
-              size="small"
-              icon="mdi-cloud-download-outline"
-              :aria-label="$t('components.learningPlan.link.download')"
-              :title="$t('components.learningPlan.link.download')"
-              @click="downloadFile(file.url, file.title, file.id)"
+      <template v-for="file in filesArray" :key="file.title">
+        <div v-if="hasPreview(file)" class="file-entry--preview">
+          <audio-player v-if="isAudioFile(file)" :src="resolveFileUrl(file.url)" @error="failedPreviews.push(file.id)">
+            <template #actions>
+              <v-btn
+                :loading="isDownloading.includes(file.id)"
+                variant="text"
+                size="small"
+                icon="mdi-cloud-download-outline"
+                :aria-label="$t('components.learningPlan.link.download')"
+                :title="$t('components.learningPlan.link.download')"
+                @click="downloadFile(file.url, file.title, file.id)"
+              >
+              </v-btn>
+              <v-btn
+                v-if="!readOnly"
+                color="error-0"
+                variant="text"
+                icon="mdi-trash-can-outline"
+                size="small"
+                :aria-label="t('components.editorjs.fileSet.remove')"
+                :title="t('components.editorjs.fileSet.remove')"
+                @click="() => deleteFile(file)"
+              >
+              </v-btn>
+            </template>
+          </audio-player>
+          <div
+            v-else
+            class="file-preview position-relative rounded-lg"
+            :class="{
+              'file-preview--pending': getPreviewType(file.extension) === 'video' && !checkedVideos.includes(file.id),
+            }"
+          >
+            <iframe
+              v-if="getPreviewType(file.extension) === 'pdf'"
+              class="file-preview__pdf"
+              :src="resolveFileUrl(file.url)"
+              :title="file.title"
+              loading="lazy"
+            ></iframe>
+            <img
+              v-else-if="getPreviewType(file.extension) === 'image'"
+              class="file-preview__image"
+              :src="resolveFileUrl(file.url)"
+              :alt="file.title"
+              loading="lazy"
+              @error="failedPreviews.push(file.id)"
+            />
+            <template v-else>
+              <video
+                v-if="!checkedVideos.includes(file.id)"
+                class="d-none"
+                :src="resolveFileUrl(file.url)"
+                preload="metadata"
+                muted
+                @loadedmetadata="checkVideoTrack($event, file.id)"
+                @error="failedPreviews.push(file.id)"
+              ></video>
+              <video-player v-else class="videoFile" :options="videoPlayerOptions(file)" custom-classes="video-fluid" />
+            </template>
+            <div
+              class="file-preview__actions d-flex ga-1 rounded-lg pa-1"
+              :class="{ 'file-preview__actions--pdf': getPreviewType(file.extension) === 'pdf' }"
             >
-            </v-btn>
-            <v-btn
-              v-if="!readOnly"
-              color="error-0"
-              variant="text"
-              icon="mdi-trash-can-outline"
-              size="small"
-              @click="() => deleteFile(file)"
-            >
-            </v-btn>
+              <v-btn
+                :loading="isDownloading.includes(file.id)"
+                variant="text"
+                size="small"
+                icon="mdi-cloud-download-outline"
+                :aria-label="$t('components.learningPlan.link.download')"
+                :title="$t('components.learningPlan.link.download')"
+                @click="downloadFile(file.url, file.title, file.id)"
+              >
+              </v-btn>
+              <v-btn
+                v-if="!readOnly"
+                color="error-0"
+                variant="text"
+                icon="mdi-trash-can-outline"
+                size="small"
+                :aria-label="t('components.editorjs.fileSet.remove')"
+                :title="t('components.editorjs.fileSet.remove')"
+                @click="() => deleteFile(file)"
+              >
+              </v-btn>
+            </div>
           </div>
         </div>
-      </div>
+        <div v-else class="fileItem d-flex rounded-lg text-body-2 text-gray-800 width-60 h-62">
+          <v-img
+            v-if="setFileBackground(file.extension) === 'img'"
+            class="min-w-16 file-border"
+            cover
+            :src="file.url"
+          ></v-img>
+          <div
+            v-else
+            class="min-w-16 file-border d-flex justify-center align-center"
+            :class="`bg-${setFileBackground(file.extension)}`"
+          >
+            <span class="text-body-2 text-uppercase">{{ file.extension }}</span>
+          </div>
+          <div class="file-content d-flex ga-3 pa-3">
+            <div class="file-text d-flex flex-column min-w-0">
+              <span class="text-body-2 text-gray-900 ellipsis lines-1">{{ file.title }}</span>
+              <span class="text-body-5 text-gray-500">{{ formatFileSize(file.size) }}</span>
+            </div>
+            <div class="file-actions d-flex justify-center align-center">
+              <v-btn
+                :loading="isDownloading.includes(file.id)"
+                variant="text"
+                size="small"
+                icon="mdi-cloud-download-outline"
+                :aria-label="$t('components.learningPlan.link.download')"
+                :title="$t('components.learningPlan.link.download')"
+                @click="downloadFile(file.url, file.title, file.id)"
+              >
+              </v-btn>
+              <v-btn
+                v-if="!readOnly"
+                color="error-0"
+                variant="text"
+                icon="mdi-trash-can-outline"
+                size="small"
+                @click="() => deleteFile(file)"
+              >
+              </v-btn>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
   </node-view-wrapper>
 </template>
 
 <script setup lang="ts">
 import { NodeViewWrapper, type NodeViewProps } from '@tiptap/vue-3';
+import VideoPlayer from '../VideoJS.vue';
+import AudioPlayer from './AudioPlayer.vue';
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const config = useRuntimeConfig();
@@ -210,15 +298,82 @@ const setFileBackground = (extension: string) => {
   return fileBackground[extension.toLocaleLowerCase()] || 'gray-blue';
 };
 
+type PreviewType = 'pdf' | 'image' | 'video' | 'audio';
+
+const previewTypes: { [key: string]: PreviewType } = {
+  pdf: 'pdf',
+  jpg: 'image',
+  jpeg: 'image',
+  png: 'image',
+  gif: 'image',
+  bmp: 'image',
+  svg: 'image',
+  webp: 'image',
+  mp4: 'video',
+  webm: 'video',
+  ogv: 'video',
+  mov: 'video',
+  mp3: 'audio',
+  wav: 'audio',
+  ogg: 'audio',
+  oga: 'audio',
+  aac: 'audio',
+  m4a: 'audio',
+  flac: 'audio',
+};
+
+const getPreviewType = (extension: string): PreviewType | undefined => {
+  return previewTypes[extension?.toLocaleLowerCase()];
+};
+
+const failedPreviews = ref<string[]>([]);
+const checkedVideos = ref<string[]>([]);
+const audioOnlyVideos = ref<string[]>([]);
+
+const hasPreview = (file: FileType) => !!getPreviewType(file.extension) && !failedPreviews.value.includes(file.id);
+
+const isAudioFile = (file: FileType) =>
+  getPreviewType(file.extension) === 'audio' || audioOnlyVideos.value.includes(file.id);
+
+const checkVideoTrack = (event: Event, id: string) => {
+  const video = event.target as HTMLVideoElement;
+  if (!video.videoWidth && !video.videoHeight) {
+    audioOnlyVideos.value.push(id);
+  }
+  checkedVideos.value.push(id);
+};
+
+const videoMimeTypes: { [key: string]: string } = {
+  webm: 'video/webm',
+  ogv: 'video/ogg',
+};
+
+const videoPlayerOptions = (file: FileType) => ({
+  controls: true,
+  fluid: true,
+  playbackRates: [0.5, 1, 1.5, 2],
+  sources: [
+    {
+      src: resolveFileUrl(file.url),
+      type: videoMimeTypes[file.extension?.toLocaleLowerCase()] || 'video/mp4',
+    },
+  ],
+});
+
+const resolveFileUrl = (url: string) => {
+  if (url.startsWith('/')) {
+    return new URL(url, config.public.strapiUrl).toString();
+  }
+  if (!url.startsWith('http')) {
+    return `https://${url}`;
+  }
+  return url;
+};
+
 const downloadFile = async (url: string, title: string, id: string) => {
   isDownloading.value.push(id);
   try {
-    let downloadUrl = url;
-    if (url.startsWith('/')) {
-      downloadUrl = new URL(url, config.public.strapiUrl).toString();
-    } else if (!url.startsWith('http')) {
-      downloadUrl = `https://${url}`;
-    }
+    const downloadUrl = resolveFileUrl(url);
     const response = await fetch(downloadUrl);
     if (!response.ok) {
       throw new Error(`File download failed with status ${response.status}`);
@@ -330,6 +485,50 @@ const deleteFile = (file: FileType) => {
 .file-actions {
   flex-shrink: 0;
   column-gap: 4px;
+}
+
+.file-entry--preview {
+  flex-basis: 100%;
+}
+
+.file-preview {
+  border: 1px solid var(--Cinza-Cinza-100, #ebedef);
+  overflow: hidden;
+}
+
+.file-preview--pending {
+  height: 0;
+  border: 0;
+  visibility: hidden;
+}
+
+.file-preview__actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.file-preview__actions--pdf {
+  top: 56px;
+  right: 24px;
+}
+
+.file-preview__pdf {
+  display: block;
+  width: 100%;
+  height: min(70vh, 720px);
+  border: 0;
+}
+
+.file-preview__image {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0 auto;
+  object-fit: contain;
 }
 
 .drop-area {

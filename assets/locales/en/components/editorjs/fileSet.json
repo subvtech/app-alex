@@ -1,5 +1,12 @@
 {
   "addFile": "Add File",
+  "remove": "Remove file",
+  "audio": {
+    "play": "Play audio",
+    "pause": "Pause audio",
+    "seek": "Audio position",
+    "speed": "Change playback speed"
+  },
   "error": {
     "download": "An error occurred while downloading the file, please try again",
     "maxFileSize": "The file {filename} is too large, the maximum allowed size is {maxFilesize}",

@@ -1,5 +1,12 @@
 {
   "addFile": "Adicionar Arquivo",
+  "remove": "Remover arquivo",
+  "audio": {
+    "play": "Reproduzir áudio",
+    "pause": "Pausar áudio",
+    "seek": "Posição do áudio",
+    "speed": "Alterar velocidade de reprodução"
+  },
   "error": {
     "download": "Ocorreu um erro ao baixar o arquivo, tente novamente",
     "maxFileSize": "o Arquivo {filename} é muito grande, o tamanho máximo permitido é {maxFilesize}",
