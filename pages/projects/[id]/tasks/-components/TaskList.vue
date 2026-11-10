@@ -741,8 +741,8 @@ const toggleExpand = () => {
   expandBacklog.value = !expandBacklog.value ? 1 : 0;
 };
 
-const handleUpdateTask = (taskId, field) => {
-  if (!taskId || !field) {
+const handleUpdateTask = (taskId: number) => {
+  if (!taskId) {
     return;
   }
   queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
@@ -771,7 +771,7 @@ const updateSprints = () => {
 };
 
 const refreshTasksFromSocket = async () => {
-  if (isCreatingTask.value || editTask.value || editingTask.value) {
+  if (isCreatingTask.value || editingTask.value) {
     return;
   }
 
@@ -1191,13 +1191,7 @@ onBeforeUnmount(() => {
       :task="editTask"
       :sprints="sprintsValue.sprints"
       :can-edit="!isGuest"
-      @update-value="
-        (field) => {
-          if (editTask) {
-            handleUpdateTask(editTask?.id ?? 0, field);
-          }
-        }
-      "
+      @update-value="() => handleUpdateTask(editTask?.id ?? 0)"
       @moved="updateTable"
       @delete-task="handleDeleteTask"
     />

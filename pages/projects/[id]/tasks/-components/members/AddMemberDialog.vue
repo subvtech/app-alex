@@ -165,18 +165,24 @@ const handleSubmit = () => {
   });
 };
 const handleUpdateResponsible = (member: MemberItem | null, inCharge: boolean) => {
-  selectedMembers.value = selectedMembers.value.map((oldMember) => {
-    if (member?.id === oldMember.id && inCharge) {
-      return { ...oldMember, role: 'in_charge' };
-    }
-    return { ...oldMember, role: 'standard' };
-  });
+  if (!member) {
+    return;
+  }
+
+  const selectedMember = selectedMembers.value.find((selected) => selected.id === member.id) ?? member;
+  selectedMembers.value = [
+    ...selectedMembers.value
+      .filter((selected) => selected.id !== member.id)
+      .map((selected) => ({ ...selected, role: 'standard' })),
+    { ...selectedMember, role: inCharge ? 'in_charge' : 'standard' },
+  ];
+
   queryClient.setQueryData<MemberItem[]>(['project-members', learningplanValue], (oldData) => {
     if (!oldData) {
       return oldData;
     }
     return oldData.map((oldMember) => {
-      if (member?.id === oldMember.id && inCharge) {
+      if (oldMember.id === member.id && inCharge) {
         return { ...oldMember, role: 'in_charge' };
       }
       return { ...oldMember, role: 'standard' };

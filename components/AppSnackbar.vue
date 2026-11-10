@@ -32,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+
 const messageStore = useMessageStore();
 
 const { show, message, color, fill, showCountdown } = storeToRefs(messageStore);

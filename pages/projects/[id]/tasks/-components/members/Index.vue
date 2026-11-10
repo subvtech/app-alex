@@ -100,6 +100,7 @@ const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inChar
   }
   await updateMember({ id: member.id, role: inCharge ? 'in_charge' : 'standard' });
   queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
+  emit('change-members');
 };
 </script>
 
