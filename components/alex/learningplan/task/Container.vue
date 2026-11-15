@@ -95,6 +95,7 @@
     :description="taskDetails?.description || undefined"
     :submission-description="taskDetails?.submission_description"
     :has-submission="taskDetails?.submission_required"
+    :delivery-status="taskDeliveryStatus"
     :allow-trail-contribution="taskDetails?.allow_trail_contribution"
     :contribution-trail-id="taskDetails?.contribution_trail?.id"
     :can-change-from-review="taskDetails?.can_change_from_review"
@@ -289,21 +290,12 @@ const tasksArray = computed(() => {
   learningPlanStore.learningPlan?.tasks
     .sort((a, b) => (a.position > b.position ? 1 : -1))
     .forEach((task) => {
-      const delivered = {
-        toDo: 0,
-        doing: 0,
-        underReview: 0,
-        completed: 0,
-      };
       if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select) return;
       if (!isDateInRange(tasksFilter.value?.startDate, task.start_at)) return;
       if (!isDateInRange(tasksFilter.value?.finalDate, task.finish_at)) return;
+      const delivered = getDeliveryStatus(task.task_members);
       const students: TaskItem['students'] = [];
       task.task_members?.forEach((taskMember) => {
-        if (taskMember.status === 'to_do') delivered.toDo += 1;
-        if (taskMember.status === 'in_progress') delivered.doing += 1;
-        if (taskMember.status === 'in_review') delivered.underReview += 1;
-        if (taskMember.status === 'done') delivered.completed += 1;
         taskMember.learning_plan_group?.group_members?.forEach((student) => {
           const studentUser = student.student_member?.user;
           students.push({
@@ -350,6 +342,26 @@ const taskDetails = computed(() => {
   }
   return null;
 });
+
+const getDeliveryStatus = (members?: TaskSimple['task_members']) => {
+  const delivered = {
+    toDo: 0,
+    doing: 0,
+    underReview: 0,
+    completed: 0,
+  };
+  members?.forEach((member) => {
+    if (member.status === 'to_do') delivered.toDo += 1;
+    if (member.status === 'in_progress') delivered.doing += 1;
+    if (member.status === 'in_review') delivered.underReview += 1;
+    if (member.status === 'done') delivered.completed += 1;
+  });
+  return delivered;
+};
+
+const taskDeliveryStatus = computed(() =>
+  taskDetails.value ? getDeliveryStatus(taskDetails.value.task_members) : undefined,
+);
 
 const filteredTasks = computed(() => {
   const draft = tasksArray.value[0].filter((task) =>

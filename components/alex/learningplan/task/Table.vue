@@ -4,6 +4,7 @@
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
     :class="over.list === group && (tableSortBy.length || activeFilter) ? 'table-drop' : ''"
+    :style="{ '--fixed-columns-width': individualJourney ? '240px' : '520px' }"
     items-per-page="-1"
     :items="tasksArray"
     :headers="header"
@@ -28,16 +29,18 @@
           @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
         >
           <template v-if="!previewRow(item.id)">
-            <td class="text-body-4 text-overflow text-left" :class="isArchived ? 'text-gray-400' : 'text-gray-800'">
-              {{ item.title }}
+            <td class="text-body-4 text-left" :class="isArchived ? 'text-gray-400' : 'text-gray-800'">
+              <div class="task-title">{{ item.title }}</div>
             </td>
             <td>
-              <alex-learningplan-task-date-chip
-                v-if="item.finish_at"
-                :date="item.finish_at"
-                :is-published="item.status === 'published' && !isArchived"
-              />
-              <span v-else>{{ $t('pages.task.table.placeholders.undefined') }}</span>
+              <div class="d-flex flex-column align-start ga-1">
+                <alex-learningplan-task-date-chip
+                  v-if="item.finish_at"
+                  :date="item.finish_at"
+                  :is-published="item.status === 'published' && !isArchived"
+                />
+                <span v-else>{{ $t('pages.task.table.placeholders.undefined') }}</span>
+              </div>
             </td>
             <td v-if="!individualJourney">
               <div v-if="item.type">
@@ -56,17 +59,6 @@
                 <alex-custom-avatar-group :avatar-items="item.students || []" :max="3" />
               </div>
               <span v-else>{{ $t('pages.task.table.placeholders.noMembers') }}</span>
-            </td>
-            <td>
-              <alex-learningplan-task-submissions-status
-                v-if="item.delivered"
-                :submitted="item.delivered"
-                :type="item.type"
-              />
-              <div v-else>
-                <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
-                <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
-              </div>
             </td>
             <td>
               <v-tooltip :text="t('pages.task.table.tooltips.kanban')" location="bottom center">
@@ -130,8 +122,8 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskItem } from './Container.vue';
 import type { TaskStatus } from '~/models/simple/taskSimple.model';
+import type { TaskItem } from './Container.vue';
 
 interface sortType {
   key: string;
@@ -331,21 +323,17 @@ const header = [
     title: t('pages.task.table.header.title'),
     key: 'title',
     sortable: true,
-    width: 680,
+    minWidth: 220,
   },
   {
     title: t('pages.task.table.header.deadline_at'),
     key: 'deadline_at',
     width: 140,
   },
-  { title: t('pages.task.table.header.type'), key: 'type' },
+  { title: t('pages.task.table.header.type'), key: 'type', width: 140 },
   {
     title: t('pages.task.table.header.students'),
     key: 'students',
-  },
-  {
-    title: t('pages.task.table.header.delivered'),
-    key: 'delivered',
     width: 140,
   },
   { title: '', key: 'actions', sortable: false, width: 100 },
@@ -402,7 +390,9 @@ const previewRow = (id: number) => {
 </script>
 
 <style scoped>
-.text-overflow {
+.task-title {
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -422,6 +412,14 @@ const previewRow = (id: number) => {
 :global(.table table) {
   position: relative !important;
   overflow: hidden !important;
+  table-layout: fixed;
+  width: 100%;
+  min-width: calc(var(--fixed-columns-width) + 220px);
+}
+
+:global(.table th:first-child) {
+  width: calc(100% - var(--fixed-columns-width)) !important;
+  min-width: 220px !important;
 }
 
 .dragging {
