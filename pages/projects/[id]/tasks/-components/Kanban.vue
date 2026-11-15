@@ -20,6 +20,7 @@ import KanbanAddColumn from './KanbanAddColumn.vue';
 import KanbanColumn from './KanbanColumn.vue';
 import type { Colors } from './KanbanColumnHeader.vue';
 import TaskCard from './TaskCard.vue';
+import { TaskMember } from '#imports';
 
 export interface Column<U extends { id: number }> {
   id: number;

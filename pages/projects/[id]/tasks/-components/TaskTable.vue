@@ -113,7 +113,7 @@ const header = computed(() => {
       title: t('pages.projects.tasks.header_title'),
       key: 'title',
       sortable: false,
-      width: 716,
+      minWidth: 180,
     },
     ...(props.hideLevels
       ? [
@@ -121,14 +121,14 @@ const header = computed(() => {
             title: 'Épico',
             key: 'epic',
             sortable: false,
-            width: 192,
+            width: 130,
           },
 
           {
             title: 'História',
             key: 'story',
             sortable: false,
-            width: 192,
+            width: 120,
           },
         ]
       : []),
@@ -136,13 +136,13 @@ const header = computed(() => {
       title: t('pages.projects.tasks.header_deadline_at'),
       key: 'deadline_at',
       sortable: false,
-      width: 192,
+      width: 140,
     },
     {
       title: t('pages.projects.tasks.header_members'),
       key: 'students',
       sortable: false,
-      width: 232,
+      width: 110,
     },
 
     ...(!props.hideLevels
@@ -151,12 +151,12 @@ const header = computed(() => {
             title: t('pages.projects.tasks.header_delivered'),
             key: 'delivered',
             sortable: false,
-            width: 192,
+            width: 176,
           },
         ]
       : []),
 
-    { title: '', key: 'actions', sortable: false, minWidth: '96px', width: 'auto' },
+    { title: '', key: 'actions', sortable: false, width: 64 },
   ];
 });
 
@@ -354,11 +354,14 @@ const setDragStart = (id: number, e: DragEvent) => {
       class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table mt-1"
       sort-asc-icon="mdi-arrow-up-thin"
       sort-desc-icon="mdi-arrow-down-thin"
-      :class="
+      :class="[
         over?.list === group && (draggedTaskSprintTitle !== group || hoveredTree?.organization === 'standard')
           ? 'table-drop'
-          : ''
-      "
+          : '',
+        !hideLevels ? 'has-delivered-column' : '',
+        hideLevels ? 'has-epic-story-columns' : '',
+      ]"
+      :style="{ '--fixed-columns-width': hideLevels ? '564px' : '490px' }"
       :headers="header"
       :items="tasksArray"
       :search="searchFilter"
@@ -469,7 +472,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none max-w-full"
+                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none w-100 max-w-full"
                     :class="[
                       edit ? 'draggable-row' : '',
                       dragging && dragFrom == item.id ? 'dragging' : '',
@@ -484,8 +487,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     "
                   >
                     <td
-                      class="text-body-4 text-overflow text-left task-title"
-                      :class="`width-${175 - level * 4} min-w-${175 - level * 4}`"
+                      class="text-body-4 text-overflow text-left task-title task-title-column"
                       :style="taskItemMargin(level)"
                       @dragover.prevent="(e) => emit('dragOver', props.group, task.id, task.position, e)"
                     >
@@ -497,7 +499,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       </v-tooltip>
                     </td>
 
-                    <td v-if="hideLevels" class="min-w-48 field-cell field-outline">
+                    <td v-if="hideLevels" class="min-w-48 field-cell field-outline project-epic-column">
                       <span
                         :class="
                           item.parent_task?.organization === 'epic' ||
@@ -515,7 +517,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       </span>
                     </td>
 
-                    <td v-if="hideLevels" class="min-w-48 field-cell field-outline">
+                    <td v-if="hideLevels" class="min-w-48 field-cell field-outline project-story-column">
                       <span
                         :class="[
                           item.parent_task?.organization === 'story' ? 'tree-title-ellipsis' : 'tw-text-black/30',
@@ -528,7 +530,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       >
                     </td>
 
-                    <td class="min-w-48">
+                    <td class="project-deadline-column">
                       <alex-learningplan-task-date-chip
                         v-if="item.finish_at"
                         :date="item.finish_at"
@@ -538,13 +540,15 @@ const setDragStart = (id: number, e: DragEvent) => {
                         {{ $t('pages.projects.tasks.not_informed') }}
                       </span>
                     </td>
-                    <td class="min-w-58">
+                    <td class="project-members-column">
                       <div v-if="getUsers(item).length" class="ml-2" :class="{ 'gray-filter': isArchived }">
                         <alex-custom-avatar-group :avatar-items="getUsers(item) || []" :max="3" />
                       </div>
-                      <span v-else>{{ $t('pages.projects.tasks.no_members') }}</span>
+                      <div v-else class="d-flex justify-center project-members-empty">
+                        <v-icon icon="mdi-close-circle-outline" />
+                      </div>
                     </td>
-                    <td class="min-w-48" v-if="!hideLevels">
+                    <td v-if="!hideLevels" class="project-delivered-column">
                       <alex-learningplan-task-submissions-status
                         v-if="item.delivered"
                         :submitted="item.delivered"
@@ -557,7 +561,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                         </span>
                       </div>
                     </td>
-                    <td class="ml-auto tw-min-w-12">
+                    <td class="project-actions-column">
                       <alex-custom-dropdown
                         variant="text"
                         prepend-icon="mdi-dots-vertical"
@@ -642,9 +646,62 @@ const setDragStart = (id: number, e: DragEvent) => {
   padding: 0 8px;
 }
 
+.project-epic-column {
+  flex: 0 0 130px;
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
+}
+
+.project-story-column {
+  flex: 0 0 130px;
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
+}
+
 .field-cell .tree-title-ellipsis {
   width: 100%;
   text-align: left;
+}
+
+.task-title-column {
+  flex: 1 1 180px;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.project-delivered-column {
+  flex: 0 0 176px;
+  width: 176px;
+  min-width: 176px;
+  max-width: 176px;
+}
+
+.project-deadline-column {
+  flex: 0 0 140px;
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+}
+
+.project-members-column {
+  flex: 0 0 110px;
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+}
+
+.project-members-empty {
+  transform: translateX(-11px);
+}
+
+.tasks-items td.project-actions-column {
+  flex: 0 0 64px;
+  width: 64px;
+  min-width: 64px;
+  max-width: 64px;
+  padding: 0 0 0 8px;
 }
 
 .draggable-row {
@@ -666,6 +723,28 @@ const setDragStart = (id: number, e: DragEvent) => {
 :global(.table table) {
   position: relative !important;
   overflow: hidden !important;
+  table-layout: fixed;
+  width: 100%;
+  min-width: calc(var(--fixed-columns-width) + 180px);
+}
+
+:global(.table th:first-child) {
+  width: calc(100% - var(--fixed-columns-width)) !important;
+  min-width: 180px !important;
+}
+
+:global(.table.has-delivered-column th:nth-child(4) .v-data-table-header__content) {
+  transform: translateX(30px);
+}
+
+:global(.table.has-delivered-column th:nth-child(2) .v-data-table-header__content),
+:global(.table.has-epic-story-columns th:nth-child(4) .v-data-table-header__content) {
+  transform: translateX(25px);
+}
+
+:global(.table.has-delivered-column th:nth-child(3) .v-data-table-header__content),
+:global(.table.has-epic-story-columns th:nth-child(5) .v-data-table-header__content) {
+  transform: translateX(-7px);
 }
 
 .dragging {
