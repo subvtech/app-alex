@@ -89,7 +89,7 @@
       :dialog-action-text="dialogGroupActionText"
       :dialog-title="dialogGroupTitle"
       :filter-keys="['title']"
-      :hide-action="!userIsCourseFacilitator"
+      :hide-action="!canCreateGroup"
       :dialog-action-loading="creatingGroup"
       :dialog-action-disabled="generateRandomGroups ? !canGenerateRandomGroups : !formAddGroup.meta.value.valid"
       empty-state-object-name="pages.classes.participant"
@@ -100,7 +100,7 @@
         <alex-learningplan-class-group-card
           :title="item?.title"
           :members="getGroupMembersInfo(item.group_members)"
-          :no-options="!classStore.userCanEdit"
+          :no-options="!canManageGroup(item.group_members)"
           @delete="() => deleteGroupCard(item.id)"
           @edit="() => setUpdatedValues(item.id, item.title, item.group_members)"
           @open="() => openGroupCard(item)"
@@ -189,7 +189,7 @@
               <alex-custom-chip status="primary" size="small" :text="$t('pages.classes.responsible')" />
             </template>
           </alex-custom-list-item-user>
-          <template v-if="!editing">
+          <template v-if="!editing && userIsCourseFacilitator">
             <alex-inputs-checkbox
               v-model:model-value="generateRandomGroups"
               :label="$t('pages.classes.generateRandomGroups')"
@@ -296,6 +296,13 @@ const usersToInvite = ref([]);
 const learningPlanStore = useLearningPlanStore();
 const viewModeStudentStore = useViewModeStudentStore();
 const classStore = useClassStore();
+const currentUser = useStrapiUser();
+const currentUserClassMemberId = computed(
+  () =>
+    classStore.activeMembers.find(
+      (member) => member.user?.id === currentUser.value?.id,
+    )?.id,
+);
 
 const route = useRoute();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
@@ -303,6 +310,9 @@ const effectiveUserIsFacilitator = computed(() => {
   return !viewModeStudentStore.viewAsStudent && learningPlanStore.userIsFacilitator;
 });
 const userIsCourseFacilitator = computed(() => effectiveUserIsFacilitator.value);
+const canCreateGroup = computed(
+  () => userIsCourseFacilitator.value || currentUserClassMemberId.value !== undefined,
+);
 const sendingInvites = ref(false);
 const creatingGroup = ref(false);
 // Remove
@@ -476,12 +486,17 @@ async function onClickSendInvites() {
 }
 
 async function onCreateGroup() {
-  if (!userIsCourseFacilitator.value) {
-    setMessage('Apenas facilitadores do curso podem criar grupos na turma.', 'red', true);
+  if (!canCreateGroup.value) {
+    setMessage(t('pages.classes.groupCreationPermissionError'), 'red', true);
     return;
   }
 
   if (generateRandomGroups.value) {
+    if (!userIsCourseFacilitator.value) {
+      setMessage(t('pages.classes.randomGroupGenerationPermissionError'), 'red', true);
+      return;
+    }
+
     await onCreateRandomGroups();
     return;
   }
@@ -601,10 +616,13 @@ async function onCreateRandomGroups() {
 }
 
 async function onDeleteGroup(id: number) {
-  const { valid } = await formAddGroup.validate();
-  if (!valid) {
+  const group = classStore.currentClass?.learning_plan_groups?.find((item) => item.id === id);
+  if (!group || !canManageGroup(group.group_members)) {
+    setMessage(t('pages.classes.groupManagementPermissionError'), 'red', true);
+    dialogConfirmDeleteGroup.value = false;
     return;
   }
+
   try {
     await strapi.delete('learnin-plan-groups', id);
     setMessage('Grupo excluido com sucesso!', 'green', true);
@@ -617,6 +635,12 @@ async function onDeleteGroup(id: number) {
 }
 
 async function onUpdateGroup(id: number) {
+  const classGroup = classStore.currentClass?.learning_plan_groups?.find((item) => item.id === id);
+  if (!classGroup || !canManageGroup(classGroup.group_members)) {
+    setMessage(t('pages.classes.groupManagementPermissionError'), 'red', true);
+    return;
+  }
+
   const { valid } = await formAddGroup.validate();
   if (!valid) {
     return;
@@ -644,6 +668,11 @@ async function onUpdateGroup(id: number) {
 }
 
 function setUpdatedValues(id: number, title: string, groupMembers: LearningPlanGroupMemberSimple[]) {
+  if (!canManageGroup(groupMembers)) {
+    setMessage(t('pages.classes.groupManagementPermissionError'), 'red', true);
+    return;
+  }
+
   generateRandomGroups.value = false;
   studentsToUse.value = '';
   peoplePerGroup.value = '';
@@ -750,8 +779,31 @@ function openGroupCard(item: any) {
 }
 
 function deleteGroupCard(id: number) {
+  const group = classStore.currentClass?.learning_plan_groups?.find((item) => item.id === id);
+  if (!group || !canManageGroup(group.group_members)) {
+    setMessage(t('pages.classes.groupManagementPermissionError'), 'red', true);
+    return;
+  }
+
   removingGroupId.value = id;
   dialogConfirmDeleteGroup.value = true;
+}
+
+function canManageGroup(groupMembers: LearningPlanGroupMemberSimple[]) {
+  if (userIsCourseFacilitator.value) {
+    return true;
+  }
+
+  const currentMemberId = currentUserClassMemberId.value;
+  if (currentMemberId !== undefined) {
+    return groupMembers.some(
+      (groupMember) =>
+        groupMember.student_member?.id === currentMemberId &&
+        groupMember.role?.toLowerCase() === learningPlanGroupMemberRolesSimple.IN_CHARGE,
+    );
+  }
+
+  return !viewModeStudentStore.viewAsStudent && classStore.userCanEdit;
 }
 
 onBeforeMount(() => (headerStore.showHeader = true));
