@@ -91,7 +91,7 @@
       :filter-keys="['title']"
       :hide-action="!userIsCourseFacilitator"
       :dialog-action-loading="creatingGroup"
-      :dialog-action-disabled="!formAddGroup.meta.value.valid"
+      :dialog-action-disabled="generateRandomGroups ? !canGenerateRandomGroups : !formAddGroup.meta.value.valid"
       empty-state-object-name="pages.classes.participant"
       entity="group"
       @action="!editing ? onCreateGroup() : onUpdateGroup(editingGroupId)"
@@ -115,6 +115,7 @@
             :placeholder="$t('pages.classes.textGroupName')"
             name="groupTitle"
             density="comfortable"
+            :disabled="generateRandomGroups"
           />
           <alex-inputs-autocomplete
             v-model="selectedInChargeGroupMember"
@@ -128,6 +129,7 @@
             :custom-filter="searchGroupMembers"
             :items="classStore.activeMembers"
             return-object
+            :disabled="generateRandomGroups"
           >
             <template #item="{ props: propsItem, item, index }">
               <alex-custom-list-item-user
@@ -154,6 +156,7 @@
             :custom-filter="searchGroupMembers"
             return-object
             multiple
+            :disabled="generateRandomGroups"
           >
             <template #selection>
               <span></span>
@@ -179,12 +182,57 @@
               image: member?.user?.avatar?.url || '',
             }"
             remove-selection
+            :no-delete="generateRandomGroups"
             @delete="() => removeSelectedGroupMember(member.id)"
           >
             <template v-if="member.id === selectedInChargeGroupMember?.id" #chip>
               <alex-custom-chip status="primary" size="small" :text="$t('pages.classes.responsible')" />
             </template>
           </alex-custom-list-item-user>
+          <template v-if="!editing">
+            <alex-inputs-checkbox
+              v-model:model-value="generateRandomGroups"
+              :label="$t('pages.classes.generateRandomGroups')"
+              class="random-groups-checkbox ml-n2 mb-2"
+            />
+            <template v-if="generateRandomGroups">
+              <div class="random-groups-fields">
+                <alex-inputs-text-field
+                  :model-value="studentsToUse"
+                  :label="$t('pages.classes.studentsToUse')"
+                  :placeholder="$t('pages.classes.studentsToUsePlaceholder')"
+                  name="studentsToUse"
+                  density="comfortable"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  :error="randomGroupValidation?.field === 'students' || randomGroupValidation?.field === 'both'"
+                  :error-messages="randomGroupValidation?.field === 'students' ? randomGroupValidation.message : undefined"
+                  @update:model-value="updateStudentsToUse"
+                />
+                <p
+                  class="text-body-2 text-gray-600 mb-4"
+                  :class="{ 'mt-n4': randomGroupValidation?.field !== 'students' }"
+                >
+                  {{ $t('pages.classes.studentsToUseHint') }}
+                </p>
+                <alex-inputs-text-field
+                  :model-value="peoplePerGroup"
+                  :label="$t('pages.classes.peoplePerGroup')"
+                  :placeholder="$t('pages.classes.peoplePerGroupPlaceholder')"
+                  name="peoplePerGroup"
+                  density="comfortable"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  :error="randomGroupValidation?.field === 'groupSize' || randomGroupValidation?.field === 'both'"
+                  :error-messages="randomGroupValidation?.field === 'groupSize' || randomGroupValidation?.field === 'both' ? randomGroupValidation.message : undefined"
+                  @update:model-value="updatePeoplePerGroup"
+                />
+                <p v-if="randomGroupCount !== null" class="text-body-2 text-gray-600 mt-n4 mb-4">
+                  {{ $t('pages.classes.randomGroupsCount', { count: randomGroupCount }) }}
+                </p>
+              </div>
+            </template>
+          </template>
         </v-form>
       </template>
     </alex-learningplan-class-section-card>
@@ -219,6 +267,7 @@
 </template>
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { buildRandomGroupDefinitions } from '~/utils/randomGroupGeneration';
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { createGroupRules } = useFormRules();
@@ -264,6 +313,95 @@ const removingMemberId = ref(0);
 const removingGroupId = ref(0);
 //
 const groupTitle = ref('');
+const generateRandomGroups = ref(false);
+const studentsToUse = ref('');
+const peoplePerGroup = ref('');
+const invalidStudentsToUse = ref(false);
+const invalidPeoplePerGroup = ref(false);
+const ungroupedActiveMembers = computed(() => {
+  const groupedStudentIds = new Set(
+    (classStore.currentClass?.learning_plan_groups || []).flatMap(
+      (group) =>
+        group.group_members?.map((groupMember) => groupMember.student_member?.id) ??
+        [],
+    ),
+  );
+  return classStore.activeMembers.filter((member) => !groupedStudentIds.has(member.id));
+});
+type RandomGroupValidation = {
+  field: 'students' | 'groupSize' | 'both';
+  message: string;
+};
+const randomGroupValidation = computed<RandomGroupValidation | null>(() => {
+  if (!generateRandomGroups.value) {
+    return null;
+  }
+
+  const availableStudentCount = ungroupedActiveMembers.value.length;
+  if (availableStudentCount === 0) {
+    return {
+      field: 'students',
+      message: t('pages.classes.randomGroupsNoStudents'),
+    };
+  }
+
+  if (invalidStudentsToUse.value) {
+    return {
+      field: 'students',
+      message: t('pages.classes.randomGroupsInvalidInteger'),
+    };
+  }
+
+  const studentCount =
+    studentsToUse.value === '' ? availableStudentCount : Number(studentsToUse.value);
+  if (!Number.isSafeInteger(studentCount) || studentCount <= 0) {
+    return {
+      field: 'students',
+      message: t('pages.classes.randomGroupsInvalidInteger'),
+    };
+  }
+  if (studentCount > availableStudentCount) {
+    return {
+      field: 'students',
+      message: t('pages.classes.randomGroupsStudentCountExceedsTotal', {
+        total: availableStudentCount,
+      }),
+    };
+  }
+
+  const groupSize = Number(peoplePerGroup.value);
+  if (
+    invalidPeoplePerGroup.value ||
+    !peoplePerGroup.value ||
+    !Number.isSafeInteger(groupSize) ||
+    groupSize <= 0
+  ) {
+    return {
+      field: 'groupSize',
+      message: t('pages.classes.randomGroupsInvalidInteger'),
+    };
+  }
+  if (studentCount % groupSize !== 0) {
+    return {
+      field: 'both',
+      message: t('pages.classes.randomGroupsNotDivisible'),
+    };
+  }
+
+  return null;
+});
+const randomGroupCount = computed<number | null>(() => {
+  if (!generateRandomGroups.value || randomGroupValidation.value) {
+    return null;
+  }
+
+  const studentCount =
+    studentsToUse.value === ''
+      ? ungroupedActiveMembers.value.length
+      : Number(studentsToUse.value);
+  return studentCount / Number(peoplePerGroup.value);
+});
+const canGenerateRandomGroups = computed(() => !randomGroupValidation.value && !creatingGroup.value);
 const headerStore = usePageHeaderStore();
 const resendingInviteMember = ref(false);
 const resendingInviteMemberId = ref(0);
@@ -285,6 +423,27 @@ function removeSelectedGroupMember(id: number) {
     }, 2000);
   }
   selectedGroupMembers.value = selectedGroupMembers.value.filter((member) => member.id !== id);
+}
+
+function normalizeIntegerInput(value: string | number | null, previousValue: string) {
+  const input = String(value ?? '');
+  const isIntegerInput = /^\d*$/.test(input);
+  return {
+    value: isIntegerInput ? input : previousValue,
+    isIntegerInput,
+  };
+}
+
+function updateStudentsToUse(value: string | number | null) {
+  const normalized = normalizeIntegerInput(value, studentsToUse.value);
+  studentsToUse.value = normalized.value;
+  invalidStudentsToUse.value = !normalized.isIntegerInput;
+}
+
+function updatePeoplePerGroup(value: string | number | null) {
+  const normalized = normalizeIntegerInput(value, peoplePerGroup.value);
+  peoplePerGroup.value = normalized.value;
+  invalidPeoplePerGroup.value = !normalized.isIntegerInput;
 }
 
 async function onClickSendInvites() {
@@ -322,6 +481,11 @@ async function onCreateGroup() {
     return;
   }
 
+  if (generateRandomGroups.value) {
+    await onCreateRandomGroups();
+    return;
+  }
+
   const { valid } = await formAddGroup.validate();
   if (!valid) {
     return;
@@ -350,6 +514,87 @@ async function onCreateGroup() {
     dialogGroup.value = false;
   } catch (_) {
     setMessage('Erro ao criar grupo!', 'red', true);
+  } finally {
+    creatingGroup.value = false;
+  }
+}
+
+async function onCreateRandomGroups() {
+  if (!canGenerateRandomGroups.value) {
+    return;
+  }
+
+  const availableMembers = ungroupedActiveMembers.value;
+  const studentCount =
+    studentsToUse.value === '' ? availableMembers.length : Number(studentsToUse.value);
+  const groupSize = Number(peoplePerGroup.value);
+  const existingTitles =
+    classStore.currentClass?.learning_plan_groups?.map((group) => group.title) || [];
+  const groups = buildRandomGroupDefinitions(
+    availableMembers,
+    studentCount,
+    groupSize,
+    existingTitles,
+  );
+  let createdCount = 0;
+
+  creatingGroup.value = true;
+  try {
+    try {
+      for (const group of groups) {
+        const groupMembers = group.members.map((member) => ({
+          member_id: member.id,
+          role: member.id === group.responsible.id ? 'in_charge' : 'standard',
+        }));
+
+        await strapi.create('learnin-plan-groups', {
+          title: group.title,
+          learningplan: learningPlanId.value,
+          learning_class: classStore.currentClass?.id || 0,
+          group_members: groupMembers,
+        });
+        createdCount++;
+      }
+    } catch {
+      if (createdCount === 0) {
+        setMessage(t('pages.classes.randomGroupsCreateError'), 'red', true);
+        return;
+      }
+
+      try {
+        await classStore.reloadClass();
+        setMessage(
+          t('pages.classes.randomGroupsPartialError', {
+            created: createdCount,
+            total: groups.length,
+          }),
+          'red',
+          true,
+        );
+      } catch {
+        setMessage(
+          t('pages.classes.randomGroupsPartialReloadError', {
+            created: createdCount,
+            total: groups.length,
+          }),
+          'red',
+          true,
+        );
+      }
+      dialogGroup.value = false;
+      return;
+    }
+
+    try {
+      await classStore.reloadClass();
+    } catch {
+      setMessage(t('pages.classes.randomGroupsReloadError', { count: createdCount }), 'red', true);
+      dialogGroup.value = false;
+      return;
+    }
+
+    setMessage(t('pages.classes.randomGroupsCreated', { count: createdCount }), 'green', true);
+    dialogGroup.value = false;
   } finally {
     creatingGroup.value = false;
   }
@@ -399,6 +644,9 @@ async function onUpdateGroup(id: number) {
 }
 
 function setUpdatedValues(id: number, title: string, groupMembers: LearningPlanGroupMemberSimple[]) {
+  generateRandomGroups.value = false;
+  studentsToUse.value = '';
+  peoplePerGroup.value = '';
   dialogGroupTitle.value = t('pages.classes.editGroup');
   dialogGroupActionText.value = t('pages.classes.editGroup');
   dialogGroup.value = true;
@@ -555,6 +803,11 @@ watch(
 watch(dialogGroup, (value) => {
   if (!value) {
     groupTitle.value = '';
+    generateRandomGroups.value = false;
+    studentsToUse.value = '';
+    peoplePerGroup.value = '';
+    invalidStudentsToUse.value = false;
+    invalidPeoplePerGroup.value = false;
     selectedGroupMembers.value = [];
     selectedInChargeGroupMember.value = null;
     formAddGroup.resetForm();
@@ -564,4 +817,22 @@ watch(dialogGroup, (value) => {
     editing.value = false;
   }
 });
+
+watch(generateRandomGroups, (enabled) => {
+  if (!enabled) {
+    invalidStudentsToUse.value = false;
+    invalidPeoplePerGroup.value = false;
+  }
+});
 </script>
+
+<style scoped>
+.random-groups-checkbox :deep(.text-container.no-hint) {
+  margin-bottom: 19px !important;
+  margin-left: 3px;
+}
+
+.random-groups-fields {
+  margin-top: -1rem;
+}
+</style>
