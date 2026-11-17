@@ -560,6 +560,16 @@ const finalGrade = computed(() => {
   return grade.toFixed(2);
 });
 
+if (props.memberType === 'professor') {
+  provideSubmissionEvaluationContext({
+    evaluation: taskSubmissionEvaluationData,
+    rubricRows,
+    headers,
+    finalGrade,
+    grade: onCriteriaGrading,
+  });
+}
+
 watch(editorContent, (_, previous) => {
   prevEditorContent.value = previous;
 });

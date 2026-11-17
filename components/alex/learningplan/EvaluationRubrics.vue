@@ -51,6 +51,14 @@ const defaultRow = {
 };
 const content = ref<rubricRow[]>([...props.data, ...(props.editable ? [{ ...defaultRow }] : [])]);
 
+watch(
+  () => props.data,
+  (data) => {
+    if (props.editable) return;
+    content.value = [...data];
+  },
+);
+
 const onCriteriaSelect = (criteriaIndex: number, index: number) => {
   const contentVal = content.value;
   contentVal[index].criterion = dropdownItems.value[criteriaIndex];

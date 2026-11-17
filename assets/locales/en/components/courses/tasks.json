@@ -64,5 +64,13 @@
     "send_to_review_btn": "Send to review",
     "return_to_progress_btn": "Back to in progress"
   },
-  "noType": "(No type)"
+  "noType": "(No type)",
+  "evaluation_panel": {
+    "title": "Submission Evaluation",
+    "type": "Type:",
+    "rubric": "Rubric",
+    "group": "Group",
+    "criteria_group": "Criteria group",
+    "final_grade": "Final grade:"
+  }
 }

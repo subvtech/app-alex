@@ -82,15 +82,8 @@
               'file-preview--pending': getPreviewType(file.extension) === 'video' && !checkedVideos.includes(file.id),
             }"
           >
-            <iframe
-              v-if="getPreviewType(file.extension) === 'pdf'"
-              class="file-preview__pdf"
-              :src="resolveFileUrl(file.url)"
-              :title="file.title"
-              loading="lazy"
-            ></iframe>
             <img
-              v-else-if="getPreviewType(file.extension) === 'image'"
+              v-if="getPreviewType(file.extension) === 'image'"
               class="file-preview__image"
               :src="resolveFileUrl(file.url)"
               :alt="file.title"
@@ -109,10 +102,7 @@
               ></video>
               <video-player v-else class="videoFile" :options="videoPlayerOptions(file)" custom-classes="video-fluid" />
             </template>
-            <div
-              class="file-preview__actions d-flex ga-1 rounded-lg pa-1"
-              :class="{ 'file-preview__actions--pdf': getPreviewType(file.extension) === 'pdf' }"
-            >
+            <div class="file-preview__actions d-flex ga-1 rounded-lg pa-1">
               <v-btn
                 :loading="isDownloading.includes(file.id)"
                 variant="text"
@@ -137,7 +127,16 @@
             </div>
           </div>
         </div>
-        <div v-else class="fileItem d-flex rounded-lg text-body-2 text-gray-800 width-60 h-62">
+        <div
+          v-else
+          class="fileItem d-flex rounded-lg text-body-2 text-gray-800 width-60 h-62"
+          :class="{ 'fileItem--clickable': canOpenInModal(file) }"
+          :role="canOpenInModal(file) ? 'button' : undefined"
+          :tabindex="canOpenInModal(file) ? 0 : undefined"
+          :title="canOpenInModal(file) ? t('components.editorjs.fileSet.open') : undefined"
+          @click="openPreview(file)"
+          @keydown.enter="openPreview(file)"
+        >
           <v-img
             v-if="setFileBackground(file.extension) === 'img'"
             class="min-w-16 file-border"
@@ -156,7 +155,7 @@
               <span class="text-body-2 text-gray-900 ellipsis lines-1">{{ file.title }}</span>
               <span class="text-body-5 text-gray-500">{{ formatFileSize(file.size) }}</span>
             </div>
-            <div class="file-actions d-flex justify-center align-center">
+            <div class="file-actions d-flex justify-center align-center" @click.stop @keydown.enter.stop>
               <v-btn
                 :loading="isDownloading.includes(file.id)"
                 variant="text"
@@ -181,6 +180,23 @@
         </div>
       </template>
     </div>
+    <alex-custom-dialog
+      v-model="previewDialog"
+      :title="previewFile?.title"
+      :max-width="submissionEvaluation ? 1600 : 1080"
+      body-classes="pa-0 bg-white"
+      maximizable
+      no-footer
+    >
+      <div v-if="previewFile" class="d-flex ga-4" :class="{ 'pa-4': submissionEvaluation }">
+        <iframe class="file-modal__pdf" :src="resolveFileUrl(previewFile.url)" :title="previewFile.title"></iframe>
+        <alex-learningplan-task-submission-evaluation-panel
+          v-if="submissionEvaluation?.evaluation.value"
+          class="file-modal__evaluation"
+          :context="submissionEvaluation"
+        />
+      </div>
+    </alex-custom-dialog>
   </node-view-wrapper>
 </template>
 
@@ -218,6 +234,7 @@ const props = defineProps({
 });
 
 const readOnly = computed(() => props.extension.options.readOnly());
+const submissionEvaluation = props.extension.options.submissionEvaluation();
 
 const filesArray = ref<FileType[]>(
   Array.isArray(props.node.attrs.files) ? [...(props.node.attrs.files as FileType[])] : [],
@@ -330,7 +347,10 @@ const failedPreviews = ref<string[]>([]);
 const checkedVideos = ref<string[]>([]);
 const audioOnlyVideos = ref<string[]>([]);
 
-const hasPreview = (file: FileType) => !!getPreviewType(file.extension) && !failedPreviews.value.includes(file.id);
+const canOpenInModal = (file: FileType) => getPreviewType(file.extension) === 'pdf';
+
+const hasPreview = (file: FileType) =>
+  !!getPreviewType(file.extension) && !canOpenInModal(file) && !failedPreviews.value.includes(file.id);
 
 const isAudioFile = (file: FileType) =>
   getPreviewType(file.extension) === 'audio' || audioOnlyVideos.value.includes(file.id);
@@ -341,6 +361,15 @@ const checkVideoTrack = (event: Event, id: string) => {
     audioOnlyVideos.value.push(id);
   }
   checkedVideos.value.push(id);
+};
+
+const previewDialog = ref(false);
+const previewFile = ref<FileType | null>(null);
+
+const openPreview = (file: FileType) => {
+  if (!canOpenInModal(file)) return;
+  previewFile.value = file;
+  previewDialog.value = true;
 };
 
 const videoMimeTypes: { [key: string]: string } = {
@@ -464,6 +493,10 @@ const deleteFile = (file: FileType) => {
   }
 }
 
+.fileItem--clickable {
+  cursor: pointer;
+}
+
 .file-border {
   border-radius: 7px 0 0 7px;
 }
@@ -511,16 +544,16 @@ const deleteFile = (file: FileType) => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.file-preview__actions--pdf {
-  top: 56px;
-  right: 24px;
+.file-modal__pdf {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: min(80vh, 900px);
+  border: 0;
 }
 
-.file-preview__pdf {
-  display: block;
-  width: 100%;
-  height: min(70vh, 720px);
-  border: 0;
+.file-modal__evaluation {
+  max-height: min(80vh, 900px);
 }
 
 .file-preview__image {
