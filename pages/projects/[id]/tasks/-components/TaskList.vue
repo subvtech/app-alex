@@ -4,6 +4,7 @@ import type { ApplicationError } from '@/models/simple/applicationError.model';
 import type { TaskSimple } from '@/models/simple/taskSimple.model';
 import type { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
+import { sortSprintsByTimeline } from '@/utils/sort-sprints-by-timeline';
 import { useQueryClient } from '@tanstack/vue-query';
 // eslint-disable-next-line import/no-duplicates
 import { format } from 'date-fns';
@@ -203,23 +204,10 @@ const sprintBacklog = computed(() => {
   showInputs.value = new Array(sprintsValue.value.sprints.length + 1).fill(false);
   tasksTitles.value = new Array(sprintsValue.value.sprints.length + 1).fill('');
 
-  return sprintsValue.value.sprints
-    .slice()
-    .sort((a, b) => a.order - b.order)
-    .sort((a, b) => {
-      const dateA = new Date(a.start_at).getTime();
-      const dateB = new Date(b.start_at).getTime();
-
-      if (isNaN(dateA) && isNaN(dateB)) return 0;
-      if (isNaN(dateA)) return 1;
-      if (isNaN(dateB)) return -1;
-
-      return dateB - dateA;
-    })
-    .map((sprint) => ({
-      ...sprint,
-      tasks: sprint.tasks.map(formatTasks),
-    }));
+  return sortSprintsByTimeline(sprintsValue.value.sprints).map((sprint) => ({
+    ...sprint,
+    tasks: sprint.tasks.map(formatTasks),
+  }));
 });
 
 const checkForCompletedTasks = (sprint: Sprint) => {
