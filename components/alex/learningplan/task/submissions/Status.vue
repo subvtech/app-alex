@@ -9,7 +9,7 @@
           : $t('pages.task.submissions.delivery')
       }}
     </HoverCardTrigger>
-    <HoverCardContent class="bg-white">
+    <HoverCardContent :side="side" :class="side === 'top' ? 'bg-white tw-z-[3000]' : 'bg-white'">
       <div class="d-flex justify-space-between pb-4 divider-row">
         <span class="text-gray-800 text-h5">{{
           $t('pages.task.submissions.progress')
@@ -41,6 +41,7 @@ interface Submissions {
     completed: number;
   };
   type?: TaskType | null;
+  side?: 'top' | 'right' | 'bottom' | 'left';
 }
 type TaskStatus = {
   text: string;
@@ -57,6 +58,7 @@ const props = withDefaults(defineProps<Submissions>(), {
     completed: 0,
   }),
   type: 'individual',
+  side: 'bottom',
 });
 
 const taskStatus: TaskStatus[] = [

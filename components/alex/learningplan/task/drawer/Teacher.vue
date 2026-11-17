@@ -103,7 +103,7 @@
         {{ $t('components.learningPlan.drawer.task.submission.label') }}
       </p>
       <v-row class="mx-0 mt-3 mb-4">
-        <v-col class="pa-0 d-flex align-center" cols="6">
+        <v-col class="pa-0 d-flex flex-column align-start" cols="6">
           <alex-custom-switch
             v-model="hasSubmission"
             :label="$t('components.learningPlan.drawer.task.submission.reqSubmission')"
@@ -155,6 +155,26 @@
         :mention-users="mentionUsers"
         :title="$t('components.learningPlan.drawer.task.submission.description.label')"
       />
+
+      <alex-learningplan-task-submissions-status
+        v-if="deliveryStatus"
+        side="top"
+        :class="hasSubmission ? 'mt-8' : 'mt-4'"
+        :submitted="deliveryStatus"
+        :type="type"
+      />
+
+      <!-- Recursos de aprendizagem -->
+      <div class="my-6">
+        <alex-learningplan-task-resources
+          v-model="openResources"
+          :edit="editable"
+          :task-id="taskId"
+          :trail-id="trail?.id"
+          :blocks="blocks"
+          teacher
+        />
+      </div>
 
       <p class="text-h3 mt-6">Avaliação</p>
       <v-row class="mx-0 mt-3 mb-4 gap-3">
@@ -288,18 +308,6 @@
         :learning-goals="taskLearningGoals"
       />
 
-      <!-- Recursos de aprendizagem -->
-      <div class="my-6">
-        <alex-learningplan-task-resources
-          v-model="openResources"
-          :edit="editable"
-          :task-id="taskId"
-          :trail-id="trail?.id"
-          :blocks="blocks"
-          teacher
-        />
-      </div>
-
       <!-- Eventos e atribuições -->
       <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
       <v-window v-model="activePage">
@@ -369,6 +377,12 @@ interface TaskTeacherDrawerProps {
   restrictions?: string;
   editable?: boolean;
   hasSubmission?: boolean;
+  deliveryStatus?: {
+    toDo: number;
+    doing: number;
+    underReview: number;
+    completed: number;
+  };
   allowTrailContribution?: boolean;
   contributionTrailId?: number;
   canChangeFromReview?: boolean;
