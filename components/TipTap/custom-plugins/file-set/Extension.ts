@@ -1,6 +1,7 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 import { VueNodeViewRenderer } from '@tiptap/vue-3';
 
+import type { SubmissionEvaluationContext } from '~/composables/useSubmissionEvaluationContext';
 import FilesetComponent from './FileSet.vue';
 
 interface FileAttributes {
@@ -19,6 +20,7 @@ interface FilesetConfig {
   }>;
   handleDeletedFiles: (id: string) => void;
   readOnly: () => boolean;
+  submissionEvaluation: () => SubmissionEvaluationContext | null;
 }
 
 export default Node.create<FilesetConfig>({
@@ -39,6 +41,7 @@ export default Node.create<FilesetConfig>({
       uploadFiles: () => Promise.resolve({ success: 1 }),
       handleDeletedFiles: () => {},
       readOnly: () => false,
+      submissionEvaluation: () => null,
     };
   },
   parseHTML() {

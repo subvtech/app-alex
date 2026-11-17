@@ -64,5 +64,13 @@
     "send_to_review_btn": "Enviar para avaliação",
     "return_to_progress_btn": "Voltar para fazendo"
   },
-  "noType": "(Sem tipo)"
+  "noType": "(Sem tipo)",
+  "evaluation_panel": {
+    "title": "Avaliação de Entrega",
+    "type": "Tipo:",
+    "rubric": "Rubrica",
+    "group": "Grupo",
+    "criteria_group": "Grupo de critérios",
+    "final_grade": "Nota final:"
+  }
 }

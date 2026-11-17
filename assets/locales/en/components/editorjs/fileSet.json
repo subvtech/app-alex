@@ -1,6 +1,7 @@
 {
   "addFile": "Add File",
   "remove": "Remove file",
+  "open": "Open file",
   "audio": {
     "play": "Play audio",
     "pause": "Pause audio",

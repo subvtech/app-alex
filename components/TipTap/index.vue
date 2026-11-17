@@ -62,6 +62,7 @@ import mentionSuggestion from './custom-plugins/mentions/Suggestions';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
+const submissionEvaluation = useSubmissionEvaluationContext();
 const app = useNuxtApp();
 
 const { t } = useI18n();
@@ -530,6 +531,7 @@ const blockToolsMap = {
       });
     },
     readOnly: () => !isEditable.value,
+    submissionEvaluation: () => submissionEvaluation,
   }),
   TaskList,
   TaskItem: TaskItem.configure({ nested: true }),
