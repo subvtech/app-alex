@@ -75,9 +75,8 @@ jobs:
           username: ${{ secrets.DEPLOY_SSH_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd /root/services/alex
-            docker compose pull ${{ steps.vars.outputs.service }}
-            docker compose up -d ${{ steps.vars.outputs.service }}
+            sudo /usr/bin/docker compose -f /root/services/alex/docker-compose.yml pull ${{ steps.vars.outputs.service }}
+            sudo /usr/bin/docker compose -f /root/services/alex/docker-compose.yml up -d ${{ steps.vars.outputs.service }}
 
   vercel-preview:
     if: github.event_name == 'pull_request'
