@@ -3050,12 +3050,12 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-italic/-/extension-italic-2.5.7.tgz#e68c2870f46e5852f43f276621b5635e469cedc1"
   integrity sha512-8tLH4LNWrl8eK741u3Nkrz0ZBqntsU3lvyXKKct1FdfKhLGK6TR0tlFOY86vwvyPzfR3PYBbR319Ye3gzU6w5Q==
 
-"@tiptap/extension-link@^3.32.2":
-  version "3.32.2"
-  resolved "https://registry.yarnpkg.com/@tiptap/extension-link/-/extension-link-3.32.2.tgz#16e8dd5d9ba6a56ee42efe0215dd2196fac32e86"
-  integrity sha512-EwQtMXsU1Vc03n+yud7lfaR+RjHTPwFyI/hcEylvJba7iIXDSLA/ey4mnpwt2od8CEx/ZcOutIryORKVR9Py/Q==
+"@tiptap/extension-link@^2.5.7":
+  version "2.27.3"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-link/-/extension-link-2.27.3.tgz#66bc28dddbb23bc211ae1d1b0633a3329e5c0108"
+  integrity sha512-0KF+iweOlegWjsRDJO7EZL1bmmcghNmjPbcSvvyeF19Lh7Nit44dYV0w1JCDvweRRAXECYFXpxZTcIvSf0fEng==
   dependencies:
-    linkifyjs "^4.3.3"
+    linkifyjs "^4.3.2"
 
 "@tiptap/extension-list-item@^2.5.7":
   version "2.5.7"
@@ -8892,7 +8892,7 @@ linkify-it@^5.0.2:
   dependencies:
     uc.micro "^2.0.0"
 
-linkifyjs@^4.3.3:
+linkifyjs@^4.3.2:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/linkifyjs/-/linkifyjs-4.4.0.tgz#07e3671964f57bc9d37351b19f1ca9c52c95da2f"
   integrity sha512-InTexvtbai+2c+dEVGcc6O6P2DMVIiwD9a/i4zFroazOIYLOS6FSVmAJ7kFeumnCMx6/gQqNAkbUvgMubV4+MA==

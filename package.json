@@ -83,7 +83,7 @@
     "@tiptap/extension-color": "^2.5.7",
     "@tiptap/extension-font-family": "^2.5.7",
     "@tiptap/extension-highlight": "^2.5.7",
-    "@tiptap/extension-link": "^3.32.2",
+    "@tiptap/extension-link": "^2.5.7",
     "@tiptap/extension-list-item": "^2.5.7",
     "@tiptap/extension-mention": "^2.5.7",
     "@tiptap/extension-placeholder": "^2.5.7",
