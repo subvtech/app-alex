@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      npm_and_yarn:
+        patterns:
+          - "*"
+    ignore:
+      # Previne que o Dependabot suba extensões isoladas do TipTap para v3
+      # mantendo compatibilidade com o ecossistema v2 e com o servidor hocuspocus-alex
+      - dependency-name: "@tiptap/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@tiptap-pro/*"
+        update-types: ["version-update:semver-major"]
+
