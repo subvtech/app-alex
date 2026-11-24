@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
 import { useCreateTask, useDeleteTask, useUpdateTask, useUpdateTaskStatus } from '../-composables/useCreateTask';
-import { useDeleteSprint, useGetSprints, useMoveSprint } from '../-composables/useSprints';
+import { getOrderedSprints, useDeleteSprint, useGetSprints, useMoveSprint } from '../-composables/useSprints';
 import type { SprintsResponse } from '../-composables/useSprints';
 import type { Droppable, SprintTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
@@ -203,23 +203,10 @@ const sprintBacklog = computed(() => {
   showInputs.value = new Array(sprintsValue.value.sprints.length + 1).fill(false);
   tasksTitles.value = new Array(sprintsValue.value.sprints.length + 1).fill('');
 
-  return sprintsValue.value.sprints
-    .slice()
-    .sort((a, b) => a.order - b.order)
-    .sort((a, b) => {
-      const dateA = new Date(a.start_at).getTime();
-      const dateB = new Date(b.start_at).getTime();
-
-      if (isNaN(dateA) && isNaN(dateB)) return 0;
-      if (isNaN(dateA)) return 1;
-      if (isNaN(dateB)) return -1;
-
-      return dateB - dateA;
-    })
-    .map((sprint) => ({
-      ...sprint,
-      tasks: sprint.tasks.map(formatTasks),
-    }));
+  return getOrderedSprints(sprintsValue.value.sprints).map((sprint) => ({
+    ...sprint,
+    tasks: sprint.tasks.map(formatTasks),
+  }));
 });
 
 const checkForCompletedTasks = (sprint: Sprint) => {

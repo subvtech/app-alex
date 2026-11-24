@@ -48,7 +48,7 @@
         required
         density="comfortable"
         hide-error
-        :allowed-dates="projectRange"
+        :allowed-dates="() => true"
       />
       <alex-inputs-date
         v-model="sprint.end_at"
@@ -59,7 +59,7 @@
         :label="$t('components.projects.sprint.endDate')"
         :disabled="!isEndDateEnabled"
         hide-error
-        :allowed-dates="projectRange"
+        :allowed-dates="endDateRange"
       />
     </div>
   </alex-custom-dialog>
@@ -180,14 +180,21 @@ const onSubmit = handleSubmit(async (values) => {
   }
 });
 
-const projectRange = (date: Date) => {
-  const projectStartDate = new Date(props.projectStartDate);
-  const projectEndDate = new Date(props.projectEndDate);
-  return date >= projectStartDate && date <= projectEndDate;
-};
-
 const dateToString = (date: Date) => {
   return format(date, 'yyyy-MM-dd');
+};
+
+const parseDateAtLocalMidnight = (date: Date | string) => {
+  const value = typeof date === 'string' ? date.slice(0, 10) : dateToString(date);
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
+const endDateRange = (date: Date) => {
+  if (!sprint.value.start_at) return true;
+
+  const startDate = parseDateAtLocalMidnight(sprint.value.start_at);
+  return date >= startDate;
 };
 
 watch(dialog, (newValue) => {
@@ -236,6 +243,16 @@ watch(
     const startDate = new Date(year, month - 1, day);
     const endDate = addWeeks(startOfDay(startDate), weeks[newInterval]);
     sprint.value.end_at = dateToString(endDate);
+  },
+);
+
+watch(
+  () => sprint.value.start_at,
+  (newStartDate) => {
+    if (!newStartDate || sprint.value.interval !== 'custom') return;
+    if (!sprint.value.end_at || sprint.value.end_at < newStartDate) {
+      sprint.value.end_at = newStartDate;
+    }
   },
 );
 

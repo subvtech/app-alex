@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { get } from '@/utils/get';
+import type { SprintSimple } from '~/models/simple/sprint.model';
 import Kanban from './-components/Kanban.vue';
 import TaskFilterDrawer from './-components/TaskFilterDrawer.vue';
 import TaskList from './-components/TaskList.vue';
 import { useGetSprints } from './-composables/useKanban';
-import type { SprintSimple } from '~/models/simple/sprint.model';
-import type { Sprint } from './-composables/useSprints';
+import { getOrderedSprints } from './-composables/useSprints';
 
 type FilterType = {
   finalDate?: { start: string | null; end: string | null };
@@ -28,7 +28,8 @@ const search = ref('');
 const route = useRoute();
 const learninplanId = computed(() => parseInt(route.params.id.toString()));
 const { data: sprints } = useGetSprints(learninplanId);
-const selectedSprint = ref<SprintSimple | undefined>(sprints.value?.sprints[0]);
+const orderedSprints = computed(() => getOrderedSprints(sprints.value?.sprints ?? []));
+const selectedSprint = ref<SprintSimple | undefined>(orderedSprints.value[0]);
 const filter = ref<FilterType>();
 const filterDrawer = ref();
 const chips = ref<string[]>([]);
@@ -61,7 +62,7 @@ watch(
 );
 watch(sprints, (value) => {
   if (!selectedSprint.value) {
-    selectedSprint.value = value.sprints[0];
+    selectedSprint.value = getOrderedSprints(value.sprints)[0];
   }
 });
 </script>
@@ -98,7 +99,7 @@ watch(sprints, (value) => {
           density="comfortable"
           item-title="title"
           name="search"
-          :items="sprints.sprints"
+          :items="orderedSprints"
           :placeholder="t('pages.projects.tasks.select_sprint')"
         />
 
