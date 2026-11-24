@@ -35,7 +35,7 @@
         :close-on-content-click="false"
       >
         <v-date-picker
-          v-model="dateValue"
+          :model-value="dateValue"
           color="secondary-0"
           rounded="lg"
           location="bottom start"
@@ -44,6 +44,7 @@
           :landscape="true"
           :allowed-dates="allowedDates"
           :max-width="360"
+          @update:model-value="handleDateChange"
         />
       </v-menu>
     </v-text-field>
@@ -100,9 +101,17 @@ const dateValue = computed({
     return convertToDate(value.value);
   },
   set(value) {
-    emit('update:modelValue', formatDate(value));
+    handleDateChange(value);
   },
 });
+
+const handleDateChange = (date?: Date | string) => {
+  const formattedDate = formatDate(date);
+  if (!formattedDate) return;
+  emit('update:modelValue', formattedDate);
+  inputValue.value = formattedDate;
+  menu.value = false;
+};
 
 const menu = ref(false);
 const inputValue = computed({

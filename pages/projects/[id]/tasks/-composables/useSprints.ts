@@ -11,6 +11,28 @@ export type SprintsResponse = {
   sprints: Sprint[];
 };
 
+export const getOrderedSprints = <T extends { start_at: string; end_at: string; order: number }>(sprints: T[]) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isCurrentSprint = (sprint: T) => {
+    const start = new Date(`${sprint.start_at}T00:00:00`);
+    const end = new Date(`${sprint.end_at}T23:59:59`);
+    return !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && today >= start && today <= end;
+  };
+
+  return [...sprints].sort((a, b) => {
+    const aIsCurrent = isCurrentSprint(a);
+    const bIsCurrent = isCurrentSprint(b);
+
+    if (aIsCurrent !== bIsCurrent) {
+      return aIsCurrent ? -1 : 1;
+    }
+
+    return a.order - b.order;
+  });
+};
+
 // Runtime shims for Vite ESM compatibility
 export const Sprint = {} as any;
 export const SprintsResponse = {} as any;
