@@ -33,7 +33,14 @@
       @created="onTrailContributionCreated"
     />
     <div class="mx-auto my-6 px-sm-6 px-md-0 w-100 editor tw-max-w-full">
+      <alex-learningplan-task-submission-items-form
+        v-if="hasSubmissionItems"
+        v-model="submissionAnswers"
+        :items="submissionItems"
+        :readonly="isReadOnly"
+      />
       <tip-tap
+        v-else
         v-model="editorContent"
         :doc-name="docName"
         :edit="!isReadOnly"
@@ -110,7 +117,14 @@
       <v-tabs-window v-model="tab" class="w-75">
         <v-tabs-window-item value="content" class="w-100">
           <div class="mx-auto px-sm-6 px-md-0 d-flex justify-center editor tw-max-w-full">
+            <alex-learningplan-task-submission-items-form
+              v-if="hasSubmissionItems"
+              v-model="submissionAnswers"
+              :items="submissionItems"
+              readonly
+            />
             <tip-tap
+              v-else
               v-model="editorContent"
               class=""
               :doc-name="docName"
@@ -261,6 +275,7 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
 import lodash from 'lodash';
+import type { SubmissionAnswers, SubmissionItemsContent } from '~/composables/useSubmissionItems';
 import type { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
 import type { Student } from '../drawer/Student.vue';
 interface submissionProps {
@@ -359,6 +374,17 @@ const dialog = ref(false);
 const fullscreen = ref(false);
 const prevEditorContent = ref('');
 const editorContent = ref<any | undefined>(undefined);
+const { items: submissionItems } = useSubmissionItems(() => props.taskId);
+const hasSubmissionItems = computed(() => submissionItems.value.length > 0);
+const submissionAnswers = computed<SubmissionAnswers>({
+  get: () => {
+    const content = editorContent.value ?? props.lastSubmission?.submission;
+    return content?.type === 'submission_items' ? content.answers : {};
+  },
+  set: (answers) => {
+    editorContent.value = { type: 'submission_items', content: [], answers } as SubmissionItemsContent;
+  },
+});
 const isLoading = ref(false);
 const { create, update, findOne } = useStrapi();
 const currentData = ref<EditorSubmission>();

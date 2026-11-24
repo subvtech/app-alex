@@ -118,6 +118,7 @@
             :task-deadline="finalDate"
             :restrictions="restrictionsValue"
             :task-member-id="taskMemberId"
+            :task-id="taskId"
             :content="submissions.data[0]"
             :task-status="status"
             :doc-name="docName"

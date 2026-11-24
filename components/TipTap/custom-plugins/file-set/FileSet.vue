@@ -84,10 +84,11 @@
           >
             <img
               v-if="getPreviewType(file.extension) === 'image'"
-              class="file-preview__image"
+              class="file-preview__image cursor-zoom-in"
               :src="resolveFileUrl(file.url)"
               :alt="file.title"
               loading="lazy"
+              @click="openImageViewer(file)"
               @error="failedPreviews.push(file.id)"
             />
             <template v-else>
@@ -197,6 +198,7 @@
         />
       </div>
     </alex-custom-dialog>
+    <alex-media-image-viewer v-model="imageViewer" :src="imageViewerFile?.src" :alt="imageViewerFile?.title" />
   </node-view-wrapper>
 </template>
 
@@ -370,6 +372,14 @@ const openPreview = (file: FileType) => {
   if (!canOpenInModal(file)) return;
   previewFile.value = file;
   previewDialog.value = true;
+};
+
+const imageViewer = ref(false);
+const imageViewerFile = ref<{ src: string; title: string } | null>(null);
+
+const openImageViewer = (file: FileType) => {
+  imageViewerFile.value = { src: resolveFileUrl(file.url), title: file.title };
+  imageViewer.value = true;
 };
 
 const videoMimeTypes: { [key: string]: string } = {
