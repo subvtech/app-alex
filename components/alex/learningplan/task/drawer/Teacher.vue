@@ -145,6 +145,9 @@
         <v-col v-if="hasSubmission" class="mt-4 pa-0" cols="12">
           <alex-learningplan-task-restrictions v-model="restrictionsValue" :edit="editable" />
         </v-col>
+        <v-col v-if="hasSubmission" class="mt-6 pa-0" cols="12">
+          <alex-learningplan-task-submission-items-builder v-model="submissionItems" :edit="editable" />
+        </v-col>
       </v-row>
 
       <alex-learningplan-task-description
@@ -424,6 +427,7 @@ const taskLearningGoals = computed(() => {
   return goals.value.map((goal) => `${goal?.verb?.text ?? ''} ${goal?.description ?? ''}`.trim()).filter(Boolean);
 });
 const taskId = toRef(props, 'taskId');
+const { items: submissionItems } = useSubmissionItems(taskId);
 const allowTrailContribution = ref(props.allowTrailContribution);
 const contributionTrailId = ref<number | undefined>(props.contributionTrailId);
 const learningPlanStore = useLearningPlanStore();

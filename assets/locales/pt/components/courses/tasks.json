@@ -72,5 +72,45 @@
     "group": "Grupo",
     "criteria_group": "Grupo de critérios",
     "final_grade": "Nota final:"
+  },
+  "submission_items": {
+    "label": "Itens da entrega",
+    "hint": "Defina o que o aluno deve entregar. Sem itens, a entrega usa o editor livre.",
+    "empty": "Nenhum item definido",
+    "add": "Adicionar item",
+    "remove": "Remover",
+    "saveError": "Não foi possível salvar os itens da entrega, tente novamente",
+    "titleLabel": "Enunciado",
+    "types": {
+      "text": "Texto",
+      "image": "Imagem",
+      "video": "Vídeo",
+      "file": "Anexo",
+      "url": "URL",
+      "quiz": "Quiz"
+    },
+    "quiz": {
+      "addQuestion": "Adicionar questão",
+      "statement": "Pergunta",
+      "option": "Alternativa {n}",
+      "addOption": "Adicionar alternativa",
+      "correctHint": "Marque a resposta correta",
+      "true": "Verdadeiro",
+      "false": "Falso",
+      "correct": "Correta",
+      "incorrect": "Incorreta",
+      "questionTypes": {
+        "multiple_choice": "Múltipla escolha",
+        "true_false": "Verdadeiro ou falso",
+        "open": "Resposta aberta"
+      }
+    },
+    "student": {
+      "textPlaceholder": "Escreva sua resposta",
+      "urlPlaceholder": "https://",
+      "upload": "Enviar arquivo",
+      "uploadError": "Não foi possível enviar o arquivo, tente novamente",
+      "noAnswer": "Sem resposta"
+    }
   }
 }

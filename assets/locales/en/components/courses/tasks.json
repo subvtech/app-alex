@@ -72,5 +72,45 @@
     "group": "Group",
     "criteria_group": "Criteria group",
     "final_grade": "Final grade:"
+  },
+  "submission_items": {
+    "label": "Submission items",
+    "hint": "Define what the student must submit. Without items, the submission uses the free editor.",
+    "empty": "No items defined",
+    "add": "Add item",
+    "remove": "Remove",
+    "saveError": "Could not save the submission items, please try again",
+    "titleLabel": "Prompt",
+    "types": {
+      "text": "Text",
+      "image": "Image",
+      "video": "Video",
+      "file": "Attachment",
+      "url": "URL",
+      "quiz": "Quiz"
+    },
+    "quiz": {
+      "addQuestion": "Add question",
+      "statement": "Question",
+      "option": "Option {n}",
+      "addOption": "Add option",
+      "correctHint": "Mark the correct answer",
+      "true": "True",
+      "false": "False",
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "questionTypes": {
+        "multiple_choice": "Multiple choice",
+        "true_false": "True or false",
+        "open": "Open answer"
+      }
+    },
+    "student": {
+      "textPlaceholder": "Write your answer",
+      "urlPlaceholder": "https://",
+      "upload": "Upload file",
+      "uploadError": "Could not upload the file, please try again",
+      "noAnswer": "No answer"
+    }
   }
 }
