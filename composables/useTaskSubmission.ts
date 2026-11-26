@@ -32,3 +32,38 @@ export function useTaskSubmission(
     },
   );
 }
+
+/**
+ * Fetches the latest content for a submission by its validated ID and marks it as submitted.
+ */
+export async function submitTaskSubmission(lastSubmission: TaskSubmissionSimple, submittedAt: string): Promise<void> {
+  const submissionId = parseValidStrapiId(lastSubmission?.id, 'submitTaskSubmission');
+  if (submissionId === null) {
+    if (
+      import.meta.dev &&
+      (lastSubmission?.id === undefined || lastSubmission?.id === null || lastSubmission?.id === 0)
+    ) {
+      console.warn('[submitTaskSubmission] Missing or invalid submission ID:', lastSubmission?.id);
+    }
+    throw new Error('missingSubmission');
+  }
+
+  const strapi = useStrapi();
+  const { findOne } = useStrapiUtils();
+
+  const lastSubRes = await findOne<TaskSubmissionSimple>('task-submissions', submissionId, {
+    fields: ['submission'],
+  });
+
+  // Valor atualizado da ultima submissão, caso tenha sido alterado
+  const lastSubVal = lastSubRes.data?.submission;
+  const resolvedSubmission =
+    (lastSubVal as { submission?: EditorSubmission } | undefined)?.submission ??
+    lastSubVal ??
+    lastSubmission.submission;
+
+  await strapi.update('task-submissions', submissionId, {
+    ...(resolvedSubmission != null && { submission: resolvedSubmission }),
+    submitted_at: submittedAt,
+  });
+}

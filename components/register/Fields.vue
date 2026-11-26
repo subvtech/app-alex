@@ -217,14 +217,14 @@ const cpfMask = reactive({
   eager: true,
 });
 
-const { findOne } = useStrapi();
+const { find } = useStrapi();
 
 const verifyField = async (field: string, inputValue: string) => {
-  const registeredFields = await findOne('users', {
+  const registeredFields = await find('users', {
     fields: [field],
     filters: { [field]: inputValue },
   });
-  // findOne retorna o tipo Promise<Strapi4ResponseSingle<F> que tem como atributos data e meta, entretanto no retorno dessa função está vindo um array de objetos apenas. Por isso que temos que tipar dessa forma para que não haja erros
+  // find retorna o tipo Promise<Strapi4ResponseMany<F>> que tem como atributos data e meta, entretanto no endpoint de users está vindo um array de objetos apenas. Por isso que temos que tipar dessa forma para que não haja erros
   if ((registeredFields as unknown as []).length) {
     return {
       status: false,

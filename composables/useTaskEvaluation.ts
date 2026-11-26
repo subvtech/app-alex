@@ -43,7 +43,12 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
       return useQuery({
         queryKey: taskEvaluationDataQuery,
         queryFn: async () => {
-          const composition = await findOne('tasks', taskId.value, {
+          const validTaskId = parseValidStrapiId(taskId?.value, 'useTaskEvaluation.getTaskEvaluatonData');
+          if (validTaskId === null) {
+            return [];
+          }
+
+          const composition = await findOne('tasks', validTaskId, {
             populate: {
               grade_composition_task: { populate: ['grade_composition.grade'] },
               evaluation_group: { populate: ['evaluation_criterias'] },
@@ -57,7 +62,7 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
 
           return composition.data || [];
         },
-        enabled: () => taskId.value > 0,
+        enabled: () => parseValidStrapiId(taskId?.value) !== null,
       });
     },
     getUserEvaluationGroupsByType(evaluationGroupType) {
@@ -133,10 +138,18 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
       return useQuery({
         queryKey: taskSubmissionEvaluationDataQuery,
         queryFn: async () => {
+          const validSubmissionId = parseValidStrapiId(
+            submissionId?.value,
+            'useTaskEvaluation.getTaskSubmissionEvaluation',
+          );
+          if (validSubmissionId === null) {
+            return null;
+          }
+
           const composition = await find('task-submission-evaluations', {
             filters: {
               task_submission: {
-                id: submissionId?.value,
+                id: validSubmissionId,
               },
             },
             populate: [
@@ -147,7 +160,7 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
 
           return composition.data[0] || null;
         },
-        enabled: () => submissionId?.value > 0,
+        enabled: () => parseValidStrapiId(submissionId?.value) !== null,
       });
     },
 
@@ -159,7 +172,15 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
       return useQuery({
         queryKey: submissionEvaluationGroupQuery,
         queryFn: async () => {
-          const submission = await findOne('task-submissions', submissionId?.value, {
+          const validSubmissionId = parseValidStrapiId(
+            submissionId?.value,
+            'useTaskEvaluation.getSubmissionEvaluationGroup',
+          );
+          if (validSubmissionId === null) {
+            return null;
+          }
+
+          const submission = await findOne('task-submissions', validSubmissionId, {
             populate: {
               evaluation_group: { populate: ['evaluation_criterias'] },
               task_evaluation_criterias: { populate: ['criteria'] },
@@ -168,7 +189,7 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
 
           return submission.data || null;
         },
-        enabled: () => submissionId?.value > 0 && (enabled ? enabled.value : true),
+        enabled: () => parseValidStrapiId(submissionId?.value) !== null && (enabled ? enabled.value : true),
       });
     },
     /**
@@ -178,13 +199,21 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
     submissionEvaluationGroupMutation(successConfirmation: null | Ref<boolean> = null) {
       return useMutation({
         mutationFn: async ({ groupId, evaluationCriterias }: any) => {
-          await update('task-submissions', submissionId?.value, {
+          const validSubmissionId = parseValidStrapiId(
+            submissionId?.value,
+            'useTaskEvaluation.submissionEvaluationGroupMutation',
+          );
+          if (validSubmissionId === null) {
+            throw new Error('Invalid submission ID');
+          }
+
+          await update('task-submissions', validSubmissionId, {
             evaluation_group: groupId,
             evaluation_criterias: evaluationCriterias,
           });
 
           return create('task-submission-evaluations', {
-            task_submission: submissionId?.value,
+            task_submission: validSubmissionId,
             evaluation_group: groupId,
           });
         },
@@ -282,8 +311,16 @@ export const useTaskEvaluation = (learningPlanId, taskId, user, submissionId: nu
     createSubmissionEvaluationMutation() {
       return useMutation({
         mutationFn: (data: any) => {
+          const validSubmissionId = parseValidStrapiId(
+            submissionId?.value,
+            'useTaskEvaluation.createSubmissionEvaluationMutation',
+          );
+          if (validSubmissionId === null) {
+            throw new Error('Invalid submission ID');
+          }
+
           return create('task-submission-evaluations', {
-            task_submission: submissionId?.value,
+            task_submission: validSubmissionId,
             evaluation_group: data.groupId,
           });
         },

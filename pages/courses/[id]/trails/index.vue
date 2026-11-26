@@ -319,10 +319,12 @@ const handleCreatedTrail = async (id) => {
   const newTrail = await findOne('trails', id, {
     populate: ['cover_image', 'structures.blocks'],
   });
-  const trail: TrailSimple = newTrail.data as TrailSimple;
-  learningPlanStore.standardTrails.unshift({
-    ...trail,
-  });
+  if (newTrail?.data) {
+    const trail: TrailSimple = newTrail.data as TrailSimple;
+    learningPlanStore.standardTrails.unshift({
+      ...trail,
+    });
+  }
   createTrailDialog.value = false;
 };
 const headerStore = usePageHeaderStore();

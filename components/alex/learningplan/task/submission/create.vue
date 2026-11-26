@@ -328,14 +328,23 @@ const fullscreen = ref(false);
 const prevEditorContent = ref('');
 const editorContent = ref<any | undefined>(undefined);
 const isLoading = ref(false);
-const { create, update, findOne } = useStrapi();
+const { create, update } = useStrapi();
+const { findOne } = useStrapiUtils();
 const currentData = ref<EditorSubmission>();
 const taskMemberId = toRef(props, 'taskMemberId');
 const hasEditorChanges = ref(false);
 const lastSaveDate = ref<Date | null>(null);
 const saveCountDown = ref<number>(saveTime);
-const submissionId = ref<number>(props.lastSubmission?.id || 0);
+const submissionId = ref<number>(parseValidStrapiId(props.lastSubmission?.id, 'task/submission/create.init') ?? 0);
+const isSubmitted = ref(false);
 const tab = ref(null);
+
+watch(
+  () => props.lastSubmission?.id,
+  (newId) => {
+    submissionId.value = parseValidStrapiId(newId, 'task/submission/create.lastSubmission') ?? 0;
+  },
+);
 
 const user = useStrapiUser();
 const taskId = toRef(props, 'taskId');
@@ -377,7 +386,7 @@ const onAssociateSubmissionEvaluationGroup = async ({ groupId, evaluationCriteri
 };
 
 const isReadOnly = computed(() => {
-  return props.readOnly || taskSubmissionEvaluationData.value?.evaluated_at;
+  return props.readOnly || isSubmitted.value || taskSubmissionEvaluationData.value?.evaluated_at;
 });
 
 const rubricGradeLevels = computed(() => {
@@ -544,23 +553,24 @@ const saveSubmissionLoop = async () => {
 };
 
 const checkDataChanges = async () => {
-  const taskSubmission = await findOne('task-submissions', {
-    filters: {
-      id: submissionId.value || 0,
-    },
-  });
-  const submissionStatus = taskSubmission.data[0]?.attributes?.submitted_at;
+  const validSubmissionId = parseValidStrapiId(submissionId.value, 'task/submission/create.checkDataChanges');
+  if (validSubmissionId === null) {
+    return editorContent.value !== undefined;
+  }
+
+  const taskSubmission = await findOne<TaskSubmissionSimple>('task-submissions', validSubmissionId);
+  const submissionStatus = taskSubmission.data?.submitted_at;
 
   if (submissionStatus) {
     setMessage(t('components.courses.tasks.submission_modal.in_review'), 'blue', true, false, true);
-    isReadOnly.value = true;
+    isSubmitted.value = true;
     clearInterval(saveInterval);
     emit('update-task-status', 'in_review');
     saveSubmission();
     return false;
   }
 
-  const lastSubmission = taskSubmission.data && taskSubmission.data[0]?.attributes?.submission;
+  const lastSubmission = taskSubmission.data?.submission as any;
 
   if (!lastSubmission) {
     return editorContent.value !== undefined;
@@ -571,11 +581,11 @@ const checkDataChanges = async () => {
   }
 
   // Compare nested arrays
-  if (lastSubmission.content.length !== editorContent.value?.content.length) {
+  if (lastSubmission.content?.length !== editorContent.value?.content?.length) {
     return true;
   }
 
-  for (let i = 0; i < lastSubmission.content.length; i++) {
+  for (let i = 0; i < (lastSubmission.content?.length || 0); i++) {
     if (!lodash.isEqual(lastSubmission.content[i].content, toRaw(editorContent.value?.content[i].content))) {
       return true;
     }
@@ -587,6 +597,10 @@ const checkDataChanges = async () => {
 const openDialog = async () => {
   dialog.value = true;
   isLoading.value = true;
+  isSubmitted.value = false;
+  if (props.lastSubmission?.id) {
+    submissionId.value = parseValidStrapiId(props.lastSubmission.id, 'task/submission/create.openDialog') ?? 0;
+  }
   currentData.value = props.lastSubmission?.submission || undefined;
 
   await executeSubmissions();
@@ -603,8 +617,9 @@ const openDialog = async () => {
   isLoading.value = false;
 };
 const saveContent = async () => {
-  if (submissionId.value) {
-    await update('task-submissions', submissionId.value, {
+  const validSubmissionId = parseValidStrapiId(submissionId.value, 'task/submission/create.saveContent');
+  if (validSubmissionId !== null) {
+    await update('task-submissions', validSubmissionId, {
       submission: editorContent.value,
     });
     emit('update-submission');
@@ -613,7 +628,7 @@ const saveContent = async () => {
       task_member: props.taskMemberId,
       submission: editorContent.value,
     });
-    submissionId.value = submission.data.id;
+    submissionId.value = parseValidStrapiId(submission.data?.id, 'task/submission/create.saveContent') ?? 0;
     emit('update-submission');
   }
   if (props.taskStatus === 'to_do') {

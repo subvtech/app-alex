@@ -143,11 +143,14 @@ const navigate = (trailId: number, page?: string) => {
 const handleTrailCreate = async (trailId: number, newStructure) => {
   const populate = ['cover_image', 'structures.blocks'];
   const trail = await findOne('trails', trailId, { populate });
-  learningPlanStore.standardTrails.unshift(trail.data as TrailSimple);
   showAddTrailDialog.value = false;
 
-  if (myTrails.value) {
-    myTrails.value = [...myTrails.value, formatTrail(trail.data as TrailSimple)];
+  if (trail?.data) {
+    learningPlanStore.standardTrails.unshift(trail.data as TrailSimple);
+
+    if (myTrails.value) {
+      myTrails.value = [...myTrails.value, formatTrail(trail.data as TrailSimple)];
+    }
   }
 
   if (newStructure && learningPlanStore.learningPlan) {

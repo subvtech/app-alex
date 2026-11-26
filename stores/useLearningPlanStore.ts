@@ -103,7 +103,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
           return;
         }
 
-        learningPlan.value = result.data;
+        learningPlan.value = result?.data ?? undefined;
         return result;
       } catch (e: any) {
         if (requestId !== latestRequestId.value) {

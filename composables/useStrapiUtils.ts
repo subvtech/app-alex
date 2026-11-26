@@ -1,6 +1,53 @@
 import type { Strapi4RequestParams } from '@nuxtjs/strapi/dist/runtime/types';
 
+function isPlainEmptyId(value: unknown): boolean {
+  return value === undefined || value === null || value === '' || value === 0;
+}
+
+/**
+ * Validates and normalizes a Strapi entity ID (positive integer or numeric string).
+ * Logs a development warning when an object or malformed ID is received.
+ */
+export function parseValidStrapiId(value: unknown, context = 'findOne'): number | null {
+  if (typeof value === 'object' && value !== null) {
+    if (import.meta.dev) {
+      console.warn(
+        `[${context}] Expected a scalar ID (number or numeric string), but received an object. Request aborted to prevent "[object Object]".`,
+        value,
+      );
+    }
+    return null;
+  }
+
+  if (isPlainEmptyId(value)) {
+    return null;
+  }
+
+  if (typeof value === 'number') {
+    if (Number.isInteger(value) && value > 0) {
+      return value;
+    }
+  } else if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (/^\d+$/.test(trimmed)) {
+      const parsed = Number(trimmed);
+      if (Number.isSafeInteger(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+  }
+
+  if (import.meta.dev) {
+    console.warn(`[${context}] Invalid ID provided:`, value);
+  }
+  return null;
+}
+
 export function formatResult<T>(result: any): T {
+  if (!result) {
+    return result;
+  }
+
   const resultFormatted = { id: result.id, ...result.attributes };
 
   Object.keys(resultFormatted).forEach((attribute) => {
@@ -32,12 +79,22 @@ export const useStrapiUtils = () => {
 
   async function findOne<T>(
     contentType: string,
-    id: number,
+    id: number | string,
     params?: Strapi4RequestParams,
   ): Promise<{ meta: any; data: T }> {
-    const result = await strapi.findOne<T>(contentType, id, params);
+    const validId = parseValidStrapiId(id, `useStrapiUtils.findOne("${contentType}")`);
+    if (validId === null) {
+      if (import.meta.dev && isPlainEmptyId(id)) {
+        console.warn(
+          `[useStrapiUtils.findOne("${contentType}")] Missing or empty ID (${String(id)}). Request aborted.`,
+        );
+      }
+      return { meta: null, data: null as unknown as T };
+    }
 
-    return { ...result, data: formatResult<T>(result.data) };
+    const result = await strapi.findOne<T>(contentType, validId, params);
+
+    return { ...result, data: formatResult<T>(result?.data) };
   }
 
   async function find<T>(contentType: string, params?: Strapi4RequestParams): Promise<{ meta: any; data: T[] }> {
