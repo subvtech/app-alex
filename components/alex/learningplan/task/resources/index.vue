@@ -159,26 +159,29 @@ const handleCreatedTrail = async (id, newStructure) => {
     populate: ['cover_image', 'structures.blocks'],
   });
 
-  const trail: TrailSimple = newTrail.data as TrailSimple;
-  learningPlanStore.standardTrails.unshift({
-    ...trail,
-  });
+  if (newTrail?.data) {
+    const trail: TrailSimple = newTrail.data as TrailSimple;
+    learningPlanStore.standardTrails.unshift({
+      ...trail,
+    });
 
-  // Adiciona a nova trilha à lista de learningStructures para ser listada em trails
-  if (learningStructure.value && learningPlanStore.learningPlan) {
-    learningPlanStore.learningPlan.learning_structures =
-      learningPlanStore.learningPlan?.learning_structures?.map((structure) => {
-        if (structure.id === learningStructure.value) {
-          structure.trails = [...structure.trails, { ...trail }];
-        }
+    // Adiciona a nova trilha à lista de learningStructures para ser listada em trails
+    if (learningStructure.value && learningPlanStore.learningPlan) {
+      learningPlanStore.learningPlan.learning_structures =
+        learningPlanStore.learningPlan?.learning_structures?.map((structure) => {
+          if (structure.id === learningStructure.value) {
+            structure.trails = [...structure.trails, { ...trail }];
+          }
 
-        return structure;
-      }) ?? [];
+          return structure;
+        }) ?? [];
 
-    structures.value = learningPlanStore.learningPlan.learning_structures;
+      structures.value = learningPlanStore.learningPlan.learning_structures;
+    }
+
+    selectedTrail.value = trail;
   }
 
-  selectedTrail.value = trail;
   editMode.value = false;
   createTrailDialog.value = false;
 
@@ -240,7 +243,9 @@ const loadTrail = async (trailId: number) => {
         },
       },
     });
-    selectedTrail.value = response.data;
+    if (response?.data) {
+      selectedTrail.value = response.data;
+    }
   } catch (error) {
     console.error('[TaskResources] trail loading failed', { trailId, error });
     setMessage(t('components.learningPlan.drawer.task.learningResources.updateError'), 'red', true);

@@ -47,7 +47,12 @@ const fetchMembers = async () => {
       populate: ['members.user.avatar', 'members.task_members.task.learning_goals'],
     });
 
-    const teste = res.data.members.map((member) => {
+    if (!res?.data) {
+      hasError.value = true;
+      return;
+    }
+
+    const teste = (res.data.members || []).map((member) => {
       let goals = 0;
       let completedGoals = 0;
 

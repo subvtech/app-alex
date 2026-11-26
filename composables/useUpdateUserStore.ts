@@ -24,9 +24,12 @@ export const useUpdateUserStore = () => {
 
 
     if (canEdit) {
-      user = await findOne<User>('users', id, {
-        populate: populate,
-      });
+      const validUserId = parseValidStrapiId(id, 'useUpdateUserStore');
+      if (validUserId !== null) {
+        user = await findOne<User>('users', validUserId, {
+          populate: populate,
+        });
+      }
     } else {
       user = (
         await find<User>('users', {

@@ -121,7 +121,10 @@ const user = useStrapiUser();
 const taskId = toRef(props, 'taskId');
 const learningPlanId = toRef(props, 'learningPlanId');
 const submission = toRef(props, 'content');
-const submissionId = computed(() => submission.value?.id);
+const submissionId = computed(() => {
+  const rawId = submission.value?.id ?? (submission.value as unknown as { data?: { id?: unknown } })?.data?.id;
+  return parseValidStrapiId(rawId, 'task/submission/index.submissionId') ?? undefined;
+});
 
 const openConfirmDialog = ref(false);
 const openSubmissionEvaluationDialog = ref(false);

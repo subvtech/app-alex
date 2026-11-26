@@ -92,6 +92,7 @@ export default defineNuxtConfig({
   },
   strapi: {
     url: STRAPI_URL,
+    version: 'v4',
     auth: { populate: ['role', 'learningplans', 'favorites'] },
   },
   routeRules: {

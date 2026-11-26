@@ -47,7 +47,7 @@ export const useTrailStore = defineStore('trail', () => {
   async function loadTrailData(id: number, showMessageIfNotFound = true) {
     try {
       loading.value = true;
-      const result = (await findOne('trails', id, { populate })).data;
+      const result = (await findOne('trails', id, { populate }))?.data ?? undefined;
       trail.value = result as TrailSimple;
       loading.value = false;
       return result;

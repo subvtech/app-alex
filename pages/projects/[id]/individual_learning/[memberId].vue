@@ -25,7 +25,13 @@ const fetchUser = async () => {
   loading.value = true;
 
   try {
-    const res = await findOne<User>(`users/${route.params.memberId}`, {
+    const memberIdParam = Array.isArray(route.params.memberId) ? route.params.memberId[0] : route.params.memberId;
+    const memberId = parseValidStrapiId(memberIdParam, 'individual_learning/[memberId].fetchUser');
+    if (memberId === null) {
+      return;
+    }
+
+    const res = await findOne<User>('users', memberId, {
       populate: ['avatar'],
     });
 
